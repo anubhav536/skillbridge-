@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Post Job | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>🏢 Recruiter Panel</h2>
+
+  <nav>
+    <a href="rec-dashboard.html">Dashboard</a><br>
+    <a href="rec-post-job.html">Post Job</a><br>
+    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
+    <a href="rec-applicants.html">Applicants</a><br>
+    <a href="rec-analytics.html">Analytics</a><br>
+    <a href="rec-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📢 Post a New Job</h2>
+
+  <!-- FORM -->
+  <form onsubmit="handlePostJob(event)">
+
+    <label>Job Title:</label><br>
+    <input type="text" id="title"><br><br>
+
+    <label>Skills Required (comma separated):</label><br>
+    <input type="text" id="skills" placeholder="HTML, CSS, JS"><br><br>
+
+    <label>Salary:</label><br>
+    <input type="number" id="salary"><br><br>
+
+    <label>Location:</label><br>
+    <input type="text" id="location"><br><br>
+
+    <button type="submit">Post Job 🚀</button>
+
+  </form>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- POST JOB LOGIC -->
+<script>
+async function handlePostJob(e){
+  e.preventDefault();
+
+  const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  let title = document.getElementById("title").value;
+  let skills = document.getElementById("skills").value;
+  let salary = document.getElementById("salary").value;
+  let location = document.getElementById("location").value;
+
+  if(!title || !skills){
+    alert("Fill required fields ❌");
+    return;
+  }
+
+  await addDoc(collection(db, "jobs"), {
+    title: title,
+    skills: skills.split(",").map(s => s.trim()),
+    salary: salary,
+    location: location,
+    recruiter: user.email,
+    createdAt: new Date()
+  });
+
+  alert("Job Posted Successfully 🚀");
+
+  // RESET FORM
+  document.getElementById("title").value = "";
+  document.getElementById("skills").value = "";
+  document.getElementById("salary").value = "";
+  document.getElementById("location").value = "";
+
+}
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

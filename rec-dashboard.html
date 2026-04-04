@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recruiter Dashboard | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>🏢 Recruiter Panel</h2>
+
+  <nav>
+    <a href="rec-dashboard.html">Dashboard</a><br>
+    <a href="rec-post-job.html">Post Job</a><br>
+    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
+    <a href="rec-applicants.html">Applicants</a><br>
+    <a href="rec-analytics.html">Analytics</a><br>
+    <a href="rec-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📊 Dashboard</h2>
+
+  <!-- WELCOME -->
+  <p id="welcome">Welcome...</p>
+
+  <hr>
+
+  <!-- STATS -->
+  <div>
+
+    <div>
+      <h3>💼 Jobs Posted</h3>
+      <p id="totalJobs">Loading...</p>
+    </div>
+
+    <div>
+      <h3>👥 Total Applicants</h3>
+      <p id="totalApps">Loading...</p>
+    </div>
+
+    <div>
+      <h3>📈 Hiring Rate</h3>
+      <p id="hiringRate">Loading...</p>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- QUICK ACTIONS -->
+  <div>
+
+    <h3>⚡ Quick Actions</h3>
+
+    <a href="rec-post-job.html"><button>Post New Job 📢</button></a>
+    <a href="rec-manage-jobs.html"><button>Manage Jobs 🛠️</button></a>
+    <a href="rec-applicants.html"><button>View Applicants 👥</button></a>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- DASHBOARD LOGIC -->
+<script>
+async function loadRecruiterDashboard(){
+
+  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  // WELCOME
+  document.getElementById("welcome").innerText = "Welcome " + user.name;
+
+  // JOBS
+  let jobsSnap = await getDocs(collection(db, "jobs"));
+  let jobs = [];
+
+  jobsSnap.forEach(doc=>{
+    let j = doc.data();
+    if(j.recruiter === user.email) jobs.push(j);
+  });
+
+  document.getElementById("totalJobs").innerText = jobs.length;
+
+  // APPLICATIONS
+  let appsSnap = await getDocs(collection(db, "applications"));
+  let apps = [];
+
+  appsSnap.forEach(doc=>{
+    apps.push(doc.data());
+  });
+
+  document.getElementById("totalApps").innerText = apps.length;
+
+  // HIRING RATE
+  let hired = apps.filter(a => a.status === "Hired").length;
+  let rate = apps.length ? Math.round((hired / apps.length) * 100) : 0;
+
+  document.getElementById("hiringRate").innerText = rate + "%";
+
+}
+
+// AUTO LOAD
+window.onload = () => {
+  loadRecruiterDashboard();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

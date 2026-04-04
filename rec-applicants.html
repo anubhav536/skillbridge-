@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Applicants | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>🏢 Recruiter Panel</h2>
+
+  <nav>
+    <a href="rec-dashboard.html">Dashboard</a><br>
+    <a href="rec-post-job.html">Post Job</a><br>
+    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
+    <a href="rec-applicants.html">Applicants</a><br>
+    <a href="rec-analytics.html">Analytics</a><br>
+    <a href="rec-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>👥 Applicants</h2>
+
+  <!-- SEARCH -->
+  <input type="text" id="searchApplicant" placeholder="Search applicants...">
+
+  <br><br>
+
+  <!-- APPLICANT LIST -->
+  <div id="applicantsList">
+    <!-- Firebase data -->
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- APPLICANTS LOGIC -->
+<script>
+async function loadApplicants(){
+
+  const { getDocs, collection, updateDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let container = document.getElementById("applicantsList");
+  container.innerHTML = "Loading...";
+
+  let snapshot = await getDocs(collection(db, "applications"));
+
+  let html = "";
+
+  snapshot.forEach(d => {
+    let a = d.data();
+
+    html += `
+      <div>
+        <b>👤 ${a.user}</b><br>
+        Job ID: ${a.jobId}<br>
+        Skills: ${a.skills || "N/A"}<br>
+        Experience: ${a.experience || "0"} years<br>
+        Status: ${a.status}<br>
+
+        <button onclick="updateStatus('${d.id}','Shortlisted')">Shortlist ✅</button>
+        <button onclick="updateStatus('${d.id}','Rejected')">Reject ❌</button>
+        <button onclick="updateStatus('${d.id}','Hired')">Hire 🎉</button>
+
+        <hr>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || "No applicants found";
+
+  // UPDATE STATUS
+  window.updateStatus = async function(id, status){
+    await updateDoc(doc(db, "applications", id), {
+      status: status
+    });
+
+    alert("Status Updated 🚀");
+    loadApplicants();
+  };
+}
+
+// SEARCH FILTER
+document.getElementById("searchApplicant").addEventListener("keyup", function(){
+  let q = this.value.toLowerCase();
+  let apps = document.querySelectorAll("#applicantsList div");
+
+  apps.forEach(a=>{
+    a.style.display = a.innerText.toLowerCase().includes(q) ? "block" : "none";
+  });
+});
+
+// AUTO LOAD
+window.onload = () => {
+  loadApplicants();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

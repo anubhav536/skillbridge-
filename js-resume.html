@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Resume Builder | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a><br>
+    <a href="js-jobs.html">Jobs</a><br>
+    <a href="js-applications.html">Applications</a><br>
+    <a href="js-resume.html">Resume Builder</a><br>
+    <a href="js-analytics.html">Analytics</a><br>
+    <a href="js-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📄 Resume Builder</h2>
+
+  <!-- FORM -->
+  <form onsubmit="generateResume(event)">
+
+    <label>Full Name:</label><br>
+    <input type="text" id="rname"><br><br>
+
+    <label>Skills:</label><br>
+    <input type="text" id="rskills" placeholder="HTML, CSS, JS"><br><br>
+
+    <label>Education:</label><br>
+    <input type="text" id="reducation"><br><br>
+
+    <label>Projects:</label><br>
+    <textarea id="rprojects" rows="4"></textarea><br><br>
+
+    <button type="submit">Generate Resume 🚀</button>
+
+  </form>
+
+  <hr>
+
+  <!-- PREVIEW -->
+  <div>
+
+    <h3>📄 Resume Preview</h3>
+
+    <pre id="resumePreview">
+Your resume will appear here...
+    </pre>
+
+    <br>
+
+    <button onclick="printResume()">Print / Download 🖨️</button>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- RESUME LOGIC -->
+<script>
+function generateResume(e){
+  e.preventDefault();
+
+  let name = document.getElementById("rname").value;
+  let skills = document.getElementById("rskills").value;
+  let edu = document.getElementById("reducation").value;
+  let proj = document.getElementById("rprojects").value;
+
+  let output = `
+========================
+        RESUME
+========================
+
+Name: ${name}
+
+Skills:
+${skills}
+
+Education:
+${edu}
+
+Projects:
+${proj}
+
+========================
+`;
+
+  document.getElementById("resumePreview").innerText = output;
+}
+
+// PRINT FUNCTION
+function printResume(){
+  let content = document.getElementById("resumePreview").innerText;
+
+  let win = window.open("", "", "width=800,height=600");
+  win.document.write("<pre>" + content + "</pre>");
+  win.print();
+}
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

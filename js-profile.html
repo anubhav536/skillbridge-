@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Profile | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a><br>
+    <a href="js-jobs.html">Jobs</a><br>
+    <a href="js-applications.html">Applications</a><br>
+    <a href="js-resume.html">Resume Builder</a><br>
+    <a href="js-analytics.html">Analytics</a><br>
+    <a href="js-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>👤 My Profile</h2>
+
+  <!-- PROFILE VIEW -->
+  <div>
+    <p><b>Name:</b> <span id="pname">Loading...</span></p>
+    <p><b>Email:</b> <span id="pemail">Loading...</span></p>
+    <p><b>Skills:</b> <span id="pskills">Not added</span></p>
+    <p><b>Experience:</b> <span id="pexp">Not added</span></p>
+  </div>
+
+  <hr>
+
+  <!-- EDIT PROFILE -->
+  <div>
+
+    <h3>Edit Profile</h3>
+
+    <form onsubmit="updateProfile(event)">
+
+      <label>Skills:</label><br>
+      <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS"><br><br>
+
+      <label>Experience (years):</label><br>
+      <input type="number" id="experience" placeholder="0"><br><br>
+
+      <button type="submit">Update Profile 💾</button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- PROFILE LOGIC -->
+<script>
+async function loadProfile(){
+
+  const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  document.getElementById("pname").innerText = user.name;
+  document.getElementById("pemail").innerText = user.email;
+
+  // fetch extra data
+  let snap = await getDoc(doc(db, "profiles", user.email));
+
+  if(snap.exists()){
+    let data = snap.data();
+    document.getElementById("pskills").innerText = data.skills || "Not added";
+    document.getElementById("pexp").innerText = data.experience || "Not added";
+  }
+}
+
+// UPDATE PROFILE
+async function updateProfile(e){
+  e.preventDefault();
+
+  const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  let skills = document.getElementById("skills").value;
+  let exp = document.getElementById("experience").value;
+
+  await setDoc(doc(db, "profiles", user.email), {
+    skills,
+    experience: exp
+  });
+
+  alert("Profile Updated ✅");
+
+  loadProfile();
+}
+
+// AUTO LOAD
+window.onload = () => {
+  loadProfile();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Apply Job | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a><br>
+    <a href="js-jobs.html">Jobs</a><br>
+    <a href="js-applications.html">Applications</a><br>
+    <a href="js-resume.html">Resume Builder</a><br>
+    <a href="js-analytics.html">Analytics</a><br>
+    <a href="js-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📥 Apply for Job</h2>
+
+  <!-- JOB INFO -->
+  <div>
+    <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
+  </div>
+
+  <hr>
+
+  <!-- FORM -->
+  <form onsubmit="handleApply(event)">
+
+    <label>Your Skills:</label><br>
+    <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS"><br><br>
+
+    <label>Experience (years):</label><br>
+    <input type="number" id="experience" placeholder="0"><br><br>
+
+    <label>Resume (text):</label><br>
+    <textarea id="resumeText" rows="5" placeholder="Write your resume..."></textarea><br><br>
+
+    <button type="submit">Submit Application 🚀</button>
+
+  </form>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- APPLY LOGIC -->
+<script>
+let currentJobId = "";
+
+// GET JOB ID FROM URL
+function getJobId(){
+  let params = new URLSearchParams(window.location.search);
+  currentJobId = params.get("id");
+  document.getElementById("jobId").innerText = currentJobId || "N/A";
+}
+
+// APPLY HANDLER
+async function handleApply(e){
+  e.preventDefault();
+
+  const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  let skills = document.getElementById("skills").value;
+  let exp = document.getElementById("experience").value;
+  let resume = document.getElementById("resumeText").value;
+
+  if(!skills || !resume){
+    alert("Fill required fields ❌");
+    return;
+  }
+
+  await addDoc(collection(db, "applications"), {
+    user: user.email,
+    jobId: currentJobId,
+    skills,
+    experience: exp,
+    resume,
+    status: "Applied",
+    time: new Date()
+  });
+
+  alert("Application Submitted ✅");
+
+  window.location.href = "js-applications.html";
+}
+
+// AUTO LOAD
+window.onload = () => {
+  getJobId();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Jobs | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a><br>
+    <a href="js-jobs.html">Jobs</a><br>
+    <a href="js-applications.html">Applications</a><br>
+    <a href="js-resume.html">Resume Builder</a><br>
+    <a href="js-analytics.html">Analytics</a><br>
+    <a href="js-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>💼 Available Jobs</h2>
+
+  <!-- SEARCH -->
+  <input type="text" id="searchJob" placeholder="Search jobs...">
+
+  <br><br>
+
+  <!-- JOB LIST -->
+  <div id="jobList">
+    <!-- Jobs will load from Firebase -->
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- JOBS LOGIC -->
+<script>
+async function loadJobsPage(){
+
+  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let container = document.getElementById("jobList");
+  container.innerHTML = "Loading...";
+
+  let snapshot = await getDocs(collection(db, "jobs"));
+
+  let html = "";
+
+  snapshot.forEach(doc=>{
+    let j = doc.data();
+
+    html += `
+      <div>
+        <b>${j.title}</b><br>
+        Skills: ${j.skills?.join(", ") || ""}<br>
+        Salary: ${j.salary || "N/A"}<br>
+        
+        <a href="js-apply.html?id=${doc.id}">
+          <button>Apply 🚀</button>
+        </a>
+
+        <hr>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || "No jobs available";
+}
+
+// SEARCH FILTER
+document.getElementById("searchJob").addEventListener("keyup", function(){
+  let q = this.value.toLowerCase();
+  let jobs = document.querySelectorAll("#jobList div");
+
+  jobs.forEach(j=>{
+    j.style.display = j.innerText.toLowerCase().includes(q) ? "block" : "none";
+  });
+});
+
+// AUTO LOAD
+window.onload = () => {
+  loadJobsPage();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

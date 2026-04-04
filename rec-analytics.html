@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recruiter Analytics | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>🏢 Recruiter Panel</h2>
+
+  <nav>
+    <a href="rec-dashboard.html">Dashboard</a><br>
+    <a href="rec-post-job.html">Post Job</a><br>
+    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
+    <a href="rec-applicants.html">Applicants</a><br>
+    <a href="rec-analytics.html">Analytics</a><br>
+    <a href="rec-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📊 Hiring Analytics</h2>
+
+  <!-- STATS -->
+  <div>
+
+    <div>
+      <h3>📄 Total Applications</h3>
+      <p id="totalApps">Loading...</p>
+    </div>
+
+    <div>
+      <h3>✅ Shortlisted Candidates</h3>
+      <p id="shortlisted">Loading...</p>
+    </div>
+
+    <div>
+      <h3>📈 Hiring Rate</h3>
+      <p id="hiringRate">Loading...</p>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- SKILL INSIGHTS -->
+  <div>
+
+    <h3>🔥 Top Skills in Applicants</h3>
+
+    <ul id="topSkills">
+      <!-- dynamic -->
+    </ul>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- ANALYTICS LOGIC -->
+<script>
+async function loadRecruiterAnalytics(){
+
+  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let appsSnap = await getDocs(collection(db, "applications"));
+
+  let apps = [];
+
+  appsSnap.forEach(doc=>{
+    apps.push(doc.data());
+  });
+
+  // TOTAL
+  document.getElementById("totalApps").innerText = apps.length;
+
+  // SHORTLISTED
+  let shortlisted = apps.filter(a => a.status === "Shortlisted").length;
+  document.getElementById("shortlisted").innerText = shortlisted;
+
+  // HIRING RATE
+  let hired = apps.filter(a => a.status === "Hired").length;
+  let rate = apps.length ? Math.round((hired / apps.length) * 100) : 0;
+  document.getElementById("hiringRate").innerText = rate + "%";
+
+  // SKILL ANALYSIS
+  let skillMap = {};
+
+  apps.forEach(a=>{
+    if(a.skills){
+      a.skills.split(",").forEach(s=>{
+        s = s.trim();
+        skillMap[s] = (skillMap[s] || 0) + 1;
+      });
+    }
+  });
+
+  let sorted = Object.keys(skillMap).sort((a,b)=>skillMap[b]-skillMap[a]);
+
+  let list = document.getElementById("topSkills");
+  list.innerHTML = "";
+
+  sorted.slice(0,5).forEach(s=>{
+    list.innerHTML += `<li>${s}</li>`;
+  });
+
+}
+
+// AUTO LOAD
+window.onload = () => {
+  loadRecruiterAnalytics();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify Account | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <h2>SkillBridge AI</h2>
+
+  <div>
+    <a href="index.html">Home</a>
+  </div>
+</nav>
+
+<hr>
+
+<!-- VERIFY SECTION -->
+<section>
+
+  <h2>🔐 Verify Your Account</h2>
+
+  <p>Enter the verification code sent to your email</p>
+
+  <!-- FORM -->
+  <div>
+
+    <label>Verification Code:</label><br>
+    <input type="text" id="otp" placeholder="Enter OTP"><br><br>
+
+    <button onclick="verifyOTP()">Verify ✅</button>
+
+    <p id="error"></p>
+
+  </div>
+
+  <br>
+
+  <p>
+    Didn’t receive code?
+    <button onclick="resendOTP()">Resend</button>
+  </p>
+
+</section>
+
+<hr>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 SkillBridge AI</p>
+</footer>
+
+<!-- JS -->
+<script src="script.js"></script>
+
+<!-- VERIFY LOGIC -->
+<script>
+function verifyOTP(){
+
+  let input = document.getElementById("otp").value;
+  let saved = localStorage.getItem("otp");
+
+  if(input === saved){
+    alert("Account Verified ✅");
+
+    // mark verified
+    localStorage.setItem("verified", "true");
+
+    // redirect to login
+    window.location.href = "jobseeker-login.html";
+  } else {
+    document.getElementById("error").innerText = "Invalid OTP ❌";
+  }
+}
+
+// RESEND OTP
+function resendOTP(){
+
+  let newOtp = Math.floor(100000 + Math.random() * 900000);
+
+  localStorage.setItem("otp", newOtp);
+
+  alert("New OTP: " + newOtp + " (simulation)");
+}
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

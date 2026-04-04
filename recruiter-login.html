@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recruiter Login | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <h2>SkillBridge AI</h2>
+
+  <div>
+    <a href="index.html">Home</a>
+    <a href="about.html">About</a>
+  </div>
+</nav>
+
+<hr>
+
+<!-- LOGIN SECTION -->
+<section>
+
+  <h2>🏢 Recruiter Login</h2>
+
+  <p>Login to manage jobs and hire candidates</p>
+
+  <!-- FORM -->
+  <div>
+
+    <label>Email:</label><br>
+    <input type="email" id="email" placeholder="Enter Email"><br><br>
+
+    <label>Password:</label><br>
+    <input type="password" id="password" placeholder="Enter Password"><br><br>
+
+    <button onclick="loginUser('recruiter')">Login 🚀</button>
+
+    <p id="error"></p>
+
+  </div>
+
+  <br>
+
+  <p>
+    Don’t have an account?
+    <a href="recruiter-signup.html">Signup</a>
+  </p>
+
+</section>
+
+<hr>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 SkillBridge AI</p>
+</footer>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

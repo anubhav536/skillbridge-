@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Users | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👑 Admin Panel</h2>
+
+  <nav>
+    <a href="admin-dashboard.html">Dashboard</a><br>
+    <a href="admin-users.html">Users</a><br>
+    <a href="admin-jobs.html">Jobs</a><br>
+    <a href="admin-applications.html">Applications</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>👥 All Users</h2>
+
+  <!-- SEARCH -->
+  <input type="text" id="searchUser" placeholder="Search users...">
+
+  <br><br>
+
+  <!-- USER LIST -->
+  <div id="usersList">
+    <!-- Firebase users will load here -->
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- LOAD USERS -->
+<script>
+async function loadAllUsers(){
+
+  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let container = document.getElementById("usersList");
+  container.innerHTML = "Loading...";
+
+  let snapshot = await getDocs(collection(db, "users"));
+
+  let html = "";
+
+  snapshot.forEach(doc => {
+    let u = doc.data();
+
+    html += `
+      <div>
+        <b>${u.name}</b><br>
+        📧 ${u.email}<br>
+        🎭 Role: ${u.role}<br>
+        <hr>
+      </div>
+    `;
+  });
+
+  container.innerHTML = html || "No users found";
+}
+
+// SEARCH FILTER
+document.getElementById("searchUser").addEventListener("keyup", function(){
+  let q = this.value.toLowerCase();
+  let users = document.querySelectorAll("#usersList div");
+
+  users.forEach(u=>{
+    u.style.display = u.innerText.toLowerCase().includes(q) ? "block" : "none";
+  });
+});
+
+// AUTO LOAD
+window.onload = () => {
+  loadAllUsers();
+};
+</script>
+
+</body>
+</html>

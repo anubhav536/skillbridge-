@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recruiter Profile | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>🏢 Recruiter Panel</h2>
+
+  <nav>
+    <a href="rec-dashboard.html">Dashboard</a><br>
+    <a href="rec-post-job.html">Post Job</a><br>
+    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
+    <a href="rec-applicants.html">Applicants</a><br>
+    <a href="rec-analytics.html">Analytics</a><br>
+    <a href="rec-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>👤 Recruiter Profile</h2>
+
+  <!-- PROFILE VIEW -->
+  <div>
+    <p><b>Name:</b> <span id="rname">Loading...</span></p>
+    <p><b>Email:</b> <span id="remail">Loading...</span></p>
+    <p><b>Company:</b> <span id="rcompany">Not added</span></p>
+  </div>
+
+  <hr>
+
+  <!-- EDIT PROFILE -->
+  <div>
+
+    <h3>Edit Profile</h3>
+
+    <form onsubmit="updateRecProfile(event)">
+
+      <label>Company Name:</label><br>
+      <input type="text" id="company" placeholder="Enter company name"><br><br>
+
+      <button type="submit">Update Profile 💾</button>
+
+    </form>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- PROFILE LOGIC -->
+<script>
+async function loadRecProfile(){
+
+  const { getDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  document.getElementById("rname").innerText = user.name;
+  document.getElementById("remail").innerText = user.email;
+
+  // FETCH PROFILE
+  let snap = await getDoc(doc(db, "recProfiles", user.email));
+
+  if(snap.exists()){
+    let data = snap.data();
+    document.getElementById("rcompany").innerText = data.company || "Not added";
+  }
+}
+
+// UPDATE PROFILE
+async function updateRecProfile(e){
+  e.preventDefault();
+
+  const { setDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  let company = document.getElementById("company").value;
+
+  await setDoc(doc(db, "recProfiles", user.email), {
+    company
+  });
+
+  alert("Profile Updated ✅");
+
+  loadRecProfile();
+}
+
+// AUTO LOAD
+window.onload = () => {
+  loadRecProfile();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">

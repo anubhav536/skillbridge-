@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard | SkillBridge AI</title>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div>
+
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a><br>
+    <a href="js-jobs.html">Jobs</a><br>
+    <a href="js-applications.html">Applications</a><br>
+    <a href="js-resume.html">Resume Builder</a><br>
+    <a href="js-analytics.html">Analytics</a><br>
+    <a href="js-profile.html">Profile</a><br>
+  </nav>
+
+  <button onclick="logout()">Logout</button>
+
+</div>
+
+<hr>
+
+<!-- MAIN CONTENT -->
+<div>
+
+  <h2>📊 Dashboard</h2>
+
+  <!-- USER WELCOME -->
+  <p id="welcome">Welcome...</p>
+
+  <hr>
+
+  <!-- STATS -->
+  <div>
+
+    <div>
+      <h3>📄 Total Applications</h3>
+      <p id="totalApps">Loading...</p>
+    </div>
+
+    <div>
+      <h3>✅ Selected</h3>
+      <p id="selectedApps">Loading...</p>
+    </div>
+
+    <div>
+      <h3>⚡ Employability Score</h3>
+      <p id="score">Calculating...</p>
+    </div>
+
+  </div>
+
+  <hr>
+
+  <!-- QUICK ACTIONS -->
+  <div>
+
+    <h3>⚡ Quick Actions</h3>
+
+    <a href="js-jobs.html"><button>Find Jobs 💼</button></a>
+    <a href="js-resume.html"><button>Build Resume 📄</button></a>
+    <a href="js-analytics.html"><button>View Analytics 📊</button></a>
+
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+<script type="module" src="firebase.js"></script>
+
+<!-- DASHBOARD LOGIC -->
+<script>
+async function loadDashboard(){
+
+  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+  const { db } = await import("./firebase.js");
+
+  let user = JSON.parse(localStorage.getItem("session"));
+
+  // WELCOME
+  document.getElementById("welcome").innerText = "Welcome " + user.name;
+
+  // APPLICATIONS
+  let snapshot = await getDocs(collection(db, "applications"));
+
+  let apps = [];
+
+  snapshot.forEach(doc=>{
+    let a = doc.data();
+    if(a.user === user.email) apps.push(a);
+  });
+
+  // TOTAL
+  document.getElementById("totalApps").innerText = apps.length;
+
+  // SELECTED
+  let selected = apps.filter(a => a.status === "Shortlisted" || a.status === "Hired").length;
+  document.getElementById("selectedApps").innerText = selected;
+
+  // SCORE
+  let score = Math.min(100, apps.length * 20 + selected * 10);
+  document.getElementById("score").innerText = score + "%";
+
+}
+
+// AUTO LOAD
+window.onload = () => {
+  loadDashboard();
+};
+</script>
+
+</body>
+</html>
+<link rel="stylesheet" href="style.css">
