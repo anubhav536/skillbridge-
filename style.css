@@ -202,3 +202,21 @@ button:hover {
   margin-top: 15px;
   font-size: 14px;
 }
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  text-align: left;
+}
+
+.login-card input {
+  width: 100%;
+}
+
+.login-card button {
+  width: 100%;
+}
+
+.auth-container {
+  padding: 20px;
+}
