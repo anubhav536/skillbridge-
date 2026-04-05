@@ -1,0 +1,266 @@
+/* ================= RESET ================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: system-ui, sans-serif;
+}
+
+body {
+  background: #0F172A;
+  color: #E2E8F0;
+  line-height: 1.6;
+  overflow-x: hidden; /* 🔥 MAIN FIX */
+}
+
+/* ================= NAVBAR ================= */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #1E293B;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+nav h2 {
+  color: #2563EB;
+  font-size: 18px;
+}
+
+nav a {
+  margin: 5px 10px;
+  text-decoration: none;
+  color: #E2E8F0;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #2563EB;
+}
+
+/* ================= BUTTON ================= */
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+  color: white;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
+
+/* ================= DASHBOARD ================= */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.sidebar {
+  width: 220px;
+  background: #1E293B;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #2563EB;
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px;
+  margin: 6px 0;
+  color: #E2E8F0;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.sidebar a:hover {
+  background: #2563EB;
+}
+
+.sidebar button {
+  margin-top: 15px;
+  width: 100%;
+}
+
+.main {
+  flex: 1;
+  padding: 20px;
+  width: 100%;
+}
+
+/* ================= CARD ================= */
+.card {
+  background: #1E293B;
+  padding: 15px;
+  border-radius: 12px;
+  margin-top: 15px;
+  transition: 0.3s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+}
+
+/* ================= GRID ================= */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 15px;
+}
+
+/* ================= INPUT ================= */
+input, textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  background: #0F172A;
+  color: #E2E8F0;
+  margin-top: 5px;
+}
+
+input:focus, textarea:focus {
+  outline: 1px solid #2563EB;
+}
+
+/* ================= FORM ================= */
+form {
+  background: #1E293B;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* ================= AUTH ================= */
+.auth-container {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* ================= LANDING PAGE FIX ================= */
+section {
+  padding: 40px 20px;
+  max-width: 100%;        /* 🔥 FIX */
+  overflow-x: hidden;     /* 🔥 FIX */
+}
+
+section h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  line-height: 1.3;
+  word-break: break-word; /* 🔥 FIX */
+}
+
+section p {
+  margin-bottom: 20px;
+  color: #94A3B8;
+  word-break: break-word; /* 🔥 FIX */
+}
+
+/* ROLE BUTTONS */
+.role-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 15px;
+}
+
+.role-buttons button {
+  flex: 1;
+  min-width: 140px;
+}
+
+/* STATS */
+.stats {
+  margin-top: 30px;
+}
+
+.stats p {
+  margin: 6px 0;
+}
+
+/* TESTIMONIAL */
+.testimonial {
+  margin-top: 25px;
+  font-style: italic;
+  color: #CBD5F5;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+  nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .dashboard {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    border-bottom: 1px solid #334155;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .sidebar a {
+    background: #0F172A;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .sidebar button {
+    width: auto;
+    margin-top: 10px;
+  }
+
+  .main {
+    padding: 15px;
+    text-align: center;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    width: 100%;
+    margin: 10px 0;
+  }
+
+  section {
+    padding: 20px 15px;
+  }
+
+  section h1 {
+    font-size: 24px;
+  }
+
+  section p {
+    font-size: 14px;
+  }
+}
