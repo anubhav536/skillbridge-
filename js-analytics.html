@@ -1,84 +1,79 @@
-
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Analytics | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=25">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
 
-  <button id="logoutBtn">Logout 👋</button>
-
-</div>
-
-<hr>
-
-<!-- MAIN -->
-<div>
-
-  <h2>📊 Career Analytics</h2>
-
-  <div>
-    <h3>⚡ Employability Score</h3>
-    <p id="score">Calculating...</p>
+    <button id="logoutBtn">Logout 👋</button>
   </div>
 
-  <div>
-    <h3>📄 Total Applications</h3>
-    <p id="totalApps">Loading...</p>
-  </div>
+  <!-- MAIN -->
+  <div class="main">
 
-  <div>
-    <h3>✅ Success Rate</h3>
-    <p id="successRate">Loading...</p>
-  </div>
+    <h2>📊 Career Analytics</h2>
 
-  <hr>
+    <div class="grid">
 
-  <div>
-    <h3>🧠 AI Suggestions</h3>
-    <ul id="suggestions"></ul>
-  </div>
+      <div class="card">
+        <h3>⚡ Employability Score</h3>
+        <p id="score">Loading...</p>
+      </div>
 
-  <hr>
+      <div class="card">
+        <h3>📄 Total Applications</h3>
+        <p id="totalApps">Loading...</p>
+      </div>
 
-  <div>
-    <h3>🔥 Trending Skills</h3>
-    <ul id="trendingSkills"></ul>
+      <div class="card">
+        <h3>✅ Success Rate</h3>
+        <p id="success">Loading...</p>
+      </div>
+
+    </div>
+
+    <!-- AI SUGGESTIONS -->
+    <div class="card">
+      <h3>🧠 AI Suggestions</h3>
+      <p id="suggest1">Loading...</p>
+      <p id="suggest2"></p>
+    </div>
+
   </div>
 
 </div>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
 <script type="module">
-
 import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// ================= LOGOUT =================
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
-
-// ================= SAFE SESSION =================
-function getSession(){
+// SESSION
+function getSession() {
   try {
     return JSON.parse(localStorage.getItem("session"));
   } catch {
@@ -86,27 +81,24 @@ function getSession(){
   }
 }
 
-
-// ================= ANALYTICS =================
-async function loadAnalytics(){
+// LOAD ANALYTICS
+async function loadAnalytics() {
 
   const user = getSession();
 
-  // 🔥 SAFE CHECK (NO RANDOM REDIRECT BUG)
-  if (!user || !user.email) {
-    console.warn("No session found");
-    alert("⚠️ Please login first");
+  if (!user) {
+    alert("Login required ❌");
     window.location.href = "index.html";
     return;
   }
 
   try {
 
-    // ================= APPLICATIONS =================
-    const appsSnap = await getDocs(collection(db, "applications"));
-    const apps = [];
+    const snap = await getDocs(collection(db, "applications"));
 
-    appsSnap.forEach(doc => {
+    let apps = [];
+
+    snap.forEach(doc => {
       const a = doc.data();
       if (a.user === user.email) apps.push(a);
     });
@@ -114,76 +106,42 @@ async function loadAnalytics(){
     // TOTAL
     document.getElementById("totalApps").innerText = apps.length;
 
-    // SUCCESS RATE
+    // SUCCESS
     const success = apps.filter(a =>
-      a.status === "Shortlisted" || a.status === "Hired"
+      a.status === "Hired" || a.status === "Shortlisted"
     ).length;
 
-    const rate = apps.length
+    const successRate = apps.length
       ? Math.round((success / apps.length) * 100)
       : 0;
 
-    document.getElementById("successRate").innerText = rate + "%";
+    document.getElementById("success").innerText = successRate + "%";
 
     // SCORE
-    const score = Math.min(100, apps.length * 20 + rate);
+    const score = Math.min(100, apps.length * 20 + success * 15);
     document.getElementById("score").innerText = score + "%";
 
-    // ================= SUGGESTIONS =================
-    const suggestions = document.getElementById("suggestions");
-    suggestions.innerHTML = "";
+    // AI SUGGESTIONS
+    const s1 = document.getElementById("suggest1");
+    const s2 = document.getElementById("suggest2");
 
-    if(rate < 30){
-      suggestions.innerHTML += "<li>📉 Improve your skills</li>";
+    if (apps.length === 0) {
+      s1.innerText = "Apply to jobs to boost your profile 🚀";
+      s2.innerText = "Complete your resume for better chances";
+    } else if (successRate < 30) {
+      s1.innerText = "Improve your skills 📚";
+      s2.innerText = "Apply to more jobs 🎯";
+    } else {
+      s1.innerText = "Great progress! Keep applying 🔥";
+      s2.innerText = "Focus on interviews now 🎤";
     }
-
-    if(apps.length < 3){
-      suggestions.innerHTML += "<li>🚀 Apply to more jobs</li>";
-    }
-
-    if(score > 70){
-      suggestions.innerHTML += "<li>🔥 You're doing great!</li>";
-    }
-
-    if(!suggestions.innerHTML){
-      suggestions.innerHTML = "<li>✨ Keep going!</li>";
-    }
-
-    // ================= TRENDING =================
-    const jobsSnap = await getDocs(collection(db, "jobs"));
-    const skillCount = {};
-
-    jobsSnap.forEach(doc => {
-      const j = doc.data();
-
-      j.skills?.forEach(s => {
-        skillCount[s] = (skillCount[s] || 0) + 1;
-      });
-    });
-
-    const sorted = Object.keys(skillCount)
-      .sort((a,b)=>skillCount[b]-skillCount[a]);
-
-    const trending = document.getElementById("trendingSkills");
-    trending.innerHTML = "";
-
-    sorted.slice(0,5).forEach(s => {
-      const li = document.createElement("li");
-      li.innerText = s;
-      trending.appendChild(li);
-    });
 
   } catch (err) {
-    console.error("Analytics Error:", err);
-    alert("❌ Error loading analytics");
+    console.error(err);
   }
-
 }
 
-
-// ================= AUTO LOAD =================
 loadAnalytics();
-
 </script>
 
 </body>
