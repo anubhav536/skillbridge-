@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Post Job | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,24 +22,24 @@
     <a href="rec-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📢 Post a New Job</h2>
 
-  <!-- FORM -->
-  <form onsubmit="handlePostJob(event)">
+  <form id="jobForm">
 
     <label>Job Title:</label><br>
     <input type="text" id="title"><br><br>
 
-    <label>Skills Required (comma separated):</label><br>
+    <label>Skills Required:</label><br>
     <input type="text" id="skills" placeholder="HTML, CSS, JS"><br><br>
 
     <label>Salary:</label><br>
@@ -47,56 +48,89 @@
     <label>Location:</label><br>
     <input type="text" id="location"><br><br>
 
-    <button type="submit">Post Job 🚀</button>
+    <button type="submit" id="submitBtn">Post Job 🚀</button>
 
   </form>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ MODULE SCRIPT -->
+<script type="module">
+  import { db, logoutUser } from "./firebase.js";
+  import { addDoc, collection } 
+    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-<!-- POST JOB LOGIC -->
-<script>
-async function handlePostJob(e){
-  e.preventDefault();
+  // 🔥 LOGOUT FIX
+  document.getElementById("logoutBtn")
+    .addEventListener("click", logoutUser);
 
-  const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
 
-  let user = JSON.parse(localStorage.getItem("session"));
-
-  let title = document.getElementById("title").value;
-  let skills = document.getElementById("skills").value;
-  let salary = document.getElementById("salary").value;
-  let location = document.getElementById("location").value;
-
-  if(!title || !skills){
-    alert("Fill required fields ❌");
-    return;
+  function getSession(){
+    try {
+      return JSON.parse(localStorage.getItem("session"));
+    } catch {
+      return null;
+    }
   }
 
-  await addDoc(collection(db, "jobs"), {
-    title: title,
-    skills: skills.split(",").map(s => s.trim()),
-    salary: salary,
-    location: location,
-    recruiter: user.email,
-    createdAt: new Date()
+
+  const form = document.getElementById("jobForm");
+  const btn = document.getElementById("submitBtn");
+
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const user = getSession();
+
+    // ✅ SECURITY CHECK
+    if (!user || user.role !== "recruiter") {
+      alert("⚠️ Unauthorized access");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const title = document.getElementById("title").value.trim();
+    const skills = document.getElementById("skills").value.trim();
+    const salary = document.getElementById("salary").value;
+    const location = document.getElementById("location").value.trim();
+
+    if (!title || !skills) {
+      alert("Fill required fields ❌");
+      return;
+    }
+
+    try {
+
+      // 🔥 LOADING STATE
+      btn.innerText = "Posting...";
+      btn.disabled = true;
+
+      await addDoc(collection(db, "jobs"), {
+        title,
+        skills: skills.split(",").map(s => s.trim()),
+        salary: salary || "N/A",
+        location: location || "Remote",
+        recruiter: user.email, // 🔥 IMPORTANT
+        createdAt: new Date().toISOString()
+      });
+
+      alert("Job Posted Successfully 🚀");
+
+      form.reset();
+
+    } catch (err) {
+      console.error("Post Job Error:", err);
+      alert("Job post failed ❌");
+    }
+
+    // 🔥 RESET BUTTON
+    btn.innerText = "Post Job 🚀";
+    btn.disabled = false;
+
   });
 
-  alert("Job Posted Successfully 🚀");
-
-  // RESET FORM
-  document.getElementById("title").value = "";
-  document.getElementById("skills").value = "";
-  document.getElementById("salary").value = "";
-  document.getElementById("location").value = "";
-
-}
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
