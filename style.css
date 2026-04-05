@@ -914,3 +914,46 @@ button:active {
   }
 
 }
+/* ================= RECRUITER DASHBOARD ================= */
+
+.main h2 {
+  margin-bottom: 10px;
+}
+
+.main p {
+  color: #94A3B8;
+}
+
+/* GRID FIX */
+.grid {
+  margin-top: 20px;
+}
+
+/* CARD CENTER */
+.card {
+  text-align: center;
+}
+
+.card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 20px;
+  font-weight: bold;
+  color: #38BDF8;
+}
+
+/* MOBILE OPTIMIZATION */
+@media (max-width: 768px) {
+
+  .main {
+    text-align: center;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+}
