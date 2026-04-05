@@ -744,3 +744,122 @@ button:hover {
   width: 100%;
   margin-top: 10px;
 }
+/* ================= MOBILE MASTER FIX ================= */
+@media (max-width: 768px) {
+
+  /* BODY SAFE */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* NAVBAR STACK */
+  nav {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  nav h2 {
+    margin-bottom: 8px;
+  }
+
+  nav div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  /* DASHBOARD STACK */
+  .dashboard {
+    flex-direction: column;
+  }
+
+  /* SIDEBAR → TOP NAV */
+  .sidebar {
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    border-bottom: 1px solid #334155;
+  }
+
+  .sidebar h2 {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .sidebar a {
+    background: #0F172A;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .sidebar button {
+    margin-top: 10px;
+    width: auto;
+  }
+
+  /* MAIN */
+  .main {
+    padding: 15px;
+    text-align: center;
+  }
+
+  /* GRID → SINGLE COLUMN */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  /* CARD */
+  .card {
+    margin: 8px 0;
+    padding: 14px;
+  }
+
+  /* TEXT FIX */
+  .card p {
+    font-size: 18px;
+  }
+
+  .card h3 {
+    font-size: 14px;
+  }
+
+  /* BUTTON FULL WIDTH */
+  button {
+    width: 100%;
+  }
+
+  /* ROLE BUTTON FIX */
+  .role-buttons {
+    flex-direction: column;
+  }
+
+  .role-buttons button {
+    width: 100%;
+  }
+
+  /* FORM FIX */
+  input, textarea {
+    font-size: 14px;
+  }
+
+}
+/* SMOOTH SCROLL */
+html {
+  scroll-behavior: smooth;
+}
+
+/* TOUCH FEEL */
+button:active {
+  transform: scale(0.97);
+}
