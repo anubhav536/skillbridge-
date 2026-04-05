@@ -1,103 +1,82 @@
-</html>
-<link rel="stylesheet" href="style.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume Builder | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
-
-  <style>
-    .resume-box {
-      border: 1px solid #ccc;
-      padding: 20px;
-      margin-top: 20px;
-      background: #fff;
-    }
-
-    .resume-box h2 {
-      margin-bottom: 5px;
-    }
-
-    .resume-section {
-      margin-top: 15px;
-    }
-
-    .resume-section h3 {
-      margin-bottom: 5px;
-      border-bottom: 1px solid #ddd;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css?v=20">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>📄 Resume Builder</h2>
+
+    <!-- FORM -->
+    <div class="resume-form">
+
+      <form id="resumeForm">
+
+        <label>Full Name</label>
+        <input type="text" id="rname" placeholder="Enter your name">
+
+        <label>Skills</label>
+        <input type="text" id="rskills" placeholder="HTML, CSS, JS">
+
+        <label>Education</label>
+        <input type="text" id="reducation">
+
+        <label>Projects</label>
+        <textarea id="rprojects"></textarea>
+
+        <button type="submit">Generate Resume 🚀</button>
+
+      </form>
+
+    </div>
+
+    <!-- PREVIEW -->
+    <div id="resumePreview" class="resume-preview"></div>
+
+    <button id="printBtn" class="print-btn">Download / Print 🖨️</button>
+
+  </div>
 
 </div>
 
-<hr>
-
-<!-- MAIN -->
-<div>
-
-  <h2>📄 Resume Builder</h2>
-
-  <!-- FORM -->
-  <form id="resumeForm">
-
-    <label>Full Name:</label><br>
-    <input type="text" id="rname"><br><br>
-
-    <label>Skills:</label><br>
-    <input type="text" id="rskills" placeholder="HTML, CSS, JS"><br><br>
-
-    <label>Education:</label><br>
-    <input type="text" id="reducation"><br><br>
-
-    <label>Projects:</label><br>
-    <textarea id="rprojects" rows="4"></textarea><br><br>
-
-    <button type="submit">Generate Resume 🚀</button>
-
-  </form>
-
-  <!-- PREVIEW -->
-  <div id="resumePreview" class="resume-box" style="display:none;"></div>
-
-  <br>
-
-  <button id="printBtn" style="display:none;">Print / Download 🖨️</button>
-
-</div>
-
-<!-- ✅ MODULE SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
 
 import { logoutUser } from "./firebase.js";
 
-// 🔥 LOGOUT FIX
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
 
-// ================= GENERATE RESUME =================
+// GENERATE
 document.getElementById("resumeForm")
   .addEventListener("submit", (e) => {
 
@@ -114,7 +93,7 @@ document.getElementById("resumeForm")
 
     preview.innerHTML = `
       <h2>${name}</h2>
-      
+
       <div class="resume-section">
         <h3>Skills</h3>
         <p>${skills}</p>
@@ -131,12 +110,11 @@ document.getElementById("resumeForm")
       </div>
     `;
 
-    document.getElementById("printBtn").style.display = "inline-block";
-
+    document.getElementById("printBtn").style.display = "block";
   });
 
 
-// ================= PRINT =================
+// PRINT
 document.getElementById("printBtn")
   .addEventListener("click", () => {
 
@@ -160,7 +138,6 @@ document.getElementById("printBtn")
 
     win.document.close();
     win.print();
-
   });
 
 </script>
