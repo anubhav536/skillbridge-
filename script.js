@@ -1,13 +1,12 @@
 // ================= FIREBASE IMPORT =================
 import { auth } from "./firebase.js";
-import { 
+import {
   signInWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 
-// ================= GLOBAL =================
+// ================= TOAST =================
 function showToast(msg) {
   let t = document.getElementById("toast");
 
@@ -35,10 +34,11 @@ function showToast(msg) {
 }
 
 
-// ================= LOGIN FUNCTION =================
+// ================= LOGIN =================
 window.loginUser = async function () {
-  let email = document.getElementById("email").value;
-  let password = document.getElementById("password").value;
+
+  let email = document.getElementById("email")?.value;
+  let password = document.getElementById("password")?.value;
 
   if (!email || !password) {
     showToast("⚠️ Fill all fields");
@@ -48,32 +48,29 @@ window.loginUser = async function () {
   try {
     let userCred = await signInWithEmailAndPassword(auth, email, password);
 
-    // ✅ session save
-    localStorage.setItem("session", JSON.stringify({
+    // ✅ save session properly
+    let userData = {
       email: userCred.user.email
-    }));
+    };
+
+    localStorage.setItem("session", JSON.stringify(userData));
 
     showToast("Login Successful ✅");
 
-    // 👉 redirect
-    setTimeout(() => {
-      window.location.href = "js-dashboard.html";
-    }, 800);
+    // 🔥 HARD REDIRECT (no delay bugs)
+    window.location.href = "js-dashboard.html";
 
   } catch (error) {
 
-    console.log(error.code);
+    console.log("LOGIN ERROR:", error.code);
 
     if (error.code === "auth/wrong-password") {
       showToast("❌ Wrong password");
-    }
-    else if (error.code === "auth/user-not-found") {
-      showToast("⚠️ Account nahi mila, signup karo");
-    }
-    else if (error.code === "auth/invalid-email") {
+    } else if (error.code === "auth/user-not-found") {
+      showToast("⚠️ User not found");
+    } else if (error.code === "auth/invalid-email") {
       showToast("❌ Invalid email");
-    }
-    else {
+    } else {
       showToast("Login failed ❌");
     }
   }
@@ -89,7 +86,7 @@ window.logout = async function () {
 
   setTimeout(() => {
     window.location.href = "index.html";
-  }, 800);
+  }, 500);
 };
 
 
@@ -97,6 +94,7 @@ window.logout = async function () {
 function checkSessionUI() {
   let user = JSON.parse(localStorage.getItem("session"));
 
+  // अगर login page पर है और already login है → redirect
   if (user && window.location.pathname.includes("login")) {
     window.location.href = "js-dashboard.html";
   }
@@ -104,23 +102,13 @@ function checkSessionUI() {
 
 
 // ================= PROTECT PAGE =================
-function protectPage() {
+window.protectPage = function () {
   let user = JSON.parse(localStorage.getItem("session"));
 
   if (!user) {
     window.location.href = "index.html";
   }
-}
-
-
-// ================= AUTO LOGIN CHECK =================
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    localStorage.setItem("session", JSON.stringify({
-      email: user.email
-    }));
-  }
-});
+};
 
 
 // ================= RUN =================
