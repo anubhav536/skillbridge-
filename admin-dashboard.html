@@ -1,3 +1,4 @@
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,18 +21,18 @@
     <a href="admin-applications.html">Applications</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📊 Dashboard Overview</h2>
 
-  <!-- STATS -->
   <div>
     <h3>📌 Total Users</h3>
     <p id="totalUsers">Loading...</p>
@@ -49,34 +50,43 @@
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- LOAD DATA -->
-<script>
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= ADMIN DATA =================
 async function loadAdminDashboard(){
 
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
+  try {
 
-  // USERS
-  let usersSnap = await getDocs(collection(db, "users"));
-  document.getElementById("totalUsers").innerText = usersSnap.size;
+    // USERS
+    let usersSnap = await getDocs(collection(db, "users"));
+    document.getElementById("totalUsers").innerText = usersSnap.size;
 
-  // JOBS
-  let jobsSnap = await getDocs(collection(db, "jobs"));
-  document.getElementById("totalJobs").innerText = jobsSnap.size;
+    // JOBS
+    let jobsSnap = await getDocs(collection(db, "jobs"));
+    document.getElementById("totalJobs").innerText = jobsSnap.size;
 
-  // APPLICATIONS
-  let appsSnap = await getDocs(collection(db, "applications"));
-  document.getElementById("totalApps").innerText = appsSnap.size;
+    // APPLICATIONS
+    let appsSnap = await getDocs(collection(db, "applications"));
+    document.getElementById("totalApps").innerText = appsSnap.size;
+
+  } catch (err) {
+    console.error("Admin Load Error:", err);
+  }
 }
 
+
 // AUTO LOAD
-window.onload = () => {
-  loadAdminDashboard();
-};
+loadAdminDashboard();
+
 </script>
 
 </body>
