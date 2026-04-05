@@ -1,8 +1,11 @@
-<!DOCTYPE html>
+
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Analytics | SkillBridge AI</title>
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,18 +24,17 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📊 Career Analytics</h2>
 
-  <!-- STATS -->
   <div>
     <h3>⚡ Employability Score</h3>
     <p id="score">Calculating...</p>
@@ -50,113 +52,139 @@
 
   <hr>
 
-  <!-- AI SUGGESTIONS -->
   <div>
-
     <h3>🧠 AI Suggestions</h3>
-
-    <ul id="suggestions">
-      <!-- Dynamic suggestions -->
-    </ul>
-
+    <ul id="suggestions"></ul>
   </div>
 
   <hr>
 
-  <!-- TRENDING SKILLS -->
   <div>
-
     <h3>🔥 Trending Skills</h3>
-
-    <ul id="trendingSkills">
-      <!-- Firebase / logic based -->
-    </ul>
-
+    <ul id="trendingSkills"></ul>
   </div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- LOAD ANALYTICS -->
-<script>
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// ================= LOGOUT =================
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= SAFE SESSION =================
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
+}
+
+
+// ================= ANALYTICS =================
 async function loadAnalytics(){
 
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
+  const user = getSession();
 
-  let user = JSON.parse(localStorage.getItem("session"));
-
-  // APPLICATIONS
-  let appsSnap = await getDocs(collection(db, "applications"));
-  let apps = [];
-
-  appsSnap.forEach(doc=>{
-    let a = doc.data();
-    if(a.user === user.email) apps.push(a);
-  });
-
-  // TOTAL APPS
-  document.getElementById("totalApps").innerText = apps.length;
-
-  // SUCCESS RATE
-  let success = apps.filter(a => a.status === "Shortlisted" || a.status === "Hired").length;
-  let rate = apps.length ? Math.round((success / apps.length) * 100) : 0;
-
-  document.getElementById("successRate").innerText = rate + "%";
-
-  // EMPLOYABILITY SCORE
-  let score = Math.min(100, apps.length * 20 + rate);
-  document.getElementById("score").innerText = score + "%";
-
-  // AI SUGGESTIONS
-  let suggestions = document.getElementById("suggestions");
-
-  suggestions.innerHTML = "";
-
-  if(rate < 30){
-    suggestions.innerHTML += "<li>Improve your skills to increase selection chances</li>";
+  // 🔥 SAFE CHECK (NO RANDOM REDIRECT BUG)
+  if (!user || !user.email) {
+    console.warn("No session found");
+    alert("⚠️ Please login first");
+    window.location.href = "index.html";
+    return;
   }
 
-  if(apps.length < 3){
-    suggestions.innerHTML += "<li>Apply to more jobs</li>";
-  }
+  try {
 
-  if(score > 70){
-    suggestions.innerHTML += "<li>You're doing great! Keep applying</li>";
-  }
+    // ================= APPLICATIONS =================
+    const appsSnap = await getDocs(collection(db, "applications"));
+    const apps = [];
 
-  // TRENDING SKILLS
-  let jobsSnap = await getDocs(collection(db, "jobs"));
-  let skillCount = {};
-
-  jobsSnap.forEach(doc=>{
-    let j = doc.data();
-    j.skills?.forEach(s=>{
-      skillCount[s] = (skillCount[s] || 0) + 1;
+    appsSnap.forEach(doc => {
+      const a = doc.data();
+      if (a.user === user.email) apps.push(a);
     });
-  });
 
-  let sorted = Object.keys(skillCount).sort((a,b)=>skillCount[b]-skillCount[a]);
+    // TOTAL
+    document.getElementById("totalApps").innerText = apps.length;
 
-  let trending = document.getElementById("trendingSkills");
+    // SUCCESS RATE
+    const success = apps.filter(a =>
+      a.status === "Shortlisted" || a.status === "Hired"
+    ).length;
 
-  trending.innerHTML = "";
+    const rate = apps.length
+      ? Math.round((success / apps.length) * 100)
+      : 0;
 
-  sorted.slice(0,5).forEach(s=>{
-    trending.innerHTML += `<li>${s}</li>`;
-  });
+    document.getElementById("successRate").innerText = rate + "%";
+
+    // SCORE
+    const score = Math.min(100, apps.length * 20 + rate);
+    document.getElementById("score").innerText = score + "%";
+
+    // ================= SUGGESTIONS =================
+    const suggestions = document.getElementById("suggestions");
+    suggestions.innerHTML = "";
+
+    if(rate < 30){
+      suggestions.innerHTML += "<li>📉 Improve your skills</li>";
+    }
+
+    if(apps.length < 3){
+      suggestions.innerHTML += "<li>🚀 Apply to more jobs</li>";
+    }
+
+    if(score > 70){
+      suggestions.innerHTML += "<li>🔥 You're doing great!</li>";
+    }
+
+    if(!suggestions.innerHTML){
+      suggestions.innerHTML = "<li>✨ Keep going!</li>";
+    }
+
+    // ================= TRENDING =================
+    const jobsSnap = await getDocs(collection(db, "jobs"));
+    const skillCount = {};
+
+    jobsSnap.forEach(doc => {
+      const j = doc.data();
+
+      j.skills?.forEach(s => {
+        skillCount[s] = (skillCount[s] || 0) + 1;
+      });
+    });
+
+    const sorted = Object.keys(skillCount)
+      .sort((a,b)=>skillCount[b]-skillCount[a]);
+
+    const trending = document.getElementById("trendingSkills");
+    trending.innerHTML = "";
+
+    sorted.slice(0,5).forEach(s => {
+      const li = document.createElement("li");
+      li.innerText = s;
+      trending.appendChild(li);
+    });
+
+  } catch (err) {
+    console.error("Analytics Error:", err);
+    alert("❌ Error loading analytics");
+  }
 
 }
 
-// AUTO LOAD
-window.onload = () => {
-  loadAnalytics();
-};
+
+// ================= AUTO LOAD =================
+loadAnalytics();
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
