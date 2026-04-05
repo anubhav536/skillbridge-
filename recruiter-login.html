@@ -49,14 +49,15 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ ONLY THIS SCRIPT -->
-<script type="module">
+<!-- ✅ FIREBASE LOAD -->
+<script type="module" src="firebase.js"></script>
 
-  import { loginUser } from "./firebase.js";
-
+<!-- ✅ BUTTON CLICK -->
+<script>
   document.getElementById("loginBtn")
-    .addEventListener("click", loginUser);
-
+    .addEventListener("click", () => {
+      window.loginUser(); // 🔥 no import needed
+    });
 </script>
 
 </body>
