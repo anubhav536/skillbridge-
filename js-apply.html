@@ -1,75 +1,78 @@
-</html>
-<link rel="stylesheet" href="style.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Apply Job | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=30">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>📥 Apply for Job</h2>
+
+    <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
+
+    <div class="card">
+
+      <form id="applyForm">
+
+        <label>Your Skills:</label>
+        <input type="text" id="skills" placeholder="HTML, CSS, JS">
+
+        <label>Experience (years):</label>
+        <input type="number" id="experience" placeholder="0">
+
+        <label>Resume:</label>
+        <textarea id="resumeText" rows="5" placeholder="Write your resume..."></textarea>
+
+        <button type="submit">Submit Application 🚀</button>
+
+      </form>
+
+    </div>
+
+  </div>
 
 </div>
 
-<hr>
 
-<!-- MAIN -->
-<div>
-
-  <h2>📥 Apply for Job</h2>
-
-  <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
-
-  <hr>
-
-  <form id="applyForm">
-
-    <label>Your Skills:</label><br>
-    <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS"><br><br>
-
-    <label>Experience (years):</label><br>
-    <input type="number" id="experience" placeholder="0"><br><br>
-
-    <label>Resume:</label><br>
-    <textarea id="resumeText" rows="5" placeholder="Write your resume..."></textarea><br><br>
-
-    <button type="submit">Submit Application 🚀</button>
-
-  </form>
-
-</div>
-
-<!-- ✅ SINGLE MODULE SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
 
 import { db, logoutUser } from "./firebase.js";
 import { addDoc, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔥 LOGOUT FIX
+// LOGOUT
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
-
-// ================= SAFE SESSION =================
+// SESSION
 function getSession(){
   try {
     return JSON.parse(localStorage.getItem("session"));
@@ -78,8 +81,7 @@ function getSession(){
   }
 }
 
-
-// ================= GET JOB ID =================
+// JOB ID
 let currentJobId = "";
 
 function getJobId(){
@@ -89,8 +91,7 @@ function getJobId(){
   document.getElementById("jobId").innerText = currentJobId || "N/A";
 }
 
-
-// ================= APPLY =================
+// APPLY
 document.getElementById("applyForm")
   .addEventListener("submit", async (e) => {
 
@@ -98,8 +99,8 @@ document.getElementById("applyForm")
 
     const user = getSession();
 
-    if(!user || !user.email){
-      alert("⚠️ Login required");
+    if(!user){
+      alert("Login required ❌");
       window.location.href = "index.html";
       return;
     }
@@ -109,7 +110,7 @@ document.getElementById("applyForm")
     const resume = document.getElementById("resumeText").value.trim();
 
     if(!skills || !resume){
-      alert("⚠️ Fill required fields");
+      alert("Fill required fields ⚠️");
       return;
     }
 
@@ -130,14 +131,13 @@ document.getElementById("applyForm")
       window.location.href = "js-applications.html";
 
     } catch (err) {
-      console.error("Apply Error:", err);
-      alert("Application failed ❌");
+      console.error(err);
+      alert("Failed ❌");
     }
 
   });
 
-
-// AUTO LOAD
+// LOAD
 getJobId();
 
 </script>
