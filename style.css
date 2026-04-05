@@ -224,3 +224,47 @@ button:hover {
   width: 100%;
   display: block;
 }
+/* DASHBOARD IMPROVE */
+.main h2 {
+  margin-bottom: 10px;
+}
+
+.main p {
+  margin-bottom: 15px;
+  color: #94A3B8;
+}
+
+/* CARD TEXT CENTER */
+.card h3 {
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* BUTTON GRID */
+.main .grid button {
+  width: 100%;
+}
+
+/* HOVER EFFECT */
+.card:hover {
+  transform: translateY(-5px);
+  background: #2563EB;
+}
+
+/* MOBILE POLISH */
+@media (max-width: 768px) {
+
+  .sidebar h2 {
+    font-size: 15px;
+  }
+
+  .main h2 {
+    font-size: 20px;
+  }
+
+}
