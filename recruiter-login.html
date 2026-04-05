@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recruiter Login | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,20 +13,18 @@
 <!-- NAVBAR -->
 <nav>
   <h2>🚀 SkillBridge AI</h2>
-
   <div>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
 </nav>
 
-<!-- LOGIN SECTION -->
+<!-- LOGIN -->
 <section class="auth-container">
 
   <h2>🏢 Recruiter Login</h2>
   <p>Login to manage jobs and hire candidates</p>
 
-  <!-- FORM -->
   <div class="card">
 
     <label>Email:</label>
@@ -36,10 +33,7 @@
     <label>Password:</label>
     <input type="password" id="password" placeholder="Enter Password">
 
-    <!-- 🔥 BUTTON -->
     <button id="loginBtn">Login 🚀</button>
-
-    <p id="error"></p>
 
   </div>
 
@@ -55,12 +49,14 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ MODULE SCRIPT -->
+<!-- ✅ ONLY THIS SCRIPT -->
 <script type="module">
-  import { loginUser } from "./script.js";
+
+  import { loginUser } from "./firebase.js";
 
   document.getElementById("loginBtn")
     .addEventListener("click", loginUser);
+
 </script>
 
 </body>
