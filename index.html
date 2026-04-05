@@ -2,104 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SkillBridge AI</title>
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <!-- NAVBAR -->
-<nav>
-  <h2>🚀 SkillBridge AI</h2>
+<nav class="navbar">
+  <h2 class="logo">🚀 SkillBridge AI</h2>
 
-  <div>
+  <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
   </div>
 </nav>
 
-<hr>
+<!-- HERO -->
+<section class="hero">
+  <h1 id="typing">Build Your Career with AI 🚀</h1>
 
-<!-- HERO SECTION -->
-<section>
-
-  <h1>Build Your Career with AI 🚀</h1>
-
-  <p>
+  <p class="subtitle">
     Smart platform connecting students and recruiters with intelligent job matching.
   </p>
 
-  <br>
+  <h2 class="role-title">Choose Your Role</h2>
 
-  <!-- ROLE SELECTION -->
-  <h2>Choose Your Role</h2>
-
-  <div>
+  <div class="role-buttons">
     <a href="jobseeker-login.html">
-      <button>👨‍🎓 I am a Job Seeker</button>
+      <button class="btn primary">👨‍🎓 I am a Job Seeker</button>
     </a>
 
     <a href="recruiter-login.html">
-      <button>🏢 I am a Recruiter</button>
+      <button class="btn secondary">🏢 I am a Recruiter</button>
     </a>
   </div>
-
 </section>
-
-<hr>
 
 <!-- FEATURES -->
-<section>
-
+<section class="features">
   <h2>🔥 Features</h2>
 
-  <ul>
-    <li>Smart job matching system</li>
-    <li>AI-based skill suggestions</li>
-    <li>Resume builder</li>
-    <li>Recruiter hiring dashboard</li>
-  </ul>
-
+  <div class="card-container">
+    <div class="card">Smart job matching system</div>
+    <div class="card">AI-based skill suggestions</div>
+    <div class="card">Resume builder</div>
+    <div class="card">Recruiter hiring dashboard</div>
+  </div>
 </section>
-
-<hr>
 
 <!-- STATS -->
-<section>
-
+<section class="stats">
   <h2>📊 Platform Stats</h2>
 
-  <p>👥 10,000+ Users</p>
-  <p>💼 2,000+ Jobs Posted</p>
-  <p>📄 5,000+ Applications</p>
-
+  <div class="stats-box">
+    <div class="stat">👥 <span id="userCount">10,000+</span> Users</div>
+    <div class="stat">💼 <span id="jobCount">2,000+</span> Jobs Posted</div>
+    <div class="stat">📄 <span id="appCount">5,000+</span> Applications</div>
+  </div>
 </section>
 
-<hr>
-
 <!-- TESTIMONIAL -->
-<section>
-
+<section class="testimonial">
   <h2>💬 What Users Say</h2>
 
   <p>
     "SkillBridge helped me land my first internship easily!"
   </p>
-
 </section>
 
-<hr>
-
 <!-- FOOTER -->
-<footer>
-
+<footer class="footer">
   <p>© 2026 SkillBridge AI</p>
-
 </footer>
 
-<!-- JS -->
-<script src="script.js"></script>
+<!-- ✅ FIXED SCRIPT -->
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
