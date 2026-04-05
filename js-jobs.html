@@ -1,8 +1,12 @@
-<!DOCTYPE html>
+</html>
+<link rel="stylesheet" href="style.css"><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Jobs | SkillBridge AI</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,84 +25,128 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>💼 Available Jobs</h2>
 
-  <!-- SEARCH -->
   <input type="text" id="searchJob" placeholder="Search jobs...">
 
   <br><br>
 
-  <!-- JOB LIST -->
-  <div id="jobList">
-    <!-- Jobs will load from Firebase -->
-  </div>
+  <div id="jobList">Loading...</div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- JOBS LOGIC -->
-<script>
-async function loadJobsPage(){
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
 
-  let container = document.getElementById("jobList");
-  container.innerHTML = "Loading...";
 
-  let snapshot = await getDocs(collection(db, "jobs"));
-
-  let html = "";
-
-  snapshot.forEach(doc=>{
-    let j = doc.data();
-
-    html += `
-      <div>
-        <b>${j.title}</b><br>
-        Skills: ${j.skills?.join(", ") || ""}<br>
-        Salary: ${j.salary || "N/A"}<br>
-        
-        <a href="js-apply.html?id=${doc.id}">
-          <button>Apply 🚀</button>
-        </a>
-
-        <hr>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html || "No jobs available";
+// ================= SAFE SESSION =================
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
 }
 
-// SEARCH FILTER
-document.getElementById("searchJob").addEventListener("keyup", function(){
-  let q = this.value.toLowerCase();
-  let jobs = document.querySelectorAll("#jobList div");
 
-  jobs.forEach(j=>{
-    j.style.display = j.innerText.toLowerCase().includes(q) ? "block" : "none";
+// ================= LOAD JOBS =================
+async function loadJobsPage(){
+
+  const user = getSession();
+
+  if(!user || !user.email){
+    alert("⚠️ Please login first");
+    window.location.href = "index.html";
+    return;
+  }
+
+  const container = document.getElementById("jobList");
+
+  try {
+
+    const snapshot = await getDocs(collection(db, "jobs"));
+
+    container.innerHTML = "";
+
+    if(snapshot.empty){
+      container.innerHTML = "No jobs available";
+      return;
+    }
+
+    snapshot.forEach(doc => {
+
+      const j = doc.data();
+
+      const card = document.createElement("div");
+
+      card.style.border = "1px solid #ccc";
+      card.style.padding = "10px";
+      card.style.marginBottom = "10px";
+
+      card.innerHTML = `
+        <b>${j.title || "No Title"}</b><br>
+        🧠 Skills: ${j.skills?.join(", ") || "N/A"}<br>
+        💰 Salary: ${j.salary || "N/A"}<br><br>
+      `;
+
+      const btn = document.createElement("button");
+      btn.innerText = "Apply 🚀";
+
+      btn.addEventListener("click", () => {
+        window.location.href = `js-apply.html?id=${doc.id}`;
+      });
+
+      card.appendChild(btn);
+      container.appendChild(card);
+
+    });
+
+  } catch (err) {
+    console.error("Jobs Load Error:", err);
+    container.innerHTML = "Error loading jobs ❌";
+  }
+
+}
+
+
+// ================= SEARCH =================
+document.getElementById("searchJob")
+  .addEventListener("keyup", function(){
+
+    const q = this.value.toLowerCase();
+    const jobs = document.querySelectorAll("#jobList div");
+
+    jobs.forEach(j=>{
+      j.style.display =
+        j.innerText.toLowerCase().includes(q)
+          ? "block"
+          : "none";
+    });
+
   });
-});
+
 
 // AUTO LOAD
-window.onload = () => {
-  loadJobsPage();
-};
+loadJobsPage();
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
