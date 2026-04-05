@@ -363,3 +363,98 @@ button:hover {
   }
 
 }
+/* ================= APPLICATIONS PAGE ================= */
+
+#appsContainer {
+  margin-top: 15px;
+}
+
+/* SEARCH BAR */
+#search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #1E293B;
+  color: #E2E8F0;
+  margin: 10px 0 15px;
+  font-size: 14px;
+}
+
+#search:focus {
+  outline: 1px solid #2563EB;
+}
+
+/* CARD */
+#appsContainer .card {
+  background: linear-gradient(145deg, #1E293B, #0F172A);
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #334155;
+  transition: 0.3s;
+}
+
+/* HOVER */
+#appsContainer .card:hover {
+  transform: translateY(-4px);
+  border-color: #2563EB;
+}
+
+/* TITLE */
+#appsContainer h3 {
+  color: #60A5FA;
+  margin-bottom: 8px;
+}
+
+/* TEXT */
+#appsContainer p {
+  font-size: 13px;
+  color: #94A3B8;
+  margin: 5px 0;
+}
+
+/* STATUS COLORS */
+#appsContainer p b {
+  color: #E2E8F0;
+}
+
+/* EMPTY MESSAGE */
+#appsContainer p:only-child {
+  text-align: center;
+  padding: 20px;
+  color: #94A3B8;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+  #search {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  #appsContainer .card {
+    padding: 15px;
+  }
+
+  #appsContainer h3 {
+    font-size: 16px;
+  }
+
+  #appsContainer p {
+    font-size: 12px;
+  }
+
+}
+/* STATUS COLORS */
+.status-applied {
+  color: #FBBF24; /* yellow */
+}
+
+.status-shortlisted {
+  color: #22C55E; /* green */
+}
+
+.status-rejected {
+  color: #EF4444; /* red */
+}
