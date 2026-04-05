@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Analytics | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=25">
+  <link rel="stylesheet" href="style.css?v=30">
 </head>
 
 <body>
@@ -27,11 +28,13 @@
     <button id="logoutBtn">Logout 👋</button>
   </div>
 
+
   <!-- MAIN -->
   <div class="main">
 
     <h2>📊 Career Analytics</h2>
 
+    <!-- STATS GRID -->
     <div class="grid">
 
       <div class="card">
@@ -51,24 +54,27 @@
 
     </div>
 
+
     <!-- AI SUGGESTIONS -->
     <div class="card">
       <h3>🧠 AI Suggestions</h3>
-      <p id="suggest1">Loading...</p>
-      <p id="suggest2"></p>
+      <ul>
+        <li id="suggest1">Loading...</li>
+        <li id="suggest2"></li>
+      </ul>
     </div>
 
   </div>
 
 </div>
 
-<script type="module">
-import { db, logoutUser } from "./firebase.js";
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
+<script type="module">
+
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// LOGOUT
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
@@ -128,10 +134,12 @@ async function loadAnalytics() {
     if (apps.length === 0) {
       s1.innerText = "Apply to jobs to boost your profile 🚀";
       s2.innerText = "Complete your resume for better chances";
-    } else if (successRate < 30) {
+    } 
+    else if (successRate < 30) {
       s1.innerText = "Improve your skills 📚";
       s2.innerText = "Apply to more jobs 🎯";
-    } else {
+    } 
+    else {
       s1.innerText = "Great progress! Keep applying 🔥";
       s2.innerText = "Focus on interviews now 🎤";
     }
@@ -142,6 +150,7 @@ async function loadAnalytics() {
 }
 
 loadAnalytics();
+
 </script>
 
 </body>
