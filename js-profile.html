@@ -1,85 +1,84 @@
-<link rel="stylesheet" href="style.css">
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Profile | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=40">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
 
-</div>
-
-<hr>
-
-<!-- MAIN -->
-<div>
-
-  <h2>👤 My Profile</h2>
-
-  <!-- VIEW -->
-  <div>
-    <p><b>Name:</b> <span id="pname">Loading...</span></p>
-    <p><b>Email:</b> <span id="pemail">Loading...</span></p>
-    <p><b>Skills:</b> <span id="pskills">Not added</span></p>
-    <p><b>Experience:</b> <span id="pexp">Not added</span></p>
-  </div>
-
-  <hr>
-
-  <!-- EDIT -->
-  <div>
-
-    <h3>Edit Profile</h3>
-
-    <form id="profileForm">
-
-      <label>Skills:</label><br>
-      <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS"><br><br>
-
-      <label>Experience:</label><br>
-      <input type="number" id="experience" placeholder="0"><br><br>
-
-      <button type="submit">Update Profile 💾</button>
-
-    </form>
+    <button id="logoutBtn">Logout 👋</button>
 
   </div>
 
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>👤 My Profile</h2>
+
+    <!-- PROFILE CARD -->
+    <div class="card profile-card">
+
+      <h3 id="name">Name: Loading...</h3>
+      <p id="email">Email: Loading...</p>
+      <p id="skills">Skills: Not added</p>
+      <p id="experience">Experience: Not added</p>
+
+    </div>
+
+
+    <!-- EDIT CARD -->
+    <div class="card">
+
+      <h3>✏️ Edit Profile</h3>
+
+      <form id="profileForm">
+
+        <label>Skills:</label>
+        <input type="text" id="skillsInput" placeholder="HTML, CSS, JS">
+
+        <label>Experience (years):</label>
+        <input type="number" id="expInput" placeholder="0">
+
+        <button type="submit">Update Profile 🚀</button>
+
+      </form>
+
+    </div>
+
+  </div>
+
 </div>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
+
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
-import { getDoc, setDoc, doc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { logoutUser } from "./firebase.js";
 
-// 🔥 LOGOUT FIX
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
-
-// ================= SAFE SESSION =================
+// SESSION
 function getSession(){
   try {
     return JSON.parse(localStorage.getItem("session"));
@@ -88,79 +87,42 @@ function getSession(){
   }
 }
 
-
-// ================= LOAD PROFILE =================
-async function loadProfile(){
+// LOAD PROFILE
+function loadProfile(){
 
   const user = getSession();
 
-  if(!user || !user.email){
-    alert("⚠️ Please login first");
+  if(!user){
     window.location.href = "index.html";
     return;
   }
 
-  document.getElementById("pname").innerText = user.name || "User";
-  document.getElementById("pemail").innerText = user.email;
-
-  try {
-
-    // 🔥 using email as id (same as your system)
-    const snap = await getDoc(doc(db, "profiles", user.email));
-
-    if(snap.exists()){
-      const data = snap.data();
-
-      document.getElementById("pskills").innerText =
-        data.skills || "Not added";
-
-      document.getElementById("pexp").innerText =
-        data.experience || "Not added";
-    }
-
-  } catch (err) {
-    console.error("Profile load error:", err);
-  }
+  document.getElementById("name").innerText = "Name: " + (user.name || "User");
+  document.getElementById("email").innerText = "Email: " + user.email;
+  document.getElementById("skills").innerText = "Skills: " + (user.skills || "Not added");
+  document.getElementById("experience").innerText = "Experience: " + (user.experience || "Not added");
 
 }
 
-
-// ================= UPDATE PROFILE =================
+// UPDATE PROFILE
 document.getElementById("profileForm")
-  .addEventListener("submit", async (e) => {
+  .addEventListener("submit", (e)=>{
 
     e.preventDefault();
 
-    const user = getSession();
+    let user = getSession();
 
-    const skills = document.getElementById("skills").value.trim();
-    const exp = document.getElementById("experience").value.trim();
+    user.skills = document.getElementById("skillsInput").value;
+    user.experience = document.getElementById("expInput").value;
 
-    if(!skills){
-      alert("⚠️ Add at least skills");
-      return;
-    }
+    localStorage.setItem("session", JSON.stringify(user));
 
-    try {
+    alert("Profile Updated ✅");
 
-      await setDoc(doc(db, "profiles", user.email), {
-        skills,
-        experience: exp || "0"
-      });
-
-      alert("Profile Updated ✅");
-
-      loadProfile();
-
-    } catch (err) {
-      console.error("Update error:", err);
-      alert("Update failed ❌");
-    }
+    loadProfile();
 
   });
 
-
-// AUTO LOAD
 loadProfile();
 
 </script>
