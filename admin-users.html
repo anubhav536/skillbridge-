@@ -1,3 +1,4 @@
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,77 +21,99 @@
     <a href="admin-applications.html">Applications</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>👥 All Users</h2>
 
-  <!-- SEARCH -->
   <input type="text" id="searchUser" placeholder="Search users...">
 
   <br><br>
 
-  <!-- USER LIST -->
-  <div id="usersList">
-    <!-- Firebase users will load here -->
-  </div>
+  <div id="usersList"></div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- LOAD USERS -->
-<script>
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= LOAD USERS =================
 async function loadAllUsers(){
 
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
-
-  let container = document.getElementById("usersList");
+  const container = document.getElementById("usersList");
   container.innerHTML = "Loading...";
 
-  let snapshot = await getDocs(collection(db, "users"));
+  try {
+    const snapshot = await getDocs(collection(db, "users"));
 
-  let html = "";
+    container.innerHTML = "";
 
-  snapshot.forEach(doc => {
-    let u = doc.data();
+    snapshot.forEach(doc => {
 
-    html += `
-      <div>
-        <b>${u.name}</b><br>
-        📧 ${u.email}<br>
-        🎭 Role: ${u.role}<br>
-        <hr>
-      </div>
-    `;
-  });
+      const u = doc.data();
 
-  container.innerHTML = html || "No users found";
+      const card = document.createElement("div");
+
+      card.style.border = "1px solid #ccc";
+      card.style.padding = "10px";
+      card.style.marginBottom = "10px";
+
+      card.innerHTML = `
+        <b>👤 ${u.name || "No Name"}</b><br>
+        📧 ${u.email || "No Email"}<br>
+        🎭 Role: ${u.role || "N/A"}
+      `;
+
+      container.appendChild(card);
+    });
+
+    if(!container.innerHTML){
+      container.innerHTML = "No users found";
+    }
+
+  } catch (err) {
+    console.error("Load Users Error:", err);
+    container.innerHTML = "Error loading users ❌";
+  }
 }
 
-// SEARCH FILTER
-document.getElementById("searchUser").addEventListener("keyup", function(){
-  let q = this.value.toLowerCase();
-  let users = document.querySelectorAll("#usersList div");
 
-  users.forEach(u=>{
-    u.style.display = u.innerText.toLowerCase().includes(q) ? "block" : "none";
+// ================= SEARCH =================
+document.getElementById("searchUser")
+  .addEventListener("keyup", function(){
+
+    const q = this.value.toLowerCase();
+    const users = document.querySelectorAll("#usersList div");
+
+    users.forEach(u=>{
+      u.style.display =
+        u.innerText.toLowerCase().includes(q)
+          ? "block"
+          : "none";
+    });
+
   });
-});
+
 
 // AUTO LOAD
-window.onload = () => {
-  loadAllUsers();
-};
+loadAllUsers();
+
 </script>
 
 </body>
