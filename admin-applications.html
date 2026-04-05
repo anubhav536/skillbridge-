@@ -1,3 +1,4 @@
+</html>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,13 +21,14 @@
     <a href="admin-applications.html">Applications</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📄 All Applications</h2>
@@ -36,29 +38,79 @@
 
   <br><br>
 
-  <!-- APPLICATION LIST -->
-  <div id="apps">
-    <!-- Firebase data will load here -->
-  </div>
+  <!-- LIST -->
+  <div id="apps"></div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- SIMPLE FILTER -->
-<script>
-function filterApps(){
-  let q = document.getElementById("searchApp").value.toLowerCase();
-  let cards = document.querySelectorAll("#apps div");
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  cards.forEach(c=>{
-    c.style.display = c.innerText.toLowerCase().includes(q) ? "block" : "none";
-  });
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= LOAD APPLICATIONS =================
+async function loadApplications(){
+
+  const container = document.getElementById("apps");
+  container.innerHTML = "Loading...";
+
+  try {
+    const snap = await getDocs(collection(db, "applications"));
+
+    container.innerHTML = "";
+
+    snap.forEach(doc => {
+      const app = doc.data();
+
+      const div = document.createElement("div");
+
+      div.style.border = "1px solid #ccc";
+      div.style.padding = "10px";
+      div.style.marginBottom = "10px";
+
+      div.innerHTML = `
+        <b>👤 ${app.name || "No Name"}</b><br>
+        📧 ${app.email || "No Email"}<br>
+        💼 ${app.jobTitle || "No Job"}<br>
+        📌 Status: ${app.status || "Pending"}
+      `;
+
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error("Load Apps Error:", err);
+    container.innerHTML = "Error loading applications ❌";
+  }
 }
 
-document.getElementById("searchApp").addEventListener("keyup", filterApps);
+
+// ================= SEARCH =================
+document.getElementById("searchApp")
+  .addEventListener("keyup", function(){
+
+    let q = this.value.toLowerCase();
+    let cards = document.querySelectorAll("#apps div");
+
+    cards.forEach(c=>{
+      c.style.display =
+        c.innerText.toLowerCase().includes(q)
+          ? "block"
+          : "none";
+    });
+
+  });
+
+
+// AUTO LOAD
+loadApplications();
+
 </script>
 
 </body>
