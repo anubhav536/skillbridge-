@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Manage Jobs | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,94 +23,133 @@
     <a href="rec-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>🛠️ Manage Your Jobs</h2>
 
-  <!-- SEARCH -->
   <input type="text" id="searchJob" placeholder="Search your jobs...">
 
   <br><br>
 
-  <!-- JOB LIST -->
-  <div id="myJobs">
-    <!-- Firebase jobs -->
-  </div>
+  <div id="myJobs">Loading...</div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE CLEAN MODULE SCRIPT -->
+<script type="module">
 
-<!-- JOB LOGIC -->
-<script>
-async function loadMyJobs(){
+  import { db, logoutUser, protectPage } from "./firebase.js";
+  import {
+    getDocs,
+    collection,
+    deleteDoc,
+    doc
+  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  const { getDocs, collection, deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
 
-  let user = JSON.parse(localStorage.getItem("session"));
+  // 🔐 PAGE PROTECTION
+  protectPage("recruiter");
 
-  let container = document.getElementById("myJobs");
-  container.innerHTML = "Loading...";
 
-  let snapshot = await getDocs(collection(db, "jobs"));
+  // 🔥 LOGOUT
+  document.getElementById("logoutBtn")
+    .addEventListener("click", logoutUser);
 
-  let html = "";
 
-  snapshot.forEach(d => {
-    let j = d.data();
+  // ================= LOAD JOBS =================
+  async function loadMyJobs() {
 
-    if(j.recruiter === user.email){
+    try {
 
-      html += `
-        <div>
-          <b>${j.title}</b><br>
-          Skills: ${j.skills?.join(", ") || ""}<br>
-          Salary: ${j.salary || "N/A"}<br>
+      const user = JSON.parse(localStorage.getItem("session"));
+      const container = document.getElementById("myJobs");
 
-          <button onclick="deleteJob('${d.id}')">Delete ❌</button>
+      container.innerHTML = "Loading...";
 
-          <hr>
-        </div>
-      `;
+      const snapshot = await getDocs(collection(db, "jobs"));
+
+      let html = "";
+
+      snapshot.forEach(d => {
+
+        const j = d.data();
+
+        if (j.recruiter === user.email) {
+
+          html += `
+            <div class="card">
+              <b>${j.title}</b><br>
+              Skills: ${j.skills?.join(", ") || "N/A"}<br>
+              Salary: ${j.salary || "N/A"}<br>
+
+              <button class="deleteBtn" data-id="${d.id}">
+                Delete ❌
+              </button>
+
+              <hr>
+            </div>
+          `;
+        }
+      });
+
+      container.innerHTML = html || "No jobs found 😴";
+
+
+      // ================= DELETE =================
+      document.querySelectorAll(".deleteBtn").forEach(btn => {
+
+        btn.addEventListener("click", async () => {
+
+          const id = btn.dataset.id;
+
+          if (!confirm("Delete this job? ❌")) return;
+
+          await deleteDoc(doc(db, "jobs", id));
+
+          alert("Job deleted 🚀");
+
+          loadMyJobs(); // reload
+        });
+
+      });
+
+    } catch (err) {
+      console.error("Load Jobs Error:", err);
+      document.getElementById("myJobs").innerHTML = "Error loading jobs ❌";
     }
-  });
 
-  container.innerHTML = html || "No jobs found";
+  }
 
-  // DELETE FUNCTION
-  window.deleteJob = async function(id){
-    await deleteDoc(doc(db, "jobs", id));
-    alert("Job Deleted 🚀");
-    loadMyJobs();
-  };
-}
 
-// SEARCH FILTER
-document.getElementById("searchJob").addEventListener("keyup", function(){
-  let q = this.value.toLowerCase();
-  let jobs = document.querySelectorAll("#myJobs div");
+  // ================= SEARCH =================
+  document.getElementById("searchJob")
+    .addEventListener("keyup", function () {
 
-  jobs.forEach(j=>{
-    j.style.display = j.innerText.toLowerCase().includes(q) ? "block" : "none";
-  });
-});
+      const q = this.value.toLowerCase();
+      const jobs = document.querySelectorAll("#myJobs .card");
 
-// AUTO LOAD
-window.onload = () => {
+      jobs.forEach(j => {
+        j.style.display =
+          j.innerText.toLowerCase().includes(q)
+            ? "block"
+            : "none";
+      });
+
+    });
+
+
+  // 🚀 AUTO LOAD
   loadMyJobs();
-};
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
