@@ -1,122 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Dashboard | SkillBridge AI</title>
+  
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
-<div>
-
-  <h2>👨‍🎓 Job Seeker Panel</h2>
-
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
-
-  <button onclick="logout()">Logout</button>
-
-</div>
-
-<hr>
-
-<!-- MAIN CONTENT -->
-<div>
-
-  <h2>📊 Dashboard</h2>
-
-  <!-- USER WELCOME -->
-  <p id="welcome">Welcome...</p>
-
-  <hr>
-
-  <!-- STATS -->
+  
+  <!-- SIDEBAR -->
   <div>
-
-    <div>
-      <h3>📄 Total Applications</h3>
-      <p id="totalApps">Loading...</p>
-    </div>
-
-    <div>
-      <h3>✅ Selected</h3>
-      <p id="selectedApps">Loading...</p>
-    </div>
-
-    <div>
-      <h3>⚡ Employability Score</h3>
-      <p id="score">Calculating...</p>
-    </div>
-
+    
+    <h2>👨‍🎓 Job Seeker Panel</h2>
+    
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a><br>
+      <a href="js-jobs.html">Jobs</a><br>
+      <a href="js-applications.html">Applications</a><br>
+      <a href="js-resume.html">Resume Builder</a><br>
+      <a href="js-analytics.html">Analytics</a><br>
+      <a href="js-profile.html">Profile</a><br>
+    </nav>
+    
+    <!-- ✅ FIXED LOGOUT -->
+    <button id="logoutBtn">Logout 👋</button>
+    
   </div>
-
+  
   <hr>
-
-  <!-- QUICK ACTIONS -->
+  
+  <!-- MAIN -->
   <div>
-
-    <h3>⚡ Quick Actions</h3>
-
-    <a href="js-jobs.html"><button>Find Jobs 💼</button></a>
-    <a href="js-resume.html"><button>Build Resume 📄</button></a>
-    <a href="js-analytics.html"><button>View Analytics 📊</button></a>
-
+    
+    <h2>📊 Dashboard</h2>
+    
+    <p id="welcome">Welcome...</p>
+    
+    <hr>
+    
+    <div>
+      
+      <div>
+        <h3>📄 Total Applications</h3>
+        <p id="totalApps">Loading...</p>
+      </div>
+      
+      <div>
+        <h3>✅ Selected</h3>
+        <p id="selectedApps">Loading...</p>
+      </div>
+      
+      <div>
+        <h3>⚡ Employability Score</h3>
+        <p id="score">Calculating...</p>
+      </div>
+      
+    </div>
+    
+    <hr>
+    
+    <div>
+      
+      <h3>⚡ Quick Actions</h3>
+      
+      <a href="js-jobs.html"><button>Find Jobs 💼</button></a>
+      <a href="js-resume.html"><button>Build Resume 📄</button></a>
+      <a href="js-analytics.html"><button>View Analytics 📊</button></a>
+      
+    </div>
+    
   </div>
-
-</div>
-
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
-
-<!-- DASHBOARD LOGIC -->
-<script>
-async function loadDashboard(){
-
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
-
-  let user = JSON.parse(localStorage.getItem("session"));
-
-  // WELCOME
-  document.getElementById("welcome").innerText = "Welcome " + user.name;
-
-  // APPLICATIONS
-  let snapshot = await getDocs(collection(db, "applications"));
-
-  let apps = [];
-
-  snapshot.forEach(doc=>{
-    let a = doc.data();
-    if(a.user === user.email) apps.push(a);
-  });
-
-  // TOTAL
-  document.getElementById("totalApps").innerText = apps.length;
-
-  // SELECTED
-  let selected = apps.filter(a => a.status === "Shortlisted" || a.status === "Hired").length;
-  document.getElementById("selectedApps").innerText = selected;
-
-  // SCORE
-  let score = Math.min(100, apps.length * 20 + selected * 10);
-  document.getElementById("score").innerText = score + "%";
-
-}
-
-// AUTO LOAD
-window.onload = () => {
-  loadDashboard();
-};
-</script>
-
+  
+  <!-- ✅ SINGLE MODULE SCRIPT -->
+  <script type="module">
+    import { db, logoutUser } from "./firebase.js";
+    import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    
+    // 🔥 LOGOUT FIX
+    document.getElementById("logoutBtn")
+      .addEventListener("click", logoutUser);
+    
+    
+    // ================= SAFE SESSION =================
+    function getSession() {
+      try {
+        return JSON.parse(localStorage.getItem("session"));
+      } catch {
+        return null;
+      }
+    }
+    
+    
+    // ================= DASHBOARD =================
+    async function loadDashboard() {
+      
+      const user = getSession();
+      
+      // ❌ not logged in → redirect
+      if (!user || !user.email) {
+        alert("⚠️ Please login first");
+        window.location.href = "index.html";
+        return;
+      }
+      
+      // ✅ welcome
+      document.getElementById("welcome").innerText =
+        "Welcome " + (user.name || "User");
+      
+      try {
+        
+        const snapshot = await getDocs(collection(db, "applications"));
+        const apps = [];
+        
+        snapshot.forEach(doc => {
+          const a = doc.data();
+          if (a.user === user.email) apps.push(a);
+        });
+        
+        // TOTAL
+        document.getElementById("totalApps").innerText = apps.length;
+        
+        // SELECTED
+        const selected = apps.filter(a =>
+          a.status === "Shortlisted" || a.status === "Hired"
+        ).length;
+        
+        document.getElementById("selectedApps").innerText = selected;
+        
+        // SCORE
+        const score = Math.min(100, apps.length * 20 + selected * 10);
+        document.getElementById("score").innerText = score + "%";
+        
+      } catch (err) {
+        console.error("Dashboard Error:", err);
+      }
+      
+    }
+    
+    
+    // AUTO LOAD
+    loadDashboard();
+  </script>
+  
 </body>
+
 </html>
-<link rel="stylesheet" href="style.css">
