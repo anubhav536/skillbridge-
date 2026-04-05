@@ -1,12 +1,11 @@
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Seeker Signup | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 
 <body>
@@ -16,35 +15,42 @@
   <h2>🚀 SkillBridge AI</h2>
   <div>
     <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+    <a href="#">About</a>
   </div>
 </nav>
 
 <!-- SIGNUP -->
 <section class="auth-container">
 
-  <h2>👨‍🎓 Job Seeker Signup</h2>
-  <p>Create your account to start applying for jobs</p>
+  <div class="card login-card">
 
-  <div class="card">
+    <h2>👨‍🎓 Job Seeker Signup</h2>
+    <p class="subtitle">
+      Create your account to start applying for jobs
+    </p>
 
-    <label>Full Name:</label>
+    <!-- NAME -->
+    <label>Full Name</label>
     <input type="text" id="name" placeholder="Enter Name">
 
-    <label>Email:</label>
+    <!-- EMAIL -->
+    <label>Email</label>
     <input type="email" id="email" placeholder="Enter Email">
 
-    <label>Password:</label>
+    <!-- PASSWORD -->
+    <label>Password</label>
     <input type="password" id="password" placeholder="Enter Password">
 
+    <!-- BUTTON -->
     <button id="signupBtn">Signup 🚀</button>
 
-  </div>
+    <!-- LOGIN -->
+    <p class="bottom-text">
+      Already have an account?
+      <a href="jobseeker-login.html">Login</a>
+    </p>
 
-  <p style="margin-top:15px;">
-    Already have an account?
-    <a href="jobseeker-login.html">Login</a>
-  </p>
+  </div>
 
 </section>
 
@@ -53,16 +59,12 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ SINGLE MODULE SCRIPT (FINAL FIX) -->
+<!-- SCRIPT -->
 <script type="module">
+  import { signupUser } from "./firebase.js";
 
-import { signupUser } from "./firebase.js";
-
-document.getElementById("signupBtn")
-  .addEventListener("click", () => {
-    signupUser("seeker");
-  });
-
+  document.getElementById("signupBtn")
+    .addEventListener("click", () => signupUser("seeker", document.getElementById("signupBtn")));
 </script>
 
 </body>
