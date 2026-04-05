@@ -3,63 +3,88 @@
 
 <head>
   <meta charset="UTF-8">
+  <title>Dashboard | SkillBridge AI</title>
   
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
-  
-  <title>Recruiter Dashboard | SkillBridge AI</title>
+  <!-- ✅ CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
   
+  <!-- SIDEBAR -->
   <div>
-    <h2>🏢 Recruiter Panel</h2>
+    
+    <h2>👨‍🎓 Job Seeker Panel</h2>
     
     <nav>
-      <a href="rec-dashboard.html">Dashboard</a><br>
-      <a href="rec-post-job.html">Post Job</a><br>
-      <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-      <a href="rec-applicants.html">Applicants</a><br>
-      <a href="rec-analytics.html">Analytics</a><br>
-      <a href="rec-profile.html">Profile</a><br>
+      <a href="js-dashboard.html">Dashboard</a><br>
+      <a href="js-jobs.html">Jobs</a><br>
+      <a href="js-applications.html">Applications</a><br>
+      <a href="js-resume.html">Resume Builder</a><br>
+      <a href="js-analytics.html">Analytics</a><br>
+      <a href="js-profile.html">Profile</a><br>
     </nav>
     
+    <!-- ✅ FIXED LOGOUT -->
     <button id="logoutBtn">Logout 👋</button>
+    
   </div>
   
   <hr>
   
+  <!-- MAIN -->
   <div>
-    <h2>📊 Dashboard Overview</h2>
     
-    <p id="welcome">Loading...</p>
+    <h2>📊 Dashboard</h2>
     
-    <div>
-      <h3>💼 Jobs Posted</h3>
-      <p id="totalJobs">Loading...</p>
-    </div>
+    <p id="welcome">Welcome...</p>
+    
+    <hr>
     
     <div>
-      <h3>👥 Total Applicants</h3>
-      <p id="totalApps">Loading...</p>
+      
+      <div>
+        <h3>📄 Total Applications</h3>
+        <p id="totalApps">Loading...</p>
+      </div>
+      
+      <div>
+        <h3>✅ Selected</h3>
+        <p id="selectedApps">Loading...</p>
+      </div>
+      
+      <div>
+        <h3>⚡ Employability Score</h3>
+        <p id="score">Calculating...</p>
+      </div>
+      
     </div>
     
+    <hr>
+    
     <div>
-      <h3>📈 Hiring Rate</h3>
-      <p id="hiringRate">Loading...</p>
+      
+      <h3>⚡ Quick Actions</h3>
+      
+      <a href="js-jobs.html"><button>Find Jobs 💼</button></a>
+      <a href="js-resume.html"><button>Build Resume 📄</button></a>
+      <a href="js-analytics.html"><button>View Analytics 📊</button></a>
+      
     </div>
+    
   </div>
   
-  <script type="module" defer>
+  <!-- ✅ SINGLE MODULE SCRIPT -->
+  <script type="module">
     import { db, logoutUser } from "./firebase.js";
-    import { getDocs, collection }
-    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
     
+    // 🔥 LOGOUT FIX
     document.getElementById("logoutBtn")
       .addEventListener("click", logoutUser);
     
+    
+    // ================= SAFE SESSION =================
     function getSession() {
       try {
         return JSON.parse(localStorage.getItem("session"));
@@ -68,70 +93,56 @@
       }
     }
     
-    function setText(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.innerText = value;
-    }
     
-    async function loadRecruiterDashboard() {
+    // ================= DASHBOARD =================
+    async function loadDashboard() {
       
       const user = getSession();
       
-      if (!user || user.role !== "recruiter") {
+      // ❌ not logged in → redirect
+      if (!user || !user.email) {
+        alert("⚠️ Please login first");
         window.location.href = "index.html";
         return;
       }
       
-      setText("welcome", "Welcome " + user.name);
+      // ✅ welcome
+      document.getElementById("welcome").innerText =
+        "Welcome " + (user.name || "User");
       
       try {
-        const jobsSnap = await getDocs(collection(db, "jobs"));
         
-        let myJobIds = [];
+        const snapshot = await getDocs(collection(db, "applications"));
+        const apps = [];
         
-        jobsSnap.forEach(doc => {
-          const j = doc.data();
-          if (j.recruiter === user.email) {
-            myJobIds.push(doc.id);
-          }
-        });
-        
-        setText("totalJobs", myJobIds.length);
-        
-        const appsSnap = await getDocs(collection(db, "applications"));
-        
-        let myApps = [];
-        
-        appsSnap.forEach(doc => {
+        snapshot.forEach(doc => {
           const a = doc.data();
-          if (myJobIds.includes(a.jobId)) {
-            myApps.push(a);
-          }
+          if (a.user === user.email) apps.push(a);
         });
         
-        setText("totalApps", myApps.length);
+        // TOTAL
+        document.getElementById("totalApps").innerText = apps.length;
         
-        const hired = myApps.filter(a => a.status === "Hired").length;
+        // SELECTED
+        const selected = apps.filter(a =>
+          a.status === "Shortlisted" || a.status === "Hired"
+        ).length;
         
-        const rate = myApps.length ?
-          Math.round((hired / myApps.length) * 100) :
-          0;
+        document.getElementById("selectedApps").innerText = selected;
         
-        setText("hiringRate", rate + "%");
+        // SCORE
+        const score = Math.min(100, apps.length * 20 + selected * 10);
+        document.getElementById("score").innerText = score + "%";
         
       } catch (err) {
-        console.log("Ignored:", err); // 🔥 silent
+        console.error("Dashboard Error:", err);
       }
+      
     }
     
-    let loaded = false;
     
-    window.addEventListener("DOMContentLoaded", () => {
-      if (loaded) return;
-      loaded = true;
-      
-      loadRecruiterDashboard();
-    });
+    // AUTO LOAD
+    loadDashboard();
   </script>
   
 </body>
