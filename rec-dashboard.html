@@ -5,7 +5,14 @@
   <meta charset="UTF-8">
   <title>Recruiter Dashboard | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=50">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- NO CACHE FIX -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -18,12 +25,12 @@
     <h2>🏢 Recruiter Panel</h2>
 
     <nav>
-      <a href="r-dashboard.html">Dashboard</a>
-      <a href="r-post-job.html">Post Job</a>
-      <a href="r-manage-jobs.html">Manage Jobs</a>
-      <a href="r-applicants.html">Applicants</a>
-      <a href="r-analytics.html">Analytics</a>
-      <a href="r-profile.html">Profile</a>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
@@ -36,23 +43,24 @@
 
     <h2>📊 Dashboard Overview</h2>
 
-    <p id="welcome">Welcome...</p>
+    <p id="welcome">Loading...</p>
 
+    <!-- GRID -->
     <div class="grid">
 
       <div class="card">
         <h3>📦 Jobs Posted</h3>
-        <p id="jobs">0</p>
+        <p id="totalJobs">Loading...</p>
       </div>
 
       <div class="card">
         <h3>👥 Total Applicants</h3>
-        <p id="apps">0</p>
+        <p id="totalApps">Loading...</p>
       </div>
 
       <div class="card">
         <h3>📈 Hiring Rate</h3>
-        <p id="rate">0%</p>
+        <p id="hiringRate">Loading...</p>
       </div>
 
     </div>
@@ -62,20 +70,21 @@
 </div>
 
 
+<!-- SCRIPT -->
 <script type="module">
 
 import { db, logoutUser } from "./firebase.js";
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getDocs, collection } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
 
 // LOGOUT
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
+
 // SESSION
-function getSession(){
+function getSession() {
   try {
     return JSON.parse(localStorage.getItem("session"));
   } catch {
@@ -83,64 +92,79 @@ function getSession(){
   }
 }
 
-// LOAD DASHBOARD
-async function loadDashboard(){
+
+// SAFE TEXT SET
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+
+// MAIN LOGIC
+async function loadRecruiterDashboard() {
 
   const user = getSession();
 
-  if(!user){
-    alert("Login required ❌");
+  if (!user || user.role !== "recruiter") {
     window.location.href = "index.html";
     return;
   }
 
-  document.getElementById("welcome").innerText =
-    "Welcome " + (user.name || "Recruiter");
+  setText("welcome", "Welcome " + user.name);
 
   try {
 
-    // JOBS
+    // ================= JOBS =================
     const jobsSnap = await getDocs(collection(db, "jobs"));
-    let myJobs = [];
 
-    jobsSnap.forEach(doc=>{
+    let myJobIds = [];
+
+    jobsSnap.forEach(doc => {
       const j = doc.data();
-      if(j.owner === user.email) myJobs.push(j);
-    });
 
-    document.getElementById("jobs").innerText = myJobs.length;
-
-
-    // APPLICATIONS
-    const appsSnap = await getDocs(collection(db, "applications"));
-    let totalApps = 0;
-    let hired = 0;
-
-    appsSnap.forEach(doc=>{
-      const a = doc.data();
-
-      if(myJobs.some(j => j.id === a.jobId)){
-        totalApps++;
-
-        if(a.status === "Hired") hired++;
+      if (j.recruiter === user.email) {
+        myJobIds.push(doc.id);
       }
     });
 
-    document.getElementById("apps").innerText = totalApps;
+    setText("totalJobs", myJobIds.length);
 
-    const rate = totalApps
-      ? Math.round((hired / totalApps) * 100)
+
+    // ================= APPLICATIONS =================
+    const appsSnap = await getDocs(collection(db, "applications"));
+
+    let myApps = [];
+
+    appsSnap.forEach(doc => {
+      const a = doc.data();
+
+      if (myJobIds.includes(a.jobId)) {
+        myApps.push(a);
+      }
+    });
+
+    setText("totalApps", myApps.length);
+
+
+    // ================= HIRING RATE =================
+    const hired = myApps.filter(a => a.status === "Hired").length;
+
+    const rate = myApps.length
+      ? Math.round((hired / myApps.length) * 100)
       : 0;
 
-    document.getElementById("rate").innerText = rate + "%";
+    setText("hiringRate", rate + "%");
 
-  } catch(err){
-    console.error(err);
+
+  } catch (err) {
+    console.log("Silent Error:", err);
   }
 
 }
 
-loadDashboard();
+
+// LOAD
+loadRecruiterDashboard();
 
 </script>
 
