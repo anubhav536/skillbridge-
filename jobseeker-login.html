@@ -1,78 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Seeker Login | SkillBridge AI</title>
-  
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css?v=7">
 </head>
 
 <body>
-  
-  <!-- NAVBAR -->
-  <nav>
-    <h2>🚀 SkillBridge AI</h2>
-    <div>
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-    </div>
-  </nav>
-  
-  <!-- LOGIN -->
-  <section class="auth-container">
-    
+
+<!-- NAVBAR -->
+<nav>
+  <h2>🚀 SkillBridge AI</h2>
+  <div>
+    <a href="index.html">Home</a>
+    <a href="#">About</a>
+  </div>
+</nav>
+
+<!-- LOGIN SECTION -->
+<section class="auth-container">
+
+  <div class="card login-card">
+
     <h2>👨‍🎓 Job Seeker Login</h2>
-    <p>Login to access your dashboard and explore jobs</p>
-    
-    <div class="card">
-      
-      <label>Email:</label>
-      <input type="email" id="email" placeholder="Enter Email">
-      
-      <label>Password:</label>
-      <input type="password" id="password" placeholder="Enter Password">
-      
-      <button id="loginBtn">Login 🚀</button>
-      
-    </div>
-    
-    <p style="margin-top:15px;">
+    <p class="subtitle">
+      Login to access your dashboard and explore jobs
+    </p>
+
+    <!-- EMAIL -->
+    <label>Email</label>
+    <input type="email" id="email" placeholder="Enter Email">
+
+    <!-- PASSWORD -->
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter Password">
+
+    <!-- BUTTON -->
+    <button id="loginBtn">Login 🚀</button>
+
+    <!-- SIGNUP -->
+    <p class="bottom-text">
       Don’t have an account?
       <a href="jobseeker-signup.html">Signup</a>
     </p>
-    
-  </section>
-  
-  <!-- FOOTER -->
-  <footer>
-    <p>© 2026 SkillBridge AI</p>
-  </footer>
-  
-  <!-- ✅ SAFE MODULE SCRIPT -->
-  <script type="module">
-    import { loginUser } from "./firebase.js";
-    
-    // 🔥 DOM fully load hone ke baad hi event attach
-    window.addEventListener("DOMContentLoaded", () => {
-      
-      const btn = document.getElementById("loginBtn");
-      
-      if (btn) {
-        btn.addEventListener("click", async () => {
-          try {
-            await loginUser();
-          } catch (e) {
-            console.error("Login crash:", e);
-            alert("Something went wrong ❌");
-          }
-        });
-      }
-      
-    });
-  </script>
-  
-</body>
 
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 SkillBridge AI</p>
+</footer>
+
+<!-- SCRIPT -->
+<script type="module">
+  import { loginUser } from "./firebase.js";
+
+  document.getElementById("loginBtn")
+    .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
+</script>
+
+</body>
 </html>
