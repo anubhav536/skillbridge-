@@ -10,6 +10,7 @@ body {
   background: #0F172A;
   color: #E2E8F0;
   line-height: 1.6;
+  overflow-x: hidden; /* 🔥 MAIN FIX */
 }
 
 /* ================= NAVBAR ================= */
@@ -20,6 +21,7 @@ nav {
   padding: 15px 20px;
   background: #1E293B;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 nav h2 {
@@ -58,6 +60,7 @@ button:hover {
 .dashboard {
   display: flex;
   min-height: 100vh;
+  width: 100%;
 }
 
 .sidebar {
@@ -93,6 +96,7 @@ button:hover {
 .main {
   flex: 1;
   padding: 20px;
+  width: 100%;
 }
 
 /* ================= CARD ================= */
@@ -150,16 +154,21 @@ form {
 /* ================= LANDING PAGE FIX ================= */
 section {
   padding: 40px 20px;
+  max-width: 100%;        /* 🔥 FIX */
+  overflow-x: hidden;     /* 🔥 FIX */
 }
 
 section h1 {
   font-size: 32px;
   margin-bottom: 10px;
+  line-height: 1.3;
+  word-break: break-word; /* 🔥 FIX */
 }
 
 section p {
   margin-bottom: 20px;
   color: #94A3B8;
+  word-break: break-word; /* 🔥 FIX */
 }
 
 /* ROLE BUTTONS */
@@ -194,18 +203,15 @@ section p {
 /* ================= MOBILE ================= */
 @media (max-width: 768px) {
 
-  /* NAV */
   nav {
     flex-direction: column;
     align-items: center;
   }
 
-  /* DASHBOARD STACK */
   .dashboard {
     flex-direction: column;
   }
 
-  /* SIDEBAR → TOP NAV */
   .sidebar {
     width: 100%;
     text-align: center;
@@ -232,26 +238,29 @@ section p {
     margin-top: 10px;
   }
 
-  /* MAIN */
   .main {
     padding: 15px;
     text-align: center;
   }
 
-  /* GRID */
   .grid {
     grid-template-columns: 1fr;
   }
 
-  /* CARD */
   .card {
     width: 100%;
     margin: 10px 0;
   }
 
-  /* HERO TEXT */
+  section {
+    padding: 20px 15px;
+  }
+
   section h1 {
     font-size: 24px;
   }
 
+  section p {
+    font-size: 14px;
+  }
 }
