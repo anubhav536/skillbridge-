@@ -3,137 +3,152 @@
 
 <head>
   <meta charset="UTF-8">
-  
+
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  
+
   <title>Recruiter Dashboard | SkillBridge AI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  
-  <div>
-    <h2>🏢 Recruiter Panel</h2>
-    
-    <nav>
-      <a href="rec-dashboard.html">Dashboard</a><br>
-      <a href="rec-post-job.html">Post Job</a><br>
-      <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-      <a href="rec-applicants.html">Applicants</a><br>
-      <a href="rec-analytics.html">Analytics</a><br>
-      <a href="rec-profile.html">Profile</a><br>
-    </nav>
-    
-    <button id="logoutBtn">Logout 👋</button>
-  </div>
-  
-  <hr>
-  
-  <div>
-    <h2>📊 Dashboard Overview</h2>
-    
-    <p id="welcome">Loading...</p>
-    
-    <div>
-      <h3>💼 Jobs Posted</h3>
-      <p id="totalJobs">Loading...</p>
-    </div>
-    
-    <div>
-      <h3>👥 Total Applicants</h3>
-      <p id="totalApps">Loading...</p>
-    </div>
-    
-    <div>
-      <h3>📈 Hiring Rate</h3>
-      <p id="hiringRate">Loading...</p>
-    </div>
-  </div>
-  
-  <script type="module" defer>
-    import { db, logoutUser } from "./firebase.js";
-    import { getDocs, collection }
-    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-    
-    document.getElementById("logoutBtn")
-      .addEventListener("click", logoutUser);
-    
-    function getSession() {
-      try {
-        return JSON.parse(localStorage.getItem("session"));
-      } catch {
-        return null;
-      }
-    }
-    
-    function setText(id, value) {
-      const el = document.getElementById(id);
-      if (el) el.innerText = value;
-    }
-    
-    async function loadRecruiterDashboard() {
-      
-      const user = getSession();
-      
-      if (!user || user.role !== "recruiter") {
-        window.location.href = "index.html";
-        return;
-      }
-      
-      setText("welcome", "Welcome " + user.name);
-      
-      try {
-        const jobsSnap = await getDocs(collection(db, "jobs"));
-        
-        let myJobIds = [];
-        
-        jobsSnap.forEach(doc => {
-          const j = doc.data();
-          if (j.recruiter === user.email) {
-            myJobIds.push(doc.id);
-          }
-        });
-        
-        setText("totalJobs", myJobIds.length);
-        
-        const appsSnap = await getDocs(collection(db, "applications"));
-        
-        let myApps = [];
-        
-        appsSnap.forEach(doc => {
-          const a = doc.data();
-          if (myJobIds.includes(a.jobId)) {
-            myApps.push(a);
-          }
-        });
-        
-        setText("totalApps", myApps.length);
-        
-        const hired = myApps.filter(a => a.status === "Hired").length;
-        
-        const rate = myApps.length ?
-          Math.round((hired / myApps.length) * 100) :
-          0;
-        
-        setText("hiringRate", rate + "%");
-        
-      } catch (err) {
-        console.log("Ignored:", err); // 🔥 silent
-      }
-    }
-    
-    let loaded = false;
-    
-    window.addEventListener("DOMContentLoaded", () => {
-      if (loaded) return;
-      loaded = true;
-      
-      loadRecruiterDashboard();
-    });
-  </script>
-  
-</body>
 
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <h2>🏢 Recruiter Panel</h2>
+
+    <nav>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>📊 Dashboard Overview</h2>
+
+    <p id="welcome">Loading...</p>
+
+    <!-- GRID -->
+    <div class="grid">
+
+      <div class="card">
+        <h3>💼 Jobs Posted</h3>
+        <p id="totalJobs">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h3>👥 Total Applicants</h3>
+        <p id="totalApps">Loading...</p>
+      </div>
+
+      <div class="card">
+        <h3>📈 Hiring Rate</h3>
+        <p id="hiringRate">Loading...</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- SCRIPT -->
+<script type="module">
+
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// logout
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+// session
+function getSession() {
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
+}
+
+// safe set
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = value;
+}
+
+// main logic
+async function loadRecruiterDashboard() {
+
+  const user = getSession();
+
+  if (!user || user.role !== "recruiter") {
+    window.location.href = "index.html";
+    return;
+  }
+
+  setText("welcome", "Welcome " + user.name);
+
+  try {
+
+    const jobsSnap = await getDocs(collection(db, "jobs"));
+
+    let myJobIds = [];
+
+    jobsSnap.forEach(doc => {
+      const j = doc.data();
+      if (j.recruiter === user.email) {
+        myJobIds.push(doc.id);
+      }
+    });
+
+    setText("totalJobs", myJobIds.length);
+
+    const appsSnap = await getDocs(collection(db, "applications"));
+
+    let myApps = [];
+
+    appsSnap.forEach(doc => {
+      const a = doc.data();
+      if (myJobIds.includes(a.jobId)) {
+        myApps.push(a);
+      }
+    });
+
+    setText("totalApps", myApps.length);
+
+    const hired = myApps.filter(a => a.status === "Hired").length;
+
+    const rate = myApps.length
+      ? Math.round((hired / myApps.length) * 100)
+      : 0;
+
+    setText("hiringRate", rate + "%");
+
+  } catch (err) {
+    console.log("Ignored:", err);
+  }
+}
+
+// load once
+window.addEventListener("DOMContentLoaded", loadRecruiterDashboard);
+
+</script>
+
+</body>
 </html>
