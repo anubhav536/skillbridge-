@@ -457,3 +457,82 @@ button:hover {
 .status-rejected {
   color: #EF4444; /* red */
 }
+/* ================= RESUME BUILDER ================= */
+
+.resume-form {
+  max-width: 500px;
+  margin: 20px auto;
+  background: #1E293B;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+/* LABEL */
+.resume-form label {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+  color: #CBD5F5;
+}
+
+/* INPUT */
+.resume-form input,
+.resume-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: none;
+  background: #0F172A;
+  color: #E2E8F0;
+  font-size: 14px;
+}
+
+/* FOCUS */
+.resume-form input:focus,
+.resume-form textarea:focus {
+  outline: 1px solid #2563EB;
+}
+
+/* TEXTAREA */
+.resume-form textarea {
+  min-height: 80px;
+  resize: none;
+}
+
+/* BUTTON */
+.resume-form button {
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  font-size: 14px;
+}
+/* RESUME PREVIEW */
+.resume-preview {
+  display: none;
+  margin-top: 20px;
+  background: #1E293B;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.resume-preview h2 {
+  color: #60A5FA;
+}
+
+.resume-section {
+  margin-top: 15px;
+}
+
+.resume-section h3 {
+  border-bottom: 1px solid #334155;
+  margin-bottom: 5px;
+}
+
+/* PRINT BUTTON */
+.print-btn {
+  display: none;
+  margin-top: 15px;
+  width: 100%;
+}
