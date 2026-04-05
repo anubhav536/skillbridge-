@@ -194,3 +194,56 @@ form {
     width: 100%;
   }
 }
+/* ================= MOBILE PRO UI ================= */
+@media (max-width: 768px) {
+
+  /* SIDEBAR = TOP NAV STYLE */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #1E293B;
+    border-bottom: 1px solid #334155;
+  }
+
+  .sidebar h2 {
+    margin-bottom: 10px;
+    font-size: 16px;
+  }
+
+  /* NAV ITEMS INLINE */
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .sidebar a {
+    background: #0F172A;
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+
+  /* LOGOUT CENTER */
+  .sidebar button {
+    margin-top: 10px;
+    width: auto;
+  }
+
+  /* MAIN CENTER ALIGN */
+  .main {
+    text-align: center;
+  }
+
+  /* GRID CENTER */
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* CARD IMPROVE */
+  .card {
+    margin: 10px 0;
+  }
+
+}
