@@ -1,8 +1,12 @@
-<!DOCTYPE html>
+</html>
+<link rel="stylesheet" href="style.css"><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>My Applications | SkillBridge AI</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,83 +25,131 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📄 My Applications</h2>
 
-  <!-- SEARCH -->
   <input type="text" id="searchApp" placeholder="Search applications...">
 
   <br><br>
 
-  <!-- APPLICATION LIST -->
-  <div id="apps">
-    <!-- Firebase data will load here -->
-  </div>
+  <div id="apps"></div>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- LOAD APPLICATIONS -->
-<script>
+import { db, logoutUser } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// 🔥 LOGOUT
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= SAFE SESSION =================
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
+}
+
+
+// ================= LOAD APPLICATIONS =================
 async function loadMyApplications(){
 
-  const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
+  const user = getSession();
+  const container = document.getElementById("apps");
 
-  let user = JSON.parse(localStorage.getItem("session"));
-  let container = document.getElementById("apps");
+  if(!user || !user.email){
+    alert("⚠️ Please login first");
+    window.location.href = "index.html";
+    return;
+  }
 
   container.innerHTML = "Loading...";
 
-  let snapshot = await getDocs(collection(db, "applications"));
+  try {
 
-  let html = "";
+    const snapshot = await getDocs(collection(db, "applications"));
 
-  snapshot.forEach(doc=>{
-    let a = doc.data();
+    container.innerHTML = "";
 
-    if(a.user === user.email){
-      html += `
-        <div>
-          <b>Job ID:</b> ${a.jobId}<br>
-          <b>Status:</b> ${a.status}<br>
-          <b>Applied On:</b> ${a.time ? new Date(a.time.seconds * 1000).toLocaleString() : "N/A"}
-          <hr>
-        </div>
-      `;
+    let found = false;
+
+    snapshot.forEach(doc => {
+
+      const a = doc.data();
+
+      if(a.user === user.email){
+
+        found = true;
+
+        const card = document.createElement("div");
+
+        card.style.border = "1px solid #ccc";
+        card.style.padding = "10px";
+        card.style.marginBottom = "10px";
+
+        card.innerHTML = `
+          <b>💼 Job ID:</b> ${a.jobId || "N/A"}<br>
+          <b>📌 Status:</b> ${a.status || "Pending"}<br>
+          <b>⏰ Applied:</b> ${
+            a.time?.seconds
+              ? new Date(a.time.seconds * 1000).toLocaleString()
+              : "N/A"
+          }
+        `;
+
+        container.appendChild(card);
+      }
+
+    });
+
+    if(!found){
+      container.innerHTML = "No applications found";
     }
-  });
 
-  container.innerHTML = html || "No applications found";
+  } catch (err) {
+    console.error("Load Apps Error:", err);
+    container.innerHTML = "Error loading applications ❌";
+  }
+
 }
 
-// SEARCH FILTER
-document.getElementById("searchApp").addEventListener("keyup", function(){
-  let q = this.value.toLowerCase();
-  let apps = document.querySelectorAll("#apps div");
 
-  apps.forEach(a=>{
-    a.style.display = a.innerText.toLowerCase().includes(q) ? "block" : "none";
+// ================= SEARCH =================
+document.getElementById("searchApp")
+  .addEventListener("keyup", function(){
+
+    const q = this.value.toLowerCase();
+    const apps = document.querySelectorAll("#apps div");
+
+    apps.forEach(a=>{
+      a.style.display =
+        a.innerText.toLowerCase().includes(q)
+          ? "block"
+          : "none";
+    });
+
   });
-});
+
 
 // AUTO LOAD
-window.onload = () => {
-  loadMyApplications();
-};
+loadMyApplications();
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
