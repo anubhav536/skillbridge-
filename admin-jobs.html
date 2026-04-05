@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Admin Jobs | SkillBridge AI</title>
@@ -7,99 +8,138 @@
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
-<div>
-
-  <h2>👑 Admin Panel</h2>
-
-  <nav>
-    <a href="admin-dashboard.html">Dashboard</a><br>
-    <a href="admin-users.html">Users</a><br>
-    <a href="admin-jobs.html">Jobs</a><br>
-    <a href="admin-applications.html">Applications</a><br>
-  </nav>
-
-  <button onclick="logout()">Logout</button>
-
-</div>
-
-<hr>
-
-<!-- MAIN CONTENT -->
-<div>
-
-  <h2>💼 All Jobs</h2>
-
-  <!-- SEARCH -->
-  <input type="text" id="searchJob" placeholder="Search jobs...">
-
-  <br><br>
-
-  <!-- JOB LIST -->
-  <div id="jobsList">
-    <!-- Firebase jobs will load here -->
+  
+  <!-- SIDEBAR -->
+  <div>
+    
+    <h2>👑 Admin Panel</h2>
+    
+    <nav>
+      <a href="admin-dashboard.html">Dashboard</a><br>
+      <a href="admin-users.html">Users</a><br>
+      <a href="admin-jobs.html">Jobs</a><br>
+      <a href="admin-applications.html">Applications</a><br>
+    </nav>
+    
+    <!-- ✅ FIXED LOGOUT -->
+    <button id="logoutBtn">Logout 👋</button>
+    
   </div>
-
-</div>
-
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
-
-<!-- LOAD JOBS -->
-<script>
-async function loadAllJobs(){
-
-  const { getDocs, collection, deleteDoc, doc } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
-
-  let container = document.getElementById("jobsList");
-  container.innerHTML = "Loading...";
-
-  let snapshot = await getDocs(collection(db, "jobs"));
-
-  let html = "";
-
-  snapshot.forEach(d => {
-    let j = d.data();
-
-    html += `
-      <div>
-        <b>${j.title}</b><br>
-        Skills: ${j.skills?.join(", ") || ""}<br>
-        Salary: ${j.salary || "N/A"}<br>
-        <button onclick="deleteJob('${d.id}')">Delete ❌</button>
-        <hr>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html || "No jobs found";
-
-  // DELETE FUNCTION
-  window.deleteJob = async function(id){
-    await deleteDoc(doc(db, "jobs", id));
-    alert("Job Deleted ❌");
+  
+  <hr>
+  
+  <!-- MAIN -->
+  <div>
+    
+    <h2>💼 All Jobs</h2>
+    
+    <input type="text" id="searchJob" placeholder="Search jobs...">
+    
+    <br><br>
+    
+    <div id="jobsList"></div>
+    
+  </div>
+  
+  <!-- ✅ SINGLE MODULE SCRIPT -->
+  <script type="module">
+    import { db, logoutUser } from "./firebase.js";
+    import {
+      getDocs,
+      collection,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    
+    
+    // 🔥 LOGOUT FIX
+    document.getElementById("logoutBtn")
+      .addEventListener("click", logoutUser);
+    
+    
+    // ================= LOAD JOBS =================
+    async function loadAllJobs() {
+      
+      const container = document.getElementById("jobsList");
+      container.innerHTML = "Loading...";
+      
+      try {
+        const snapshot = await getDocs(collection(db, "jobs"));
+        
+        container.innerHTML = "";
+        
+        snapshot.forEach(d => {
+          
+          const j = d.data();
+          
+          const card = document.createElement("div");
+          
+          card.style.border = "1px solid #ccc";
+          card.style.padding = "10px";
+          card.style.marginBottom = "10px";
+          
+          card.innerHTML = `
+        <b>💼 ${j.title || "No Title"}</b><br>
+        🛠 Skills: ${j.skills?.join(", ") || "N/A"}<br>
+        💰 Salary: ${j.salary || "N/A"}<br>
+        <button class="deleteBtn">Delete ❌</button>
+      `;
+          
+          // 🔥 DELETE BUTTON EVENT
+          card.querySelector(".deleteBtn")
+            .addEventListener("click", async () => {
+              
+              const confirmDelete = confirm("Delete this job?");
+              if (!confirmDelete) return;
+              
+              try {
+                await deleteDoc(doc(db, "jobs", d.id));
+                alert("Job Deleted ❌");
+                
+                loadAllJobs(); // reload
+                
+              } catch (err) {
+                console.error(err);
+                alert("Delete failed ❌");
+              }
+              
+            });
+          
+          container.appendChild(card);
+        });
+        
+        if (!container.innerHTML) {
+          container.innerHTML = "No jobs found";
+        }
+        
+      } catch (err) {
+        console.error("Load Jobs Error:", err);
+        container.innerHTML = "Error loading jobs ❌";
+      }
+    }
+    
+    
+    // ================= SEARCH =================
+    document.getElementById("searchJob")
+      .addEventListener("keyup", function() {
+        
+        const q = this.value.toLowerCase();
+        const jobs = document.querySelectorAll("#jobsList div");
+        
+        jobs.forEach(j => {
+          j.style.display =
+            j.innerText.toLowerCase().includes(q) ?
+            "block" :
+            "none";
+        });
+        
+      });
+    
+    
+    // AUTO LOAD
     loadAllJobs();
-  }
-}
-
-// SEARCH FILTER
-document.getElementById("searchJob").addEventListener("keyup", function(){
-  let q = this.value.toLowerCase();
-  let jobs = document.querySelectorAll("#jobsList div");
-
-  jobs.forEach(j=>{
-    j.style.display = j.innerText.toLowerCase().includes(q) ? "block" : "none";
-  });
-});
-
-// AUTO LOAD
-window.onload = () => {
-  loadAllJobs();
-};
-</script>
-
+  </script>
+  
 </body>
-</html>
+
+</html>""
