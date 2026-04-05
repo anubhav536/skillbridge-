@@ -127,3 +127,46 @@ button:hover {
   }
 
 }
+/* ================= LOGIN PAGE FIX ================= */
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+  text-align: left;
+}
+
+.login-card h2 {
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #94A3B8;
+  margin-bottom: 15px;
+}
+
+.login-card label {
+  display: block;
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.login-card input {
+  margin-bottom: 10px;
+}
+
+.login-card button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.bottom-text {
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+.bottom-text a {
+  color: #7C3AED;
+  text-decoration: none;
+}
