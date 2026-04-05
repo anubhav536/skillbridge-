@@ -1,8 +1,34 @@
-<!DOCTYPE html>
+</html>
+<link rel="stylesheet" href="style.css"><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Resume Builder | SkillBridge AI</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .resume-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-top: 20px;
+      background: #fff;
+    }
+
+    .resume-box h2 {
+      margin-bottom: 5px;
+    }
+
+    .resume-section {
+      margin-top: 15px;
+    }
+
+    .resume-section h3 {
+      margin-bottom: 5px;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
 </head>
 
 <body>
@@ -21,19 +47,20 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📄 Resume Builder</h2>
 
   <!-- FORM -->
-  <form onsubmit="generateResume(event)">
+  <form id="resumeForm">
 
     <label>Full Name:</label><br>
     <input type="text" id="rname"><br><br>
@@ -51,71 +78,92 @@
 
   </form>
 
-  <hr>
-
   <!-- PREVIEW -->
-  <div>
+  <div id="resumePreview" class="resume-box" style="display:none;"></div>
 
-    <h3>📄 Resume Preview</h3>
+  <br>
 
-    <pre id="resumePreview">
-Your resume will appear here...
-    </pre>
-
-    <br>
-
-    <button onclick="printResume()">Print / Download 🖨️</button>
-
-  </div>
+  <button id="printBtn" style="display:none;">Print / Download 🖨️</button>
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ MODULE SCRIPT -->
+<script type="module">
 
-<!-- RESUME LOGIC -->
-<script>
-function generateResume(e){
-  e.preventDefault();
+import { logoutUser } from "./firebase.js";
 
-  let name = document.getElementById("rname").value;
-  let skills = document.getElementById("rskills").value;
-  let edu = document.getElementById("reducation").value;
-  let proj = document.getElementById("rprojects").value;
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
 
-  let output = `
-========================
-        RESUME
-========================
 
-Name: ${name}
+// ================= GENERATE RESUME =================
+document.getElementById("resumeForm")
+  .addEventListener("submit", (e) => {
 
-Skills:
-${skills}
+    e.preventDefault();
 
-Education:
-${edu}
+    const name = document.getElementById("rname").value;
+    const skills = document.getElementById("rskills").value;
+    const edu = document.getElementById("reducation").value;
+    const proj = document.getElementById("rprojects").value;
 
-Projects:
-${proj}
+    const preview = document.getElementById("resumePreview");
 
-========================
-`;
+    preview.style.display = "block";
 
-  document.getElementById("resumePreview").innerText = output;
-}
+    preview.innerHTML = `
+      <h2>${name}</h2>
+      
+      <div class="resume-section">
+        <h3>Skills</h3>
+        <p>${skills}</p>
+      </div>
 
-// PRINT FUNCTION
-function printResume(){
-  let content = document.getElementById("resumePreview").innerText;
+      <div class="resume-section">
+        <h3>Education</h3>
+        <p>${edu}</p>
+      </div>
 
-  let win = window.open("", "", "width=800,height=600");
-  win.document.write("<pre>" + content + "</pre>");
-  win.print();
-}
+      <div class="resume-section">
+        <h3>Projects</h3>
+        <p>${proj}</p>
+      </div>
+    `;
+
+    document.getElementById("printBtn").style.display = "inline-block";
+
+  });
+
+
+// ================= PRINT =================
+document.getElementById("printBtn")
+  .addEventListener("click", () => {
+
+    const content = document.getElementById("resumePreview").innerHTML;
+
+    const win = window.open("", "", "width=800,height=600");
+
+    win.document.write(`
+      <html>
+      <head>
+        <title>Resume</title>
+        <style>
+          body { font-family: Arial; padding: 20px; }
+          h2 { margin-bottom: 5px; }
+          h3 { border-bottom: 1px solid #ccc; }
+        </style>
+      </head>
+      <body>${content}</body>
+      </html>
+    `);
+
+    win.document.close();
+    win.print();
+
+  });
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
