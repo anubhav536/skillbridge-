@@ -1,63 +1,59 @@
-</html>
-<link rel="stylesheet" href="style.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>My Applications | SkillBridge AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Applications | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=15">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <button id="logoutBtn">Logout 👋</button>
+  </div>
 
-</div>
+  <!-- MAIN -->
+  <div class="main">
 
-<hr>
+    <h2>📄 My Applications</h2>
 
-<!-- MAIN -->
-<div>
+    <input type="text" id="search" placeholder="Search applications..." />
 
-  <h2>📄 My Applications</h2>
+    <div id="appsContainer" class="grid"></div>
 
-  <input type="text" id="searchApp" placeholder="Search applications...">
-
-  <br><br>
-
-  <div id="apps"></div>
+  </div>
 
 </div>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
 <script type="module">
-
 import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔥 LOGOUT
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
-
-// ================= SAFE SESSION =================
-function getSession(){
+// SESSION
+function getSession() {
   try {
     return JSON.parse(localStorage.getItem("session"));
   } catch {
@@ -65,90 +61,57 @@ function getSession(){
   }
 }
 
+// LOAD APPLICATIONS
+async function loadApplications() {
 
-// ================= LOAD APPLICATIONS =================
-async function loadMyApplications(){
+  const container = document.getElementById("appsContainer");
+  container.innerHTML = "Loading...";
 
   const user = getSession();
-  const container = document.getElementById("apps");
 
-  if(!user || !user.email){
-    alert("⚠️ Please login first");
+  if (!user) {
+    alert("Login required ❌");
     window.location.href = "index.html";
     return;
   }
 
-  container.innerHTML = "Loading...";
-
   try {
 
-    const snapshot = await getDocs(collection(db, "applications"));
-
-    container.innerHTML = "";
+    const snap = await getDocs(collection(db, "applications"));
 
     let found = false;
+    container.innerHTML = "";
 
-    snapshot.forEach(doc => {
+    snap.forEach(doc => {
+      const app = doc.data();
 
-      const a = doc.data();
-
-      if(a.user === user.email){
-
+      if (app.user === user.email) {
         found = true;
 
-        const card = document.createElement("div");
+        const div = document.createElement("div");
+        div.className = "card";
 
-        card.style.border = "1px solid #ccc";
-        card.style.padding = "10px";
-        card.style.marginBottom = "10px";
-
-        card.innerHTML = `
-          <b>💼 Job ID:</b> ${a.jobId || "N/A"}<br>
-          <b>📌 Status:</b> ${a.status || "Pending"}<br>
-          <b>⏰ Applied:</b> ${
-            a.time?.seconds
-              ? new Date(a.time.seconds * 1000).toLocaleString()
-              : "N/A"
-          }
+        div.innerHTML = `
+          <h3>Job ID: ${app.jobId}</h3>
+          <p><b>Status:</b> ${app.status}</p>
+          <p><b>Applied On:</b> ${new Date(app.createdAt).toLocaleDateString()}</p>
         `;
 
-        container.appendChild(card);
+        container.appendChild(div);
       }
-
     });
 
-    if(!found){
-      container.innerHTML = "No applications found";
+    if (!found) {
+      container.innerHTML = "<p>No applications found ❌</p>";
     }
 
   } catch (err) {
-    console.error("Load Apps Error:", err);
+    console.error(err);
     container.innerHTML = "Error loading applications ❌";
   }
-
 }
 
-
-// ================= SEARCH =================
-document.getElementById("searchApp")
-  .addEventListener("keyup", function(){
-
-    const q = this.value.toLowerCase();
-    const apps = document.querySelectorAll("#apps div");
-
-    apps.forEach(a=>{
-      a.style.display =
-        a.innerText.toLowerCase().includes(q)
-          ? "block"
-          : "none";
-    });
-
-  });
-
-
-// AUTO LOAD
-loadMyApplications();
-
+loadApplications();
 </script>
 
 </body>
