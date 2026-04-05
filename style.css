@@ -220,3 +220,7 @@ button:hover {
 .auth-container {
   padding: 20px;
 }
+.login-card input {
+  width: 100%;
+  display: block;
+}
