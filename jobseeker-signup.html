@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -52,15 +53,16 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ FIREBASE LOAD -->
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT (FINAL FIX) -->
+<script type="module">
 
-<!-- ✅ BUTTON EVENT -->
-<script>
-  document.getElementById("signupBtn")
-    .addEventListener("click", () => {
-      window.signupUser("seeker"); // 🔥 KEY LINE
-    });
+import { signupUser } from "./firebase.js";
+
+document.getElementById("signupBtn")
+  .addEventListener("click", () => {
+    signupUser("seeker");
+  });
+
 </script>
 
 </body>
