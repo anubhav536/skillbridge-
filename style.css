@@ -708,3 +708,39 @@ button:hover {
     font-size: 20px;
   }
 }
+/* PROFILE PAGE */
+
+.profile-card {
+  text-align: left;
+  line-height: 1.8;
+}
+
+.profile-card h3 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.profile-card p {
+  color: #94A3B8;
+}
+
+/* FORM */
+.main form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main label {
+  font-size: 14px;
+  color: #94A3B8;
+}
+
+.main input {
+  margin-bottom: 10px;
+}
+
+.main button {
+  width: 100%;
+  margin-top: 10px;
+}
