@@ -1,5 +1,4 @@
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -50,14 +49,12 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
+  import { loginUser } from "./firebase.js";
 
-import { loginUser } from "./firebase.js";
-
-document.getElementById("loginBtn")
-  .addEventListener("click", loginUser);
-
+  document.getElementById("loginBtn")
+    .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
 </script>
 
 </body>
