@@ -1,9 +1,11 @@
 // ================= FIREBASE IMPORT =================
 import { auth } from "./firebase.js";
+
 import {
   signInWithEmailAndPassword,
   signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js"; 
+// 🔥 IMPORTANT: version SAME rakha (12.11.0)
 
 
 // ================= TOAST =================
@@ -37,8 +39,8 @@ function showToast(msg) {
 // ================= LOGIN =================
 window.loginUser = async function () {
 
-  let email = document.getElementById("email")?.value;
-  let password = document.getElementById("password")?.value;
+  const email = document.getElementById("email")?.value.trim();
+  const password = document.getElementById("password")?.value.trim();
 
   if (!email || !password) {
     showToast("⚠️ Fill all fields");
@@ -46,10 +48,9 @@ window.loginUser = async function () {
   }
 
   try {
-    let userCred = await signInWithEmailAndPassword(auth, email, password);
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
 
-    // ✅ save session properly
-    let userData = {
+    const userData = {
       email: userCred.user.email
     };
 
@@ -57,12 +58,11 @@ window.loginUser = async function () {
 
     showToast("Login Successful ✅");
 
-    // 🔥 HARD REDIRECT (no delay bugs)
     window.location.href = "js-dashboard.html";
 
   } catch (error) {
 
-    console.log("LOGIN ERROR:", error.code);
+    console.log("LOGIN ERROR:", error);
 
     if (error.code === "auth/wrong-password") {
       showToast("❌ Wrong password");
@@ -79,7 +79,12 @@ window.loginUser = async function () {
 
 // ================= LOGOUT =================
 window.logout = async function () {
-  await signOut(auth);
+  try {
+    await signOut(auth);
+  } catch (e) {
+    console.log("Logout error:", e);
+  }
+
   localStorage.removeItem("session");
 
   showToast("Logged out 👋");
@@ -92,9 +97,8 @@ window.logout = async function () {
 
 // ================= SESSION CHECK =================
 function checkSessionUI() {
-  let user = JSON.parse(localStorage.getItem("session"));
+  const user = JSON.parse(localStorage.getItem("session"));
 
-  // अगर login page पर है और already login है → redirect
   if (user && window.location.pathname.includes("login")) {
     window.location.href = "js-dashboard.html";
   }
@@ -103,7 +107,7 @@ function checkSessionUI() {
 
 // ================= PROTECT PAGE =================
 window.protectPage = function () {
-  let user = JSON.parse(localStorage.getItem("session"));
+  const user = JSON.parse(localStorage.getItem("session"));
 
   if (!user) {
     window.location.href = "index.html";
