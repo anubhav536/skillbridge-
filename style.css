@@ -268,3 +268,98 @@ button:hover {
   }
 
 }
+/* ================= JOBS PAGE ================= */
+
+#search {
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  background: #1E293B;
+  color: #E2E8F0;
+  margin: 15px 0;
+  font-size: 14px;
+}
+
+#search:focus {
+  outline: 1px solid #2563EB;
+}
+
+/* JOB CARD */
+#jobsContainer .card {
+  padding: 18px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #1E293B, #0F172A);
+  border: 1px solid #334155;
+  transition: 0.3s;
+  position: relative;
+}
+
+/* HOVER EFFECT */
+#jobsContainer .card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: #2563EB;
+}
+
+/* TITLE */
+#jobsContainer h3 {
+  color: #60A5FA;
+  margin-bottom: 8px;
+}
+
+/* TEXT */
+#jobsContainer p {
+  font-size: 13px;
+  color: #94A3B8;
+  margin: 5px 0;
+}
+
+/* APPLY BUTTON */
+#jobsContainer button {
+  margin-top: 10px;
+  width: 100%;
+  font-size: 13px;
+  padding: 10px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #2563EB, #7C3AED);
+}
+
+/* ================= GRID FIX ================= */
+
+#jobsContainer {
+  margin-top: 10px;
+}
+
+/* ================= EMPTY STATE ================= */
+
+#jobsContainer p {
+  text-align: center;
+  padding: 20px;
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+  #search {
+    font-size: 13px;
+    padding: 10px;
+  }
+
+  #jobsContainer .card {
+    padding: 15px;
+  }
+
+  #jobsContainer h3 {
+    font-size: 16px;
+  }
+
+  #jobsContainer p {
+    font-size: 12px;
+  }
+
+  #jobsContainer button {
+    font-size: 12px;
+  }
+
+}
