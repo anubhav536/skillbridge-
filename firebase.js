@@ -13,6 +13,7 @@ import {
   getDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
+
 // ================= CONFIG =================
 const firebaseConfig = {
   apiKey: "AIzaSyAvT2lDQ8UFfe8iKdJ-SDnJi49H6OSUfxM",
@@ -23,49 +24,52 @@ const firebaseConfig = {
   appId: "1:215570592226:web:70812f81c5d3afc2a109bb"
 };
 
+
 // ================= INIT =================
 const app = initializeApp(firebaseConfig);
 
-// ✅ EXPORT FIX (MOST IMPORTANT)
+// ✅ EXPORT (IMPORTANT)
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
+
 // ================= LOGIN =================
 export async function loginUser() {
-  
-  let email = document.getElementById("email").value.trim();
-  let password = document.getElementById("password").value.trim();
-  
+
+  const email = document.getElementById("email")?.value.trim();
+  const password = document.getElementById("password")?.value.trim();
+
   if (!email || !password) {
     alert("Fill all fields ❌");
     return;
   }
-  
+
   try {
-    let userCred = await signInWithEmailAndPassword(auth, email, password);
-    let uid = userCred.user.uid;
-    
-    let snap = await getDoc(doc(db, "users", uid));
-    
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
+    const uid = userCred.user.uid;
+
+    const snap = await getDoc(doc(db, "users", uid));
+
     if (!snap.exists()) {
       alert("User data not found ❌");
       return;
     }
-    
-    let user = snap.data();
-    
+
+    const user = snap.data();
+
     localStorage.setItem("session", JSON.stringify(user));
-    
+
     alert("Login success 🚀");
-    
-    // 🔥 smart redirect
+
+    // 🔥 role based redirect
     window.location.href = user.role === "seeker"
       ? "js-dashboard.html"
       : "rec-dashboard.html";
-    
+
   } catch (err) {
+
     console.log("Login Error:", err.code);
-    
+
     if (err.code === "auth/wrong-password") {
       alert("Wrong password ❌");
     } 
@@ -80,6 +84,7 @@ export async function loginUser() {
     }
   }
 }
+
 
 // ================= LOGOUT =================
 export async function logoutUser() {
