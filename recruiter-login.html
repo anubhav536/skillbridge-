@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <title>Recruiter Login | SkillBridge AI</title>
+
+  <!-- CSS FIX (HEAD me hona chahiye) -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <!-- NAVBAR -->
 <nav>
-  <h2>SkillBridge AI</h2>
+  <h2>🚀 SkillBridge AI</h2>
 
   <div>
     <a href="index.html">Home</a>
@@ -17,17 +20,14 @@
   </div>
 </nav>
 
-<hr>
-
 <!-- LOGIN SECTION -->
 <section>
 
   <h2>🏢 Recruiter Login</h2>
-
   <p>Login to manage jobs and hire candidates</p>
 
   <!-- FORM -->
-  <div>
+  <div class="card">
 
     <label>Email:</label><br>
     <input type="email" id="email" placeholder="Enter Email"><br><br>
@@ -35,8 +35,10 @@
     <label>Password:</label><br>
     <input type="password" id="password" placeholder="Enter Password"><br><br>
 
-    <button onclick="loginUser('recruiter')">Login 🚀</button>
+    <!-- 🔥 FIXED BUTTON -->
+    <button onclick="loginUser()">Login 🚀</button>
 
+    <!-- ERROR -->
     <p id="error"></p>
 
   </div>
@@ -50,17 +52,13 @@
 
 </section>
 
-<hr>
-
 <!-- FOOTER -->
 <footer>
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- 🔥 IMPORTANT: script module hona chahiye -->
+<script type="module" src="script.js"></script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
