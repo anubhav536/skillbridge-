@@ -5,64 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Seeker Login | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <nav>
   <h2>🚀 SkillBridge AI</h2>
-
   <div>
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
 </nav>
 
-<!-- LOGIN SECTION -->
 <section class="auth-container">
 
   <h2>👨‍🎓 Job Seeker Login</h2>
   <p>Login to access your dashboard and explore jobs</p>
 
-  <!-- FORM -->
   <div class="card">
 
     <label>Email:</label>
-    <input type="email" id="email" placeholder="Enter Email">
+    <input type="email" id="email">
 
     <label>Password:</label>
-    <input type="password" id="password" placeholder="Enter Password">
+    <input type="password" id="password">
 
-    <!-- 🔥 BUTTON -->
     <button id="loginBtn">Login 🚀</button>
-
-    <p id="error"></p>
 
   </div>
 
-  <p style="margin-top:15px;">
-    Don’t have an account?
-    <a href="jobseeker-signup.html">Signup</a>
-  </p>
-
 </section>
 
-<!-- FOOTER -->
 <footer>
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- ✅ MODULE JS -->
+<!-- ✅ FIXED IMPORT -->
 <script type="module">
+  import { loginUser } from "./firebase.js";
 
-import { loginUser } from "./script.js";
-
-// 🔥 Proper event listener (NO onclick bugs)
-document.getElementById("loginBtn").addEventListener("click", loginUser);
-
+  document.getElementById("loginBtn")
+    .addEventListener("click", loginUser);
 </script>
 
 </body>
