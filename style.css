@@ -643,3 +643,68 @@ button:hover {
     font-size: 18px;
   }
 }
+/* ===== ANALYTICS PRO UPGRADE ===== */
+
+/* MAIN HEADING */
+.main h2 {
+  margin-bottom: 15px;
+}
+
+/* GRID CENTER FIX */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* CARD PREMIUM LOOK */
+.card {
+  background: linear-gradient(145deg, #1E293B, #0F172A);
+  border-radius: 14px;
+  padding: 18px;
+  transition: 0.3s;
+  text-align: center;
+}
+
+/* HOVER EFFECT 🔥 */
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* CARD TEXT */
+.card h3 {
+  font-size: 15px;
+  color: #94A3B8;
+}
+
+.card p {
+  font-size: 26px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* AI BOX SPECIAL */
+.card ul {
+  list-style: none;
+  padding: 0;
+}
+
+.card li {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #CBD5F5;
+}
+
+/* ADD ICON STYLE */
+.card li::before {
+  content: "✨ ";
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .card p {
+    font-size: 20px;
+  }
+}
