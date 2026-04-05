@@ -37,7 +37,6 @@
 
   </div>
 
-  <!-- ✅ FIXED LINK -->
   <p style="margin-top:15px;">
     Don’t have an account?
     <a href="jobseeker-signup.html">Signup</a>
@@ -50,12 +49,15 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- JS -->
-<script type="module">
-  import { loginUser } from "./firebase.js";
+<!-- ✅ FIREBASE LOAD -->
+<script type="module" src="firebase.js"></script>
 
+<!-- ✅ BUTTON EVENT -->
+<script>
   document.getElementById("loginBtn")
-    .addEventListener("click", loginUser);
+    .addEventListener("click", () => {
+      window.loginUser(); // 🔥 THIS IS KEY
+    });
 </script>
 
 </body>
