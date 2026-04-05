@@ -863,3 +863,54 @@ html {
 button:active {
   transform: scale(0.97);
 }
+/* ================= PROFILE PAGE ================= */
+
+.profile-card {
+  text-align: center;
+}
+
+.profile-card h3 {
+  font-size: 18px;
+  color: #38BDF8;
+  margin-bottom: 8px;
+}
+
+.profile-card p {
+  color: #94A3B8;
+  margin: 4px 0;
+}
+
+/* FORM */
+.main form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.main label {
+  font-size: 14px;
+  color: #94A3B8;
+}
+
+.main input {
+  margin-bottom: 10px;
+}
+
+/* BUTTON */
+.main button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* MOBILE PERFECT */
+@media (max-width: 768px) {
+
+  .profile-card {
+    padding: 15px;
+  }
+
+  .profile-card h3 {
+    font-size: 16px;
+  }
+
+}
