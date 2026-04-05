@@ -1,133 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Post Job | SkillBridge AI</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- NO CACHE -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>🏢 Recruiter Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="rec-dashboard.html">Dashboard</a><br>
-    <a href="rec-post-job.html">Post Job</a><br>
-    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-    <a href="rec-applicants.html">Applicants</a><br>
-    <a href="rec-analytics.html">Analytics</a><br>
-    <a href="rec-profile.html">Profile</a><br>
-  </nav>
+    <h2>🏢 Recruiter Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>📢 Post a New Job</h2>
+
+    <div class="card">
+
+      <form id="jobForm">
+
+        <label>Job Title</label>
+        <input type="text" id="title" placeholder="Frontend Developer">
+
+        <label>Skills Required</label>
+        <input type="text" id="skills" placeholder="HTML, CSS, JS">
+
+        <label>Salary</label>
+        <input type="text" id="salary" placeholder="₹3-5 LPA">
+
+        <label>Location</label>
+        <input type="text" id="location" placeholder="Remote / Delhi">
+
+        <button type="submit" id="postBtn">Post Job 🚀</button>
+
+      </form>
+
+    </div>
+
+  </div>
 
 </div>
 
-<hr>
 
-<!-- MAIN -->
-<div>
-
-  <h2>📢 Post a New Job</h2>
-
-  <form id="jobForm">
-
-    <label>Job Title:</label><br>
-    <input type="text" id="title"><br><br>
-
-    <label>Skills Required:</label><br>
-    <input type="text" id="skills" placeholder="HTML, CSS, JS"><br><br>
-
-    <label>Salary:</label><br>
-    <input type="number" id="salary"><br><br>
-
-    <label>Location:</label><br>
-    <input type="text" id="location"><br><br>
-
-    <button type="submit" id="submitBtn">Post Job 🚀</button>
-
-  </form>
-
-</div>
-
-<!-- ✅ MODULE SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
-  import { db, logoutUser } from "./firebase.js";
-  import { addDoc, collection } 
-    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  // 🔥 LOGOUT FIX
-  document.getElementById("logoutBtn")
-    .addEventListener("click", logoutUser);
+import { postJob, logoutUser, protectPage } from "./firebase.js";
 
+// protect recruiter page
+protectPage("recruiter");
 
-  function getSession(){
-    try {
-      return JSON.parse(localStorage.getItem("session"));
-    } catch {
-      return null;
-    }
-  }
+// logout
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
 
-
-  const form = document.getElementById("jobForm");
-  const btn = document.getElementById("submitBtn");
-
-
-  form.addEventListener("submit", async (e) => {
+// post job
+document.getElementById("jobForm")
+  .addEventListener("submit", (e) => {
     e.preventDefault();
-
-    const user = getSession();
-
-    // ✅ SECURITY CHECK
-    if (!user || user.role !== "recruiter") {
-      alert("⚠️ Unauthorized access");
-      window.location.href = "index.html";
-      return;
-    }
-
-    const title = document.getElementById("title").value.trim();
-    const skills = document.getElementById("skills").value.trim();
-    const salary = document.getElementById("salary").value;
-    const location = document.getElementById("location").value.trim();
-
-    if (!title || !skills) {
-      alert("Fill required fields ❌");
-      return;
-    }
-
-    try {
-
-      // 🔥 LOADING STATE
-      btn.innerText = "Posting...";
-      btn.disabled = true;
-
-      await addDoc(collection(db, "jobs"), {
-        title,
-        skills: skills.split(",").map(s => s.trim()),
-        salary: salary || "N/A",
-        location: location || "Remote",
-        recruiter: user.email, // 🔥 IMPORTANT
-        createdAt: new Date().toISOString()
-      });
-
-      alert("Job Posted Successfully 🚀");
-
-      form.reset();
-
-    } catch (err) {
-      console.error("Post Job Error:", err);
-      alert("Job post failed ❌");
-    }
-
-    // 🔥 RESET BUTTON
-    btn.innerText = "Post Job 🚀";
-    btn.disabled = false;
-
+    postJob(document.getElementById("postBtn"));
   });
 
 </script>
