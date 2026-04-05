@@ -25,53 +25,57 @@ const firebaseConfig = {
 
 // ================= INIT =================
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+
+// ✅ EXPORT FIX (MOST IMPORTANT)
+export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 // ================= LOGIN =================
 export async function loginUser() {
-
+  
   let email = document.getElementById("email").value.trim();
   let password = document.getElementById("password").value.trim();
-
+  
   if (!email || !password) {
     alert("Fill all fields ❌");
     return;
   }
-
+  
   try {
     let userCred = await signInWithEmailAndPassword(auth, email, password);
     let uid = userCred.user.uid;
-
+    
     let snap = await getDoc(doc(db, "users", uid));
-
-    // ✅ SAFE CHECK
+    
     if (!snap.exists()) {
       alert("User data not found ❌");
       return;
     }
-
+    
     let user = snap.data();
-
+    
     localStorage.setItem("session", JSON.stringify(user));
-
+    
     alert("Login success 🚀");
-
-    // ✅ ROLE BASED REDIRECT
+    
+    // 🔥 smart redirect
     window.location.href = user.role === "seeker"
       ? "js-dashboard.html"
       : "rec-dashboard.html";
-
+    
   } catch (err) {
     console.log("Login Error:", err.code);
-
+    
     if (err.code === "auth/wrong-password") {
       alert("Wrong password ❌");
-    } else if (err.code === "auth/user-not-found") {
+    } 
+    else if (err.code === "auth/user-not-found") {
       alert("User not found ❌");
-    } else if (err.code === "auth/invalid-email") {
+    } 
+    else if (err.code === "auth/invalid-email") {
       alert("Invalid email ❌");
-    } else {
+    } 
+    else {
       alert("Login failed ❌");
     }
   }
