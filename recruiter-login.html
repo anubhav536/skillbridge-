@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Recruiter Login | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css?v=9">
 </head>
 
 <body>
@@ -14,31 +15,33 @@
   <h2>🚀 SkillBridge AI</h2>
   <div>
     <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+    <a href="#">About</a>
   </div>
 </nav>
 
 <!-- LOGIN -->
 <section class="auth-container">
 
-  <div class="card" style="width:100%; max-width:350px; text-align:center;">
+  <div class="card login-card">
 
     <h2>🏢 Recruiter Login</h2>
-    <p style="color:#94A3B8; margin-bottom:15px;">
+    <p class="subtitle">
       Manage jobs & hire candidates
     </p>
 
+    <!-- EMAIL -->
     <label>Email</label>
     <input type="email" id="email" placeholder="Enter Email">
 
-    <label style="margin-top:10px;">Password</label>
+    <!-- PASSWORD -->
+    <label>Password</label>
     <input type="password" id="password" placeholder="Enter Password">
 
-    <button id="loginBtn" style="width:100%; margin-top:15px;">
-      Login 🚀
-    </button>
+    <!-- BUTTON -->
+    <button id="loginBtn">Login 🚀</button>
 
-    <p style="margin-top:15px; font-size:14px;">
+    <!-- SIGNUP -->
+    <p class="bottom-text">
       Don’t have an account?
       <a href="recruiter-signup.html">Signup</a>
     </p>
