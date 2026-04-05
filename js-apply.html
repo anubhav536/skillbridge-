@@ -1,8 +1,12 @@
-<!DOCTYPE html>
+</html>
+<link rel="stylesheet" href="style.css"><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>Apply Job | SkillBridge AI</title>
+
+  <!-- ✅ CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -21,26 +25,23 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
-  <button onclick="logout()">Logout</button>
+  <!-- ✅ FIXED LOGOUT -->
+  <button id="logoutBtn">Logout 👋</button>
 
 </div>
 
 <hr>
 
-<!-- MAIN CONTENT -->
+<!-- MAIN -->
 <div>
 
   <h2>📥 Apply for Job</h2>
 
-  <!-- JOB INFO -->
-  <div>
-    <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
-  </div>
+  <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
 
   <hr>
 
-  <!-- FORM -->
-  <form onsubmit="handleApply(event)">
+  <form id="applyForm">
 
     <label>Your Skills:</label><br>
     <input type="text" id="skills" placeholder="e.g. HTML, CSS, JS"><br><br>
@@ -48,7 +49,7 @@
     <label>Experience (years):</label><br>
     <input type="number" id="experience" placeholder="0"><br><br>
 
-    <label>Resume (text):</label><br>
+    <label>Resume:</label><br>
     <textarea id="resumeText" rows="5" placeholder="Write your resume..."></textarea><br><br>
 
     <button type="submit">Submit Application 🚀</button>
@@ -57,60 +58,89 @@
 
 </div>
 
-<!-- JS -->
-<script src="script.js"></script>
-<script type="module" src="firebase.js"></script>
+<!-- ✅ SINGLE MODULE SCRIPT -->
+<script type="module">
 
-<!-- APPLY LOGIC -->
-<script>
+import { db, logoutUser } from "./firebase.js";
+import { addDoc, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// 🔥 LOGOUT FIX
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// ================= SAFE SESSION =================
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
+}
+
+
+// ================= GET JOB ID =================
 let currentJobId = "";
 
-// GET JOB ID FROM URL
 function getJobId(){
-  let params = new URLSearchParams(window.location.search);
+  const params = new URLSearchParams(window.location.search);
   currentJobId = params.get("id");
+
   document.getElementById("jobId").innerText = currentJobId || "N/A";
 }
 
-// APPLY HANDLER
-async function handleApply(e){
-  e.preventDefault();
 
-  const { addDoc, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
-  const { db } = await import("./firebase.js");
+// ================= APPLY =================
+document.getElementById("applyForm")
+  .addEventListener("submit", async (e) => {
 
-  let user = JSON.parse(localStorage.getItem("session"));
+    e.preventDefault();
 
-  let skills = document.getElementById("skills").value;
-  let exp = document.getElementById("experience").value;
-  let resume = document.getElementById("resumeText").value;
+    const user = getSession();
 
-  if(!skills || !resume){
-    alert("Fill required fields ❌");
-    return;
-  }
+    if(!user || !user.email){
+      alert("⚠️ Login required");
+      window.location.href = "index.html";
+      return;
+    }
 
-  await addDoc(collection(db, "applications"), {
-    user: user.email,
-    jobId: currentJobId,
-    skills,
-    experience: exp,
-    resume,
-    status: "Applied",
-    time: new Date()
+    const skills = document.getElementById("skills").value.trim();
+    const exp = document.getElementById("experience").value.trim();
+    const resume = document.getElementById("resumeText").value.trim();
+
+    if(!skills || !resume){
+      alert("⚠️ Fill required fields");
+      return;
+    }
+
+    try {
+
+      await addDoc(collection(db, "applications"), {
+        user: user.email,
+        jobId: currentJobId,
+        skills,
+        experience: exp || "0",
+        resume,
+        status: "Applied",
+        time: new Date().toISOString()
+      });
+
+      alert("Application Submitted ✅");
+
+      window.location.href = "js-applications.html";
+
+    } catch (err) {
+      console.error("Apply Error:", err);
+      alert("Application failed ❌");
+    }
+
   });
 
-  alert("Application Submitted ✅");
-
-  window.location.href = "js-applications.html";
-}
 
 // AUTO LOAD
-window.onload = () => {
-  getJobId();
-};
+getJobId();
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
