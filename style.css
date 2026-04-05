@@ -572,3 +572,74 @@ button:hover {
   width: 100%;
   margin-top: 10px;
 }
+/* ANALYTICS PAGE */
+
+/* GRID CARDS */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+/* CARD TEXT CENTER */
+.card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* LIST STYLE */
+.card ul {
+  padding-left: 15px;
+}
+
+.card li {
+  margin: 5px 0;
+}
+
+/* MOBILE FIX */
+@media (max-width: 768px) {
+  .card p {
+    font-size: 18px;
+  }
+}
+/* ANALYTICS UPGRADE */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.card p {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+/* LIST STYLE */
+.card ul {
+  padding-left: 15px;
+}
+
+.card li {
+  margin: 6px 0;
+  color: #CBD5F5;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .card p {
+    font-size: 18px;
+  }
+}
