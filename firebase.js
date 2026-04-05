@@ -1,4 +1,5 @@
-// ================= IMPORT =================
+  window.location.href = "index.html";
+};// ================= IMPORT =================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 
 import {
@@ -32,21 +33,19 @@ const firebaseConfig = {
 // ================= INIT =================
 const app = initializeApp(firebaseConfig);
 
-// ✅ FIX 1: EXPORT AUTH
+// ✅ ONLY ONE EXPORT
 export const auth = getAuth(app);
-
-// ✅ optional export
 export const db = getFirestore(app);
 
 // ================= SIGNUP =================
-window.signupUser = async function(role) {
+export async function signupUser(role) {
 
   let name = document.getElementById("name")?.value;
   let email = document.getElementById("email")?.value;
   let password = document.getElementById("password")?.value;
 
   if (!name || !email || !password) {
-    showToast("Fill all fields ❌");
+    alert("Fill all fields ❌");
     return;
   }
 
@@ -61,25 +60,25 @@ window.signupUser = async function(role) {
       createdAt: new Date()
     });
 
-    showToast("Signup successful 🚀");
+    alert("Signup successful 🚀");
 
     window.location.href = role === "seeker"
       ? "jobseeker-login.html"
       : "recruiter-login.html";
 
   } catch (err) {
-    showToast(err.message);
+    alert(err.message);
   }
-};
+}
 
 // ================= LOGIN =================
-window.loginUser = async function(role) {
+export async function loginUser() {
 
   let email = document.getElementById("email")?.value;
   let password = document.getElementById("password")?.value;
 
   if (!email || !password) {
-    showToast("Fill all fields ❌");
+    alert("Fill all fields ❌");
     return;
   }
 
@@ -91,31 +90,27 @@ window.loginUser = async function(role) {
     let user = snap.data();
 
     if (!user) {
-      showToast("User not found ❌");
+      alert("User not found ❌");
       return;
     }
 
-    // ✅ FIX 2: role auto detect
-    let userRole = user.role;
-
     localStorage.setItem("session", JSON.stringify(user));
 
-    showToast("Login success 🚀");
+    alert("Login success 🚀");
 
-    // ✅ smart redirect
-    window.location.href = userRole === "seeker"
+    window.location.href = user.role === "seeker"
       ? "js-dashboard.html"
       : "rec-dashboard.html";
 
   } catch (error) {
     console.log(error);
-    showToast("Login failed ❌");
+    alert("Login failed ❌");
   }
-};
+}
 
 // ================= LOGOUT =================
-window.firebaseLogout = async function() {
+export async function firebaseLogout() {
   await signOut(auth);
   localStorage.removeItem("session");
   window.location.href = "index.html";
-};
+}
