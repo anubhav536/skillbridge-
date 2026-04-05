@@ -1,63 +1,60 @@
-</html>
-<link rel="stylesheet" href="style.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jobs | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>👨‍🎓 Job Seeker Panel</h2>
 
-  <nav>
-    <a href="js-dashboard.html">Dashboard</a><br>
-    <a href="js-jobs.html">Jobs</a><br>
-    <a href="js-applications.html">Applications</a><br>
-    <a href="js-resume.html">Resume Builder</a><br>
-    <a href="js-analytics.html">Analytics</a><br>
-    <a href="js-profile.html">Profile</a><br>
-  </nav>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <button id="logoutBtn">Logout 👋</button>
+  </div>
 
-</div>
+  <!-- MAIN -->
+  <div class="main">
 
-<hr>
+    <h2>💼 Available Jobs</h2>
 
-<!-- MAIN -->
-<div>
+    <input type="text" id="search" placeholder="Search jobs..." />
 
-  <h2>💼 Available Jobs</h2>
+    <div id="jobsContainer" class="grid"></div>
 
-  <input type="text" id="searchJob" placeholder="Search jobs...">
-
-  <br><br>
-
-  <div id="jobList">Loading...</div>
+  </div>
 
 </div>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
 <script type="module">
-
 import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  getDocs,
+  collection,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔥 LOGOUT FIX
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
-
-// ================= SAFE SESSION =================
-function getSession(){
+// SESSION
+function getSession() {
   try {
     return JSON.parse(localStorage.getItem("session"));
   } catch {
@@ -65,87 +62,66 @@ function getSession(){
   }
 }
 
+// LOAD JOBS
+async function loadJobs() {
 
-// ================= LOAD JOBS =================
-async function loadJobsPage(){
-
-  const user = getSession();
-
-  if(!user || !user.email){
-    alert("⚠️ Please login first");
-    window.location.href = "index.html";
-    return;
-  }
-
-  const container = document.getElementById("jobList");
+  const container = document.getElementById("jobsContainer");
+  container.innerHTML = "Loading...";
 
   try {
+    const snap = await getDocs(collection(db, "jobs"));
 
-    const snapshot = await getDocs(collection(db, "jobs"));
-
-    container.innerHTML = "";
-
-    if(snapshot.empty){
-      container.innerHTML = "No jobs available";
+    if (snap.empty) {
+      container.innerHTML = "<p>No jobs available ❌</p>";
       return;
     }
 
-    snapshot.forEach(doc => {
+    container.innerHTML = "";
 
-      const j = doc.data();
+    snap.forEach(doc => {
+      const job = doc.data();
 
-      const card = document.createElement("div");
+      const div = document.createElement("div");
+      div.className = "card";
 
-      card.style.border = "1px solid #ccc";
-      card.style.padding = "10px";
-      card.style.marginBottom = "10px";
-
-      card.innerHTML = `
-        <b>${j.title || "No Title"}</b><br>
-        🧠 Skills: ${j.skills?.join(", ") || "N/A"}<br>
-        💰 Salary: ${j.salary || "N/A"}<br><br>
+      div.innerHTML = `
+        <h3>${job.title}</h3>
+        <p><b>Skills:</b> ${job.skills.join(", ")}</p>
+        <p><b>Posted by:</b> ${job.recruiter}</p>
+        <button onclick="applyJob('${doc.id}')">Apply 🚀</button>
       `;
 
-      const btn = document.createElement("button");
-      btn.innerText = "Apply 🚀";
-
-      btn.addEventListener("click", () => {
-        window.location.href = `js-apply.html?id=${doc.id}`;
-      });
-
-      card.appendChild(btn);
-      container.appendChild(card);
-
+      container.appendChild(div);
     });
 
   } catch (err) {
-    console.error("Jobs Load Error:", err);
+    console.error(err);
     container.innerHTML = "Error loading jobs ❌";
   }
-
 }
 
+// APPLY JOB
+window.applyJob = async function(jobId) {
 
-// ================= SEARCH =================
-document.getElementById("searchJob")
-  .addEventListener("keyup", function(){
+  const user = getSession();
 
-    const q = this.value.toLowerCase();
-    const jobs = document.querySelectorAll("#jobList div");
+  if (!user) {
+    alert("Login required ❌");
+    return;
+  }
 
-    jobs.forEach(j=>{
-      j.style.display =
-        j.innerText.toLowerCase().includes(q)
-          ? "block"
-          : "none";
-    });
-
+  await addDoc(collection(db, "applications"), {
+    jobId,
+    user: user.email,
+    status: "Applied",
+    createdAt: new Date().toISOString()
   });
 
+  alert("Applied successfully 🚀");
+};
 
-// AUTO LOAD
-loadJobsPage();
-
+// LOAD
+loadJobs();
 </script>
 
 </body>
