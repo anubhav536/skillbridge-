@@ -1,10 +1,8 @@
-  window.location.href = "index.html";
-};// ================= IMPORT =================
+// ================= IMPORT =================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
@@ -12,12 +10,7 @@ import {
 import {
   getFirestore,
   doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  getDocs,
-  deleteDoc
+  getDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 // ================= CONFIG =================
@@ -32,50 +25,14 @@ const firebaseConfig = {
 
 // ================= INIT =================
 const app = initializeApp(firebaseConfig);
-
-// ✅ ONLY ONE EXPORT
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-
-// ================= SIGNUP =================
-export async function signupUser(role) {
-
-  let name = document.getElementById("name")?.value;
-  let email = document.getElementById("email")?.value;
-  let password = document.getElementById("password")?.value;
-
-  if (!name || !email || !password) {
-    alert("Fill all fields ❌");
-    return;
-  }
-
-  try {
-    let userCred = await createUserWithEmailAndPassword(auth, email, password);
-    let uid = userCred.user.uid;
-
-    await setDoc(doc(db, "users", uid), {
-      name,
-      email,
-      role,
-      createdAt: new Date()
-    });
-
-    alert("Signup successful 🚀");
-
-    window.location.href = role === "seeker"
-      ? "jobseeker-login.html"
-      : "recruiter-login.html";
-
-  } catch (err) {
-    alert(err.message);
-  }
-}
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // ================= LOGIN =================
 export async function loginUser() {
 
-  let email = document.getElementById("email")?.value;
-  let password = document.getElementById("password")?.value;
+  let email = document.getElementById("email").value.trim();
+  let password = document.getElementById("password").value.trim();
 
   if (!email || !password) {
     alert("Fill all fields ❌");
@@ -87,29 +44,41 @@ export async function loginUser() {
     let uid = userCred.user.uid;
 
     let snap = await getDoc(doc(db, "users", uid));
-    let user = snap.data();
 
-    if (!user) {
-      alert("User not found ❌");
+    // ✅ SAFE CHECK
+    if (!snap.exists()) {
+      alert("User data not found ❌");
       return;
     }
+
+    let user = snap.data();
 
     localStorage.setItem("session", JSON.stringify(user));
 
     alert("Login success 🚀");
 
+    // ✅ ROLE BASED REDIRECT
     window.location.href = user.role === "seeker"
       ? "js-dashboard.html"
       : "rec-dashboard.html";
 
-  } catch (error) {
-    console.log(error);
-    alert("Login failed ❌");
+  } catch (err) {
+    console.log("Login Error:", err.code);
+
+    if (err.code === "auth/wrong-password") {
+      alert("Wrong password ❌");
+    } else if (err.code === "auth/user-not-found") {
+      alert("User not found ❌");
+    } else if (err.code === "auth/invalid-email") {
+      alert("Invalid email ❌");
+    } else {
+      alert("Login failed ❌");
+    }
   }
 }
 
 // ================= LOGOUT =================
-export async function firebaseLogout() {
+export async function logoutUser() {
   await signOut(auth);
   localStorage.removeItem("session");
   window.location.href = "index.html";
