@@ -1,11 +1,34 @@
-
-</html><!DOCTYPE html>
+</html>
+<link rel="stylesheet" href="style.css"><!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Analytics | SkillBridge AI</title>
+  <title>Resume Builder | SkillBridge AI</title>
 
+  <!-- ✅ CSS -->
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .resume-box {
+      border: 1px solid #ccc;
+      padding: 20px;
+      margin-top: 20px;
+      background: #fff;
+    }
+
+    .resume-box h2 {
+      margin-bottom: 5px;
+    }
+
+    .resume-section {
+      margin-top: 15px;
+    }
+
+    .resume-section h3 {
+      margin-bottom: 5px;
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
 </head>
 
 <body>
@@ -24,6 +47,7 @@
     <a href="js-profile.html">Profile</a><br>
   </nav>
 
+  <!-- ✅ FIXED LOGOUT -->
   <button id="logoutBtn">Logout 👋</button>
 
 </div>
@@ -33,156 +57,111 @@
 <!-- MAIN -->
 <div>
 
-  <h2>📊 Career Analytics</h2>
+  <h2>📄 Resume Builder</h2>
 
-  <div>
-    <h3>⚡ Employability Score</h3>
-    <p id="score">Calculating...</p>
-  </div>
+  <!-- FORM -->
+  <form id="resumeForm">
 
-  <div>
-    <h3>📄 Total Applications</h3>
-    <p id="totalApps">Loading...</p>
-  </div>
+    <label>Full Name:</label><br>
+    <input type="text" id="rname"><br><br>
 
-  <div>
-    <h3>✅ Success Rate</h3>
-    <p id="successRate">Loading...</p>
-  </div>
+    <label>Skills:</label><br>
+    <input type="text" id="rskills" placeholder="HTML, CSS, JS"><br><br>
 
-  <hr>
+    <label>Education:</label><br>
+    <input type="text" id="reducation"><br><br>
 
-  <div>
-    <h3>🧠 AI Suggestions</h3>
-    <ul id="suggestions"></ul>
-  </div>
+    <label>Projects:</label><br>
+    <textarea id="rprojects" rows="4"></textarea><br><br>
 
-  <hr>
+    <button type="submit">Generate Resume 🚀</button>
 
-  <div>
-    <h3>🔥 Trending Skills</h3>
-    <ul id="trendingSkills"></ul>
-  </div>
+  </form>
+
+  <!-- PREVIEW -->
+  <div id="resumePreview" class="resume-box" style="display:none;"></div>
+
+  <br>
+
+  <button id="printBtn" style="display:none;">Print / Download 🖨️</button>
 
 </div>
 
-<!-- ✅ SINGLE MODULE SCRIPT -->
+<!-- ✅ MODULE SCRIPT -->
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { logoutUser } from "./firebase.js";
 
-// ================= LOGOUT =================
+// 🔥 LOGOUT FIX
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
 
-// ================= SAFE SESSION =================
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
+// ================= GENERATE RESUME =================
+document.getElementById("resumeForm")
+  .addEventListener("submit", (e) => {
+
+    e.preventDefault();
+
+    const name = document.getElementById("rname").value;
+    const skills = document.getElementById("rskills").value;
+    const edu = document.getElementById("reducation").value;
+    const proj = document.getElementById("rprojects").value;
+
+    const preview = document.getElementById("resumePreview");
+
+    preview.style.display = "block";
+
+    preview.innerHTML = `
+      <h2>${name}</h2>
+      
+      <div class="resume-section">
+        <h3>Skills</h3>
+        <p>${skills}</p>
+      </div>
+
+      <div class="resume-section">
+        <h3>Education</h3>
+        <p>${edu}</p>
+      </div>
+
+      <div class="resume-section">
+        <h3>Projects</h3>
+        <p>${proj}</p>
+      </div>
+    `;
+
+    document.getElementById("printBtn").style.display = "inline-block";
+
+  });
 
 
-// ================= ANALYTICS =================
-async function loadAnalytics(){
+// ================= PRINT =================
+document.getElementById("printBtn")
+  .addEventListener("click", () => {
 
-  const user = getSession();
+    const content = document.getElementById("resumePreview").innerHTML;
 
-  // 🔥 SAFE CHECK (NO RANDOM REDIRECT BUG)
-  if (!user || !user.email) {
-    console.warn("No session found");
-    alert("⚠️ Please login first");
-    window.location.href = "index.html";
-    return;
-  }
+    const win = window.open("", "", "width=800,height=600");
 
-  try {
+    win.document.write(`
+      <html>
+      <head>
+        <title>Resume</title>
+        <style>
+          body { font-family: Arial; padding: 20px; }
+          h2 { margin-bottom: 5px; }
+          h3 { border-bottom: 1px solid #ccc; }
+        </style>
+      </head>
+      <body>${content}</body>
+      </html>
+    `);
 
-    // ================= APPLICATIONS =================
-    const appsSnap = await getDocs(collection(db, "applications"));
-    const apps = [];
+    win.document.close();
+    win.print();
 
-    appsSnap.forEach(doc => {
-      const a = doc.data();
-      if (a.user === user.email) apps.push(a);
-    });
-
-    // TOTAL
-    document.getElementById("totalApps").innerText = apps.length;
-
-    // SUCCESS RATE
-    const success = apps.filter(a =>
-      a.status === "Shortlisted" || a.status === "Hired"
-    ).length;
-
-    const rate = apps.length
-      ? Math.round((success / apps.length) * 100)
-      : 0;
-
-    document.getElementById("successRate").innerText = rate + "%";
-
-    // SCORE
-    const score = Math.min(100, apps.length * 20 + rate);
-    document.getElementById("score").innerText = score + "%";
-
-    // ================= SUGGESTIONS =================
-    const suggestions = document.getElementById("suggestions");
-    suggestions.innerHTML = "";
-
-    if(rate < 30){
-      suggestions.innerHTML += "<li>📉 Improve your skills</li>";
-    }
-
-    if(apps.length < 3){
-      suggestions.innerHTML += "<li>🚀 Apply to more jobs</li>";
-    }
-
-    if(score > 70){
-      suggestions.innerHTML += "<li>🔥 You're doing great!</li>";
-    }
-
-    if(!suggestions.innerHTML){
-      suggestions.innerHTML = "<li>✨ Keep going!</li>";
-    }
-
-    // ================= TRENDING =================
-    const jobsSnap = await getDocs(collection(db, "jobs"));
-    const skillCount = {};
-
-    jobsSnap.forEach(doc => {
-      const j = doc.data();
-
-      j.skills?.forEach(s => {
-        skillCount[s] = (skillCount[s] || 0) + 1;
-      });
-    });
-
-    const sorted = Object.keys(skillCount)
-      .sort((a,b)=>skillCount[b]-skillCount[a]);
-
-    const trending = document.getElementById("trendingSkills");
-    trending.innerHTML = "";
-
-    sorted.slice(0,5).forEach(s => {
-      const li = document.createElement("li");
-      li.innerText = s;
-      trending.appendChild(li);
-    });
-
-  } catch (err) {
-    console.error("Analytics Error:", err);
-    alert("❌ Error loading analytics");
-  }
-
-}
-
-
-// ================= AUTO LOAD =================
-loadAnalytics();
+  });
 
 </script>
 
