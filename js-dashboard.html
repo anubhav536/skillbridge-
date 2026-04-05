@@ -3,148 +3,145 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard | SkillBridge AI</title>
-  
-  <!-- ✅ CSS -->
-  <link rel="stylesheet" href="style.css">
+
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 
 <body>
-  
+
+<!-- DASHBOARD WRAPPER -->
+<div class="dashboard">
+
   <!-- SIDEBAR -->
-  <div>
-    
+  <div class="sidebar">
+
     <h2>👨‍🎓 Job Seeker Panel</h2>
-    
+
     <nav>
-      <a href="js-dashboard.html">Dashboard</a><br>
-      <a href="js-jobs.html">Jobs</a><br>
-      <a href="js-applications.html">Applications</a><br>
-      <a href="js-resume.html">Resume Builder</a><br>
-      <a href="js-analytics.html">Analytics</a><br>
-      <a href="js-profile.html">Profile</a><br>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
     </nav>
-    
-    <!-- ✅ FIXED LOGOUT -->
+
     <button id="logoutBtn">Logout 👋</button>
-    
+
   </div>
-  
-  <hr>
-  
+
   <!-- MAIN -->
-  <div>
-    
+  <div class="main">
+
     <h2>📊 Dashboard</h2>
-    
     <p id="welcome">Welcome...</p>
-    
-    <hr>
-    
-    <div>
-      
-      <div>
+
+    <!-- STATS -->
+    <div class="grid">
+
+      <div class="card">
         <h3>📄 Total Applications</h3>
         <p id="totalApps">Loading...</p>
       </div>
-      
-      <div>
+
+      <div class="card">
         <h3>✅ Selected</h3>
         <p id="selectedApps">Loading...</p>
       </div>
-      
-      <div>
+
+      <div class="card">
         <h3>⚡ Employability Score</h3>
         <p id="score">Calculating...</p>
       </div>
-      
-    </div>
-    
-    <hr>
-    
-    <div>
-      
-      <h3>⚡ Quick Actions</h3>
-      
-      <a href="js-jobs.html"><button>Find Jobs 💼</button></a>
-      <a href="js-resume.html"><button>Build Resume 📄</button></a>
-      <a href="js-analytics.html"><button>View Analytics 📊</button></a>
-      
-    </div>
-    
-  </div>
-  
-  <!-- ✅ SINGLE MODULE SCRIPT -->
-  <script type="module">
-    import { db, logoutUser } from "./firebase.js";
-    import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-    
-    // 🔥 LOGOUT FIX
-    document.getElementById("logoutBtn")
-      .addEventListener("click", logoutUser);
-    
-    
-    // ================= SAFE SESSION =================
-    function getSession() {
-      try {
-        return JSON.parse(localStorage.getItem("session"));
-      } catch {
-        return null;
-      }
-    }
-    
-    
-    // ================= DASHBOARD =================
-    async function loadDashboard() {
-      
-      const user = getSession();
-      
-      // ❌ not logged in → redirect
-      if (!user || !user.email) {
-        alert("⚠️ Please login first");
-        window.location.href = "index.html";
-        return;
-      }
-      
-      // ✅ welcome
-      document.getElementById("welcome").innerText =
-        "Welcome " + (user.name || "User");
-      
-      try {
-        
-        const snapshot = await getDocs(collection(db, "applications"));
-        const apps = [];
-        
-        snapshot.forEach(doc => {
-          const a = doc.data();
-          if (a.user === user.email) apps.push(a);
-        });
-        
-        // TOTAL
-        document.getElementById("totalApps").innerText = apps.length;
-        
-        // SELECTED
-        const selected = apps.filter(a =>
-          a.status === "Shortlisted" || a.status === "Hired"
-        ).length;
-        
-        document.getElementById("selectedApps").innerText = selected;
-        
-        // SCORE
-        const score = Math.min(100, apps.length * 20 + selected * 10);
-        document.getElementById("score").innerText = score + "%";
-        
-      } catch (err) {
-        console.error("Dashboard Error:", err);
-      }
-      
-    }
-    
-    
-    // AUTO LOAD
-    loadDashboard();
-  </script>
-  
-</body>
 
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <h3 style="margin-top:20px;">⚡ Quick Actions</h3>
+
+    <div class="grid">
+
+      <a href="js-jobs.html">
+        <button>Find Jobs 💼</button>
+      </a>
+
+      <a href="js-resume.html">
+        <button>Build Resume 📄</button>
+      </a>
+
+      <a href="js-analytics.html">
+        <button>View Analytics 📊</button>
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script type="module">
+  import { db, logoutUser } from "./firebase.js";
+  import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+  // LOGOUT
+  document.getElementById("logoutBtn")
+    .addEventListener("click", logoutUser);
+
+  // SESSION
+  function getSession() {
+    try {
+      return JSON.parse(localStorage.getItem("session"));
+    } catch {
+      return null;
+    }
+  }
+
+  // DASHBOARD
+  async function loadDashboard() {
+
+    const user = getSession();
+
+    if (!user || !user.email) {
+      alert("⚠️ Please login first");
+      window.location.href = "index.html";
+      return;
+    }
+
+    document.getElementById("welcome").innerText =
+      "Welcome " + (user.name || "User");
+
+    try {
+
+      const snapshot = await getDocs(collection(db, "applications"));
+      const apps = [];
+
+      snapshot.forEach(doc => {
+        const a = doc.data();
+        if (a.user === user.email) apps.push(a);
+      });
+
+      document.getElementById("totalApps").innerText = apps.length;
+
+      const selected = apps.filter(a =>
+        a.status === "Shortlisted" || a.status === "Hired"
+      ).length;
+
+      document.getElementById("selectedApps").innerText = selected;
+
+      const score = Math.min(100, apps.length * 20 + selected * 10);
+      document.getElementById("score").innerText = score + "%";
+
+    } catch (err) {
+      console.error("Dashboard Error:", err);
+    }
+
+  }
+
+  loadDashboard();
+</script>
+
+</body>
 </html>
