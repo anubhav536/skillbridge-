@@ -3,7 +3,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family: system-ui, sans-serif;
 }
 
 body {
@@ -17,55 +17,84 @@ nav {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 25px;
+  padding: 15px 20px;
   background: #1E293B;
+  flex-wrap: wrap;
 }
 
 nav h2 {
   color: #2563EB;
+  font-size: 18px;
 }
 
 nav a {
-  margin-left: 15px;
+  margin: 5px 10px;
   text-decoration: none;
   color: #E2E8F0;
+  font-size: 14px;
 }
 
 nav a:hover {
   color: #2563EB;
 }
 
-/* ================= LANDING ================= */
-section {
-  padding: 50px 20px;
-  text-align: center;
-}
-
-section h1 {
-  font-size: 32px;
-  margin-bottom: 10px;
-}
-
-section p {
-  color: #94A3B8;
-  max-width: 500px;
-  margin: auto;
-}
-
 /* ================= BUTTON ================= */
 button {
-  padding: 10px 15px;
-  margin-top: 10px;
+  padding: 10px 14px;
   border: none;
   border-radius: 8px;
   background: linear-gradient(135deg, #2563EB, #7C3AED);
   color: white;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 14px;
 }
 
 button:hover {
   transform: scale(1.05);
+}
+
+/* ================= DASHBOARD LAYOUT ================= */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 220px;
+  background: #1E293B;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  color: #2563EB;
+  margin-bottom: 20px;
+}
+
+.sidebar a {
+  display: block;
+  padding: 10px;
+  margin: 6px 0;
+  color: #E2E8F0;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.sidebar a:hover {
+  background: #2563EB;
+}
+
+.sidebar button {
+  margin-top: 15px;
+  width: 100%;
+}
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 20px;
 }
 
 /* ================= CARDS ================= */
@@ -74,55 +103,11 @@ button:hover {
   padding: 15px;
   border-radius: 10px;
   margin-top: 15px;
+  transition: 0.3s;
 }
 
-/* ================= LIST ================= */
-ul {
-  list-style: none;
-}
-
-ul li {
-  background: #1E293B;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 8px;
-}
-
-/* ================= SIDEBAR LAYOUT ================= */
-.dashboard {
-  display: flex;
-}
-
-/* SIDEBAR */
-.sidebar {
-  width: 220px;
-  min-height: 100vh;
-  background: #1E293B;
-  padding: 20px;
-}
-
-.sidebar h2 {
-  color: #2563EB;
-  margin-bottom: 15px;
-}
-
-.sidebar a {
-  display: block;
-  padding: 10px;
-  margin: 5px 0;
-  color: #E2E8F0;
-  text-decoration: none;
-  border-radius: 6px;
-}
-
-.sidebar a:hover {
-  background: #2563EB;
-}
-
-/* MAIN */
-.main {
-  flex: 1;
-  padding: 20px;
+.card:hover {
+  transform: translateY(-3px);
 }
 
 /* ================= GRID ================= */
@@ -154,44 +139,58 @@ form {
   border-radius: 10px;
 }
 
-/* ================= FOOTER ================= */
-footer {
-  text-align: center;
-  padding: 15px;
-  background: #1E293B;
-  margin-top: 20px;
+/* ================= AUTH ================= */
+.auth-container {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* ================= MOBILE ================= */
 @media (max-width: 768px) {
 
+  /* NAV */
   nav {
     flex-direction: column;
-    gap: 10px;
+    align-items: center;
   }
 
+  /* DASHBOARD STACK */
   .dashboard {
     flex-direction: column;
   }
 
+  /* SIDEBAR TOP BAR */
   .sidebar {
     width: 100%;
-    min-height: auto;
+    text-align: center;
+    padding: 15px;
   }
 
+  .sidebar nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .sidebar a {
+    margin: 5px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .sidebar button {
+    width: auto;
+  }
+
+  /* MAIN */
   .main {
     padding: 15px;
   }
 
-  section h1 {
-    font-size: 24px;
+  /* CARDS FULL WIDTH */
+  .card {
+    width: 100%;
   }
-
-}
-.auth-container {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
 }
