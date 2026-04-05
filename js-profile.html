@@ -1,51 +1,137 @@
-/* ================= PROFILE PAGE ================= */
+<!DOCTYPE html>
+<html lang="en">
 
-.profile-card {
-  text-align: center;
+<head>
+  <meta charset="UTF-8">
+  <title>Profile | SkillBridge AI</title>
+
+  <link rel="stylesheet" href="style.css?v=40">
+</head>
+
+<body>
+
+<div class="dashboard">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <h2>👨‍🎓 Job Seeker Panel</h2>
+
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="js-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>👤 My Profile</h2>
+
+    <!-- PROFILE CARD -->
+    <div class="card profile-card">
+
+      <h3 id="name">Name: Loading...</h3>
+      <p id="email">Email: Loading...</p>
+      <p id="skillsText">Skills: Not added</p>
+      <p id="expText">Experience: Not added</p>
+
+    </div>
+
+
+    <!-- EDIT FORM -->
+    <div class="card">
+
+      <h3>✏️ Edit Profile</h3>
+
+      <form id="profileForm">
+
+        <label>Skills:</label>
+        <input type="text" id="skills" placeholder="HTML, CSS, JS">
+
+        <label>Experience (years):</label>
+        <input type="number" id="exp" placeholder="0">
+
+        <button type="submit">Update Profile 🚀</button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script type="module">
+
+import { logoutUser } from "./firebase.js";
+
+// LOGOUT
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+// SESSION
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
+  }
 }
 
-.profile-card h3 {
-  font-size: 18px;
-  color: #38BDF8;
-  margin-bottom: 8px;
-}
+// LOAD PROFILE
+function loadProfile(){
 
-.profile-card p {
-  color: #94A3B8;
-  margin: 4px 0;
-}
+  const user = getSession();
 
-/* FORM */
-.main form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.main label {
-  font-size: 14px;
-  color: #94A3B8;
-}
-
-.main input {
-  margin-bottom: 10px;
-}
-
-/* BUTTON */
-.main button {
-  width: 100%;
-  margin-top: 10px;
-}
-
-/* MOBILE PERFECT */
-@media (max-width: 768px) {
-
-  .profile-card {
-    padding: 15px;
+  if(!user){
+    alert("Login required ❌");
+    window.location.href = "index.html";
+    return;
   }
 
-  .profile-card h3 {
-    font-size: 16px;
-  }
+  document.getElementById("name").innerText = "Name: " + (user.name || "User");
+  document.getElementById("email").innerText = "Email: " + user.email;
+
+  document.getElementById("skillsText").innerText =
+    "Skills: " + (user.skills || "Not added");
+
+  document.getElementById("expText").innerText =
+    "Experience: " + (user.exp || "Not added");
 
 }
+
+// UPDATE PROFILE
+document.getElementById("profileForm")
+  .addEventListener("submit", (e)=>{
+
+    e.preventDefault();
+
+    let user = getSession();
+
+    user.skills = document.getElementById("skills").value;
+    user.exp = document.getElementById("exp").value;
+
+    localStorage.setItem("session", JSON.stringify(user));
+
+    alert("Profile Updated ✅");
+
+    loadProfile();
+
+  });
+
+loadProfile();
+
+</script>
+
+</body>
+</html>
