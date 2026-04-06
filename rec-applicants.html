@@ -1,62 +1,76 @@
-</html>
-<link rel="stylesheet" href="style.css"><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Applicants | SkillBridge AI</title>
 
-  <!-- ✅ CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>🏢 Recruiter Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="rec-dashboard.html">Dashboard</a><br>
-    <a href="rec-post-job.html">Post Job</a><br>
-    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-    <a href="rec-applicants.html">Applicants</a><br>
-    <a href="rec-analytics.html">Analytics</a><br>
-    <a href="rec-profile.html">Profile</a><br>
-  </nav>
+    <h2>🏢 Recruiter Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>👥 Applicants</h2>
+
+    <input 
+      type="text" 
+      id="search" 
+      placeholder="Search applicants..."
+      class="search-box"
+    >
+
+    <div id="appList"></div>
+
+  </div>
 
 </div>
 
-<hr>
 
-<!-- MAIN -->
-<div>
-
-  <h2>👥 Applicants</h2>
-
-  <input type="text" id="searchApplicant" placeholder="Search applicants...">
-
-  <br><br>
-
-  <div id="applicantsList">Loading...</div>
-
-</div>
-
-<!-- ✅ MODULE SCRIPT -->
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection, updateDoc, doc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { db, logoutUser, protectPage } from "./firebase.js";
+import { 
+  getDocs, 
+  collection, 
+  updateDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔥 LOGOUT
+// protect
+protectPage("recruiter");
+
+// logout
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
 
-// ================= SESSION =================
+// session
 function getSession(){
   try {
     return JSON.parse(localStorage.getItem("session"));
@@ -66,116 +80,127 @@ function getSession(){
 }
 
 
-// ================= LOAD APPLICANTS =================
+let allApps = [];
+
+
+// LOAD
 async function loadApplicants(){
 
   const user = getSession();
+  const list = document.getElementById("appList");
 
-  if(!user || user.role !== "recruiter"){
-    alert("⚠️ Unauthorized");
-    window.location.href = "index.html";
-    return;
-  }
-
-  const container = document.getElementById("applicantsList");
+  list.innerHTML = "Loading...";
 
   try {
 
+    // 1️⃣ get jobs of recruiter
     const jobsSnap = await getDocs(collection(db, "jobs"));
-    const appsSnap = await getDocs(collection(db, "applications"));
 
-    const myJobs = [];
+    let myJobIds = [];
 
-    // 🔥 only recruiter jobs
-    jobsSnap.forEach(d=>{
+    jobsSnap.forEach(d => {
       const j = d.data();
       if(j.recruiter === user.email){
-        myJobs.push(d.id);
+        myJobIds.push(d.id);
       }
     });
 
-    container.innerHTML = "";
 
-    let found = false;
+    // 2️⃣ get applications
+    const appsSnap = await getDocs(collection(db, "applications"));
+
+    allApps = [];
 
     appsSnap.forEach(d => {
-
       const a = d.data();
 
-      if(myJobs.includes(a.jobId)){
-
-        found = true;
-
-        const card = document.createElement("div");
-
-        card.style.border = "1px solid #ccc";
-        card.style.padding = "10px";
-        card.style.marginBottom = "10px";
-
-        card.innerHTML = `
-          <b>👤 ${a.user}</b><br>
-          💼 Job: ${a.jobId}<br>
-          🧠 Skills: ${a.skills || "N/A"}<br>
-          📊 Experience: ${a.experience || "0"} years<br>
-          📌 Status: <b>${a.status}</b><br><br>
-        `;
-
-        // buttons
-        const btns = ["Shortlisted", "Rejected", "Hired"];
-
-        btns.forEach(status => {
-
-          const btn = document.createElement("button");
-          btn.innerText = status;
-
-          btn.style.marginRight = "5px";
-
-          btn.addEventListener("click", async () => {
-            await updateDoc(doc(db, "applications", d.id), { status });
-            alert("Updated 🚀");
-            loadApplicants();
-          });
-
-          card.appendChild(btn);
-
+      if(myJobIds.includes(a.jobId)){
+        allApps.push({
+          id: d.id,
+          ...a
         });
-
-        container.appendChild(card);
-
       }
-
     });
 
-    if(!found){
-      container.innerHTML = "No applicants found";
-    }
+    renderApps(allApps);
 
-  } catch (err) {
-    console.error("Applicants Error:", err);
-    container.innerHTML = "Error loading applicants ❌";
+  } catch (err){
+    console.log(err);
+    list.innerHTML = "Error loading applicants ❌";
   }
 
 }
 
 
-// ================= SEARCH =================
-document.getElementById("searchApplicant")
-  .addEventListener("keyup", function(){
+// RENDER
+function renderApps(apps){
 
-    const q = this.value.toLowerCase();
-    const apps = document.querySelectorAll("#applicantsList div");
+  const list = document.getElementById("appList");
 
-    apps.forEach(a=>{
-      a.style.display =
-        a.innerText.toLowerCase().includes(q)
-          ? "block"
-          : "none";
+  if(apps.length === 0){
+    list.innerHTML = "No applicants found 😢";
+    return;
+  }
+
+  list.innerHTML = apps.map(a => `
+    <div class="card app-card">
+
+      <h3>${a.user}</h3>
+
+      <p><b>Skills:</b> ${a.skills}</p>
+      <p><b>Experience:</b> ${a.experience} yrs</p>
+      <p><b>Status:</b> ${a.status}</p>
+
+      <div class="btn-group">
+        <button onclick="updateStatus('${a.id}', 'Shortlisted')">
+          Shortlist ✅
+        </button>
+
+        <button onclick="updateStatus('${a.id}', 'Rejected')">
+          Reject ❌
+        </button>
+      </div>
+
+    </div>
+  `).join("");
+
+}
+
+
+// UPDATE STATUS
+window.updateStatus = async function(id, status){
+
+  try {
+    await updateDoc(doc(db, "applications", id), {
+      status
     });
+
+    alert("Updated 🚀");
+    loadApplicants();
+
+  } catch {
+    alert("Failed ❌");
+  }
+
+}
+
+
+// SEARCH
+document.getElementById("search")
+  .addEventListener("input", (e) => {
+
+    const val = e.target.value.toLowerCase();
+
+    const filtered = allApps.filter(a =>
+      a.user.toLowerCase().includes(val)
+    );
+
+    renderApps(filtered);
 
   });
 
 
-// AUTO LOAD
+// INIT
 loadApplicants();
 
 </script>
