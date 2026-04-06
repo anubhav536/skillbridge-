@@ -1130,3 +1130,12 @@ form button:hover {
   background: crimson;
   color: white;
 }
+/* SKILLS LIST */
+#skillsList {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+
+#skillsList li {
+  margin-bottom: 5px;
+}
