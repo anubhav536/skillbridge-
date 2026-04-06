@@ -4,150 +4,185 @@
 <head>
   <meta charset="UTF-8">
   <title>Manage Jobs | SkillBridge AI</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>🏢 Recruiter Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="rec-dashboard.html">Dashboard</a><br>
-    <a href="rec-post-job.html">Post Job</a><br>
-    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-    <a href="rec-applicants.html">Applicants</a><br>
-    <a href="rec-analytics.html">Analytics</a><br>
-    <a href="rec-profile.html">Profile</a><br>
-  </nav>
+    <h2>🏢 Recruiter Panel</h2>
 
-  <!-- ✅ LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
+    </nav>
+
+    <button id="logoutBtn">Logout 👋</button>
+
+  </div>
+
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>🛠 Manage Your Jobs</h2>
+
+    <input 
+      type="text" 
+      id="search" 
+      placeholder="Search your jobs..."
+      class="search-box"
+    >
+
+    <div id="jobsList"></div>
+
+  </div>
 
 </div>
 
-<hr>
 
-<!-- MAIN -->
-<div>
-
-  <h2>🛠️ Manage Your Jobs</h2>
-
-  <input type="text" id="searchJob" placeholder="Search your jobs...">
-
-  <br><br>
-
-  <div id="myJobs">Loading...</div>
-
-</div>
-
-<!-- ✅ SINGLE CLEAN MODULE SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
 
-  import { db, logoutUser, protectPage } from "./firebase.js";
-  import {
-    getDocs,
-    collection,
-    deleteDoc,
-    doc
-  } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { db, logoutUser, protectPage } from "./firebase.js";
+import { 
+  getDocs, 
+  collection, 
+  deleteDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// protect
+protectPage("recruiter");
+
+// logout
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
 
 
-  // 🔐 PAGE PROTECTION
-  protectPage("recruiter");
-
-
-  // 🔥 LOGOUT
-  document.getElementById("logoutBtn")
-    .addEventListener("click", logoutUser);
-
-
-  // ================= LOAD JOBS =================
-  async function loadMyJobs() {
-
-    try {
-
-      const user = JSON.parse(localStorage.getItem("session"));
-      const container = document.getElementById("myJobs");
-
-      container.innerHTML = "Loading...";
-
-      const snapshot = await getDocs(collection(db, "jobs"));
-
-      let html = "";
-
-      snapshot.forEach(d => {
-
-        const j = d.data();
-
-        if (j.recruiter === user.email) {
-
-          html += `
-            <div class="card">
-              <b>${j.title}</b><br>
-              Skills: ${j.skills?.join(", ") || "N/A"}<br>
-              Salary: ${j.salary || "N/A"}<br>
-
-              <button class="deleteBtn" data-id="${d.id}">
-                Delete ❌
-              </button>
-
-              <hr>
-            </div>
-          `;
-        }
-      });
-
-      container.innerHTML = html || "No jobs found 😴";
-
-
-      // ================= DELETE =================
-      document.querySelectorAll(".deleteBtn").forEach(btn => {
-
-        btn.addEventListener("click", async () => {
-
-          const id = btn.dataset.id;
-
-          if (!confirm("Delete this job? ❌")) return;
-
-          await deleteDoc(doc(db, "jobs", id));
-
-          alert("Job deleted 🚀");
-
-          loadMyJobs(); // reload
-        });
-
-      });
-
-    } catch (err) {
-      console.error("Load Jobs Error:", err);
-      document.getElementById("myJobs").innerHTML = "Error loading jobs ❌";
-    }
-
+// session
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
   }
+}
 
 
-  // ================= SEARCH =================
-  document.getElementById("searchJob")
-    .addEventListener("keyup", function () {
+let allJobs = [];
 
-      const q = this.value.toLowerCase();
-      const jobs = document.querySelectorAll("#myJobs .card");
 
-      jobs.forEach(j => {
-        j.style.display =
-          j.innerText.toLowerCase().includes(q)
-            ? "block"
-            : "none";
-      });
+// LOAD JOBS
+async function loadJobs() {
 
+  const user = getSession();
+  const list = document.getElementById("jobsList");
+
+  list.innerHTML = "Loading...";
+
+  try {
+
+    const snap = await getDocs(collection(db, "jobs"));
+
+    allJobs = [];
+
+    snap.forEach(d => {
+      const j = d.data();
+
+      if (j.recruiter === user.email) {
+        allJobs.push({
+          id: d.id,
+          ...j
+        });
+      }
     });
 
+    renderJobs(allJobs);
 
-  // 🚀 AUTO LOAD
-  loadMyJobs();
+  } catch (err) {
+    console.log(err);
+    list.innerHTML = "Error loading jobs ❌";
+  }
+
+}
+
+
+// RENDER
+function renderJobs(jobs) {
+
+  const list = document.getElementById("jobsList");
+
+  if (jobs.length === 0) {
+    list.innerHTML = "No jobs found 😢";
+    return;
+  }
+
+  list.innerHTML = jobs.map(j => `
+    <div class="card job-card">
+
+      <h3>${j.title}</h3>
+
+      <p><b>Skills:</b> ${j.skills?.join(", ") || ""}</p>
+      <p><b>Salary:</b> ${j.salary || "Not specified"}</p>
+      <p><b>Location:</b> ${j.location || "Not specified"}</p>
+
+      <button onclick="deleteJob('${j.id}')">
+        Delete ❌
+      </button>
+
+    </div>
+  `).join("");
+
+}
+
+
+// DELETE
+window.deleteJob = async function(id){
+
+  if (!confirm("Delete this job?")) return;
+
+  try {
+    await deleteDoc(doc(db, "jobs", id));
+
+    alert("Deleted ✅");
+    loadJobs();
+
+  } catch (err) {
+    alert("Delete failed ❌");
+  }
+
+}
+
+
+// SEARCH
+document.getElementById("search")
+  .addEventListener("input", (e) => {
+
+    const val = e.target.value.toLowerCase();
+
+    const filtered = allJobs.filter(j =>
+      j.title.toLowerCase().includes(val)
+    );
+
+    renderJobs(filtered);
+
+  });
+
+
+// INIT
+loadJobs();
 
 </script>
 
