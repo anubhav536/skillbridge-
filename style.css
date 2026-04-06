@@ -1160,3 +1160,121 @@ form button:hover {
   font-weight: bold;
   cursor: pointer;
 }
+/* ================= UI CENTER + BALANCE FIX ================= */
+
+/* MAIN CONTENT CENTER */
+.main {
+  max-width: 1100px;
+  margin: auto;
+  width: 100%;
+}
+
+/* CARD CONTENT CENTER FIX */
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* TEXT WRAP FIX (important 🔥) */
+.card p, 
+.card h3 {
+  word-wrap: break-word;
+  text-align: center;
+}
+
+/* BUTTON CENTER */
+.card button {
+  max-width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ================= APPLICANTS BUTTON FIX ================= */
+
+.btn-group {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-group button {
+  flex: 1;
+  min-width: 120px;
+  max-width: 180px;
+}
+
+/* ================= SEARCH CENTER ================= */
+
+#search,
+.search-box {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ================= SIDEBAR FIX (DESKTOP) ================= */
+
+.sidebar {
+  min-width: 220px;
+}
+
+/* ================= GRID CENTER ================= */
+
+.grid {
+  justify-content: center;
+}
+
+/* ================= MOBILE PREMIUM FIX ================= */
+
+@media (max-width: 768px) {
+
+  /* MAIN CENTER */
+  .main {
+    width: 100%;
+    padding: 15px;
+  }
+
+  /* CARD FULL CENTER */
+  .card {
+    align-items: center;
+    text-align: center;
+  }
+
+  /* BUTTON STACK */
+  .btn-group {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .btn-group button {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  /* SEARCH FULL WIDTH */
+  #search,
+  .search-box {
+    width: 100%;
+    max-width: 100%;
+  }
+
+}
+
+/* ================= ULTRA POLISH (SMOOTH LOOK) ================= */
+
+/* subtle glow */
+.card {
+  backdrop-filter: blur(6px);
+}
+
+/* smoother hover */
+.card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* button feel */
+button {
+  display: block;
+  margin: auto;
+}
