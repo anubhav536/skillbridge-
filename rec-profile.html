@@ -1,155 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Recruiter Profile | SkillBridge AI</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div>
+<div class="dashboard">
 
-  <h2>🏢 Recruiter Panel</h2>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
 
-  <nav>
-    <a href="rec-dashboard.html">Dashboard</a><br>
-    <a href="rec-post-job.html">Post Job</a><br>
-    <a href="rec-manage-jobs.html">Manage Jobs</a><br>
-    <a href="rec-applicants.html">Applicants</a><br>
-    <a href="rec-analytics.html">Analytics</a><br>
-    <a href="rec-profile.html">Profile</a><br>
-  </nav>
+    <h2>🏢 Recruiter Panel</h2>
 
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
+    <nav>
+      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-profile.html">Profile</a>
+    </nav>
 
-</div>
-
-<hr>
-
-<!-- MAIN -->
-<div>
-
-  <h2>👤 Recruiter Profile</h2>
-
-  <div>
-    <p><b>Name:</b> <span id="rname">Loading...</span></p>
-    <p><b>Email:</b> <span id="remail">Loading...</span></p>
-    <p><b>Company:</b> <span id="rcompany">Loading...</span></p>
-  </div>
-
-  <hr>
-
-  <div>
-
-    <h3>Edit Profile</h3>
-
-    <form id="profileForm">
-
-      <label>Company Name:</label><br>
-      <input type="text" id="company" placeholder="Enter company name"><br><br>
-
-      <button type="submit" id="saveBtn">Update Profile 💾</button>
-
-    </form>
+    <button id="logoutBtn">Logout 👋</button>
 
   </div>
 
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <h2>👤 Recruiter Profile</h2>
+
+    <!-- PROFILE CARD -->
+    <div class="card">
+
+      <p><b>Name:</b> <span id="name"></span></p>
+      <p><b>Email:</b> <span id="email"></span></p>
+      <p><b>Company:</b> <span id="company"></span></p>
+
+    </div>
+
+
+    <!-- EDIT -->
+    <div class="card">
+
+      <h3>✏️ Edit Profile</h3>
+
+      <input 
+        type="text" 
+        id="companyInput" 
+        placeholder="Enter company name"
+      >
+
+      <button id="updateBtn">
+        Update Profile 💾
+      </button>
+
+    </div>
+
+  </div>
+
 </div>
 
-<!-- ✅ MODULE SCRIPT -->
+
 <script type="module">
-  import { db, logoutUser } from "./firebase.js";
-  import { getDoc, setDoc, doc } 
-    from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  // 🔥 LOGOUT FIX
-  document.getElementById("logoutBtn")
-    .addEventListener("click", logoutUser);
+import { db, logoutUser, protectPage } from "./firebase.js";
+import { doc, updateDoc, getDocs, collection } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+protectPage("recruiter");
+
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
 
 
-  function getSession(){
-    try {
-      return JSON.parse(localStorage.getItem("session"));
-    } catch {
-      return null;
-    }
+// session
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem("session"));
+  } catch {
+    return null;
   }
+}
 
 
-  async function loadRecProfile(){
+// LOAD PROFILE
+function loadProfile(){
+
+  const user = getSession();
+
+  document.getElementById("name").innerText = user.name;
+  document.getElementById("email").innerText = user.email;
+  document.getElementById("company").innerText = user.company || "Not added";
+
+}
+
+loadProfile();
+
+
+// UPDATE PROFILE
+document.getElementById("updateBtn")
+  .addEventListener("click", async () => {
 
     const user = getSession();
+    const company = document.getElementById("companyInput").value.trim();
 
-    // ✅ SECURITY CHECK
-    if (!user || user.role !== "recruiter") {
-      alert("⚠️ Unauthorized access");
-      window.location.href = "index.html";
-      return;
-    }
-
-    document.getElementById("rname").innerText = user.name;
-    document.getElementById("remail").innerText = user.email;
-
-    try {
-
-      const snap = await getDoc(doc(db, "recProfiles", user.email));
-
-      if (snap.exists()) {
-        const data = snap.data();
-        document.getElementById("rcompany").innerText = data.company || "Not added";
-      } else {
-        document.getElementById("rcompany").innerText = "Not added";
-      }
-
-    } catch (err) {
-      console.error("Load Profile Error:", err);
-    }
-  }
-
-
-  // ================= UPDATE =================
-  const form = document.getElementById("profileForm");
-  const btn = document.getElementById("saveBtn");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const user = getSession();
-    const company = document.getElementById("company").value.trim();
-
-    if (!company) {
+    if(!company){
       alert("Enter company name ❌");
       return;
     }
 
     try {
 
-      btn.innerText = "Saving...";
-      btn.disabled = true;
+      // 🔍 find user doc
+      const snap = await getDocs(collection(db, "users"));
 
-      await setDoc(doc(db, "recProfiles", user.email), {
+      let userId = null;
+
+      snap.forEach(docSnap => {
+        const d = docSnap.data();
+        if(d.email === user.email){
+          userId = docSnap.id;
+        }
+      });
+
+      if(!userId){
+        alert("User not found ❌");
+        return;
+      }
+
+      // 🔥 update firestore
+      await updateDoc(doc(db, "users", userId), {
         company
-      }, { merge: true }); // 🔥 IMPORTANT (no overwrite)
+      });
 
-      alert("Profile Updated ✅");
+      // 🔥 update session
+      user.company = company;
+      localStorage.setItem("session", JSON.stringify(user));
 
-      loadRecProfile();
+      alert("Profile updated ✅");
 
-    } catch (err) {
-      console.error("Update Error:", err);
+      loadProfile();
+
+    } catch (err){
+      console.log(err);
       alert("Update failed ❌");
     }
 
-    btn.innerText = "Update Profile 💾";
-    btn.disabled = false;
   });
-
-
-  // AUTO LOAD
-  loadRecProfile();
 
 </script>
 
