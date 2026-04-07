@@ -54,7 +54,7 @@
 
 <script type="module">
 
-import { db, logoutUser, protectPage } from "./firebase.js";
+import { db, logoutUser, protectPage, updateApplicationStatus } from "./firebase.js";
 import { 
   getDocs, 
   collection, 
@@ -142,13 +142,19 @@ function renderApps(apps){
     return;
   }
 
-  list.innerHTML = apps.map(a => `
+  list.innerHTML = apps.map(a => {
+  
+  const skills = Array.isArray(a.skills) ?
+    a.skills.join(", ") :
+    a.skills || "N/A";
+  
+  return `
     <div class="card app-card">
 
       <h3>${a.user}</h3>
 
-      <p><b>Skills:</b> ${a.skills}</p>
-      <p><b>Experience:</b> ${a.experience} yrs</p>
+      <p><b>Skills:</b> ${skills}</p>
+      <p><b>Experience:</b> ${a.experience || "0"} yrs</p>
       <p><b>Status:</b> ${a.status}</p>
 
       <div class="btn-group">
@@ -162,7 +168,8 @@ function renderApps(apps){
       </div>
 
     </div>
-  `).join("");
+  `;
+}).join("");
 
 }
 
@@ -171,10 +178,7 @@ function renderApps(apps){
 window.updateStatus = async function(id, status){
 
   try {
-    await updateDoc(doc(db, "applications", id), {
-      status
-    });
-
+    await updateApplicationStatus(id, status);
     alert("Updated 🚀");
     loadApplicants();
 
@@ -188,15 +192,34 @@ window.updateStatus = async function(id, status){
 // SEARCH
 document.getElementById("search")
   .addEventListener("input", (e) => {
-
+    
     const val = e.target.value.toLowerCase();
-
-    const filtered = allApps.filter(a =>
-      a.user.toLowerCase().includes(val)
-    );
-
+    
+    if (val === "") {
+      renderApps(allApps);
+      return;
+    }
+    
+    const filtered = allApps.filter(a => {
+      
+      const email = a.user?.toLowerCase() || "";
+      
+      const skills = Array.isArray(a.skills) ?
+        a.skills.join(" ").toLowerCase() :
+        (a.skills || "").toLowerCase();
+      
+      const status = a.status?.toLowerCase() || "";
+      
+      return (
+        email.includes(val) ||
+        skills.includes(val) ||
+        status.includes(val)
+      );
+      
+    });
+    
     renderApps(filtered);
-
+    
   });
 
 
