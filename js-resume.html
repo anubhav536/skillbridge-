@@ -89,7 +89,42 @@ import { logoutUser, saveResume, getSession } from "./firebase.js";
 
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
+function calculateATSScore(resume, jobSkills = []) {
 
+  let score = 0;
+
+  // 🔹 Skills Match (40 marks)
+  const matchedSkills = resume.skills.filter(s =>
+    jobSkills.includes(s.toLowerCase())
+  );
+
+  score += (matchedSkills.length / (jobSkills.length || 1)) * 40;
+
+  // 🔹 Keywords (20 marks)
+  const text = (
+    resume.projects +
+    resume.experience +
+    resume.education
+  ).toLowerCase();
+
+  const keywords = ["developed", "engineered", "managed", "designed"];
+
+  let keywordCount = keywords.filter(k => text.includes(k)).length;
+
+  score += (keywordCount / keywords.length) * 20;
+
+  // 🔹 Experience (20 marks)
+  if (resume.experience && resume.experience.length > 20) {
+    score += 20;
+  }
+
+  // 🔹 Resume Length Quality (20 marks)
+  if (text.length > 200) {
+    score += 20;
+  }
+
+  return Math.min(100, Math.round(score));
+}
 
 // 🔥 AI TEXT IMPROVE
 function enhanceText(text) {
@@ -150,7 +185,12 @@ document.getElementById("resumeForm")
     const experience = enhanceText(document.getElementById("experience").value);
     const achievements = enhanceText(document.getElementById("achievements").value);
     const objective = enhanceText(document.getElementById("objective").value);
-
+const atsScore = calculateATSScore({
+  skills,
+  education,
+  projects,
+  experience
+}, ["javascript","html","css"]);
     const preview = document.getElementById("resumePreview");
 
     try {
@@ -177,6 +217,10 @@ document.getElementById("resumeForm")
     <h1>${name || "Your Name"}</h1>
     <p>${email || ""}</p>
     <p>${phone || ""}</p>
+    <h3>📊 ATS Score</h3>
+<p style="font-size:22px;color:#22C55E;">
+  ${atsScore}/100
+</p>
 
     <h3>🛠 Skills</h3>
     ${skills.length ? skills.map(s => `
