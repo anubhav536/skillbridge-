@@ -73,7 +73,7 @@
 
 <script type="module">
 
-import { logoutUser } from "./firebase.js";
+import { logoutUser, updateUserProfile } from "./firebase.js"; // ✅ UPDATED
 
 // LOGOUT
 document.getElementById("logoutBtn")
@@ -112,16 +112,14 @@ function loadProfile(){
 
 // UPDATE PROFILE
 document.getElementById("profileForm")
-  .addEventListener("submit", (e)=>{
+  .addEventListener("submit", async (e)=>{
 
     e.preventDefault();
 
-    let user = getSession();
+    const skills = document.getElementById("skills").value;
+    const exp = document.getElementById("exp").value;
 
-    user.skills = document.getElementById("skills").value;
-    user.exp = document.getElementById("exp").value;
-
-    localStorage.setItem("session", JSON.stringify(user));
+    await updateUserProfile({ skills, exp }); // ✅ FIREBASE SAVE
 
     alert("Profile Updated ✅");
 
@@ -132,6 +130,5 @@ document.getElementById("profileForm")
 loadProfile();
 
 </script>
-
 </body>
 </html>
