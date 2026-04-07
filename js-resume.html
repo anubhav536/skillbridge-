@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Resume Builder | SkillBridge AI</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <link rel="stylesheet" href="style.css?v=20">
 </head>
@@ -41,17 +42,31 @@
       <form id="resumeForm">
 
         <label>Full Name</label>
-        <input type="text" id="rname" placeholder="Enter your name">
+<input type="text" id="name">
 
-        <label>Skills</label>
-        <input type="text" id="rskills" placeholder="HTML, CSS, JS">
+<label>Email</label>
+<input type="email" id="email">
 
-        <label>Education</label>
-        <input type="text" id="reducation">
+<label>Phone</label>
+<input type="text" id="phone">
 
-        <label>Projects</label>
-        <textarea id="rprojects"></textarea>
+<label>Skills (comma separated)</label>
+<input type="text" id="skills">
 
+<label>Education</label>
+<textarea id="education"></textarea>
+
+<label>Projects</label>
+<textarea id="projects"></textarea>
+
+<label>Experience</label>
+<textarea id="experience"></textarea>
+
+<label>Achievements</label>
+<textarea id="achievements"></textarea>
+
+<label>Career Objective</label>
+<textarea id="objective"></textarea>
         <button type="submit">Generate Resume 🚀</button>
 
       </form>
@@ -70,77 +85,168 @@
 <!-- SCRIPT -->
 <script type="module">
 
-import { logoutUser } from "./firebase.js";
+import { logoutUser, saveResume, getSession } from "./firebase.js";
 
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
 
-// GENERATE
+// 🔥 AI TEXT IMPROVE
+function enhanceText(text) {
+  if (!text) return "";
+  
+  return text
+    .replace(/i /gi, "I ")
+    .replace(/made/gi, "Developed")
+    .replace(/worked on/gi, "Worked professionally on")
+    .replace(/project/gi, "Project demonstrating practical skills in")
+    .replace(/using/gi, "utilizing")
+    .replace(/built/gi, "Engineered")
+    .replace(/created/gi, "Designed and developed")
+    .replace(/simple/gi, "efficient")
+    .replace(/website/gi, "responsive web application");
+}
+// Auto Bullet Generator 
+function convertToPoints(text) {
+  if (!text) return "<li>Not specified</li>";
+  
+  return text
+    .split(".")
+    .filter(line => line.trim() !== "")
+    .map(line => `<li>${enhanceText(line.trim())}</li>`)
+    .join("");
+}
+
+// 🚀 GENERATE + SAVE
 document.getElementById("resumeForm")
-  .addEventListener("submit", (e) => {
+  .addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const name = document.getElementById("rname").value;
-    const skills = document.getElementById("rskills").value;
-    const edu = document.getElementById("reducation").value;
-    const proj = document.getElementById("rprojects").value;
+    const btn = e.target.querySelector("button");
+    btn.disabled = true;
+    btn.innerText = "✨ Generating...";
+
+    const user = getSession();
+
+    if (!user) {
+      alert("Login required ❌");
+      btn.disabled = false;
+      btn.innerText = "Generate Resume 🚀";
+      return;
+    }
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+
+    const skills = document.getElementById("skills").value
+      .split(",")
+      .map(s => s.trim())
+      .filter(s => s);
+
+    const education = enhanceText(document.getElementById("education").value);
+    const projects = enhanceText(document.getElementById("projects").value);
+    const experience = enhanceText(document.getElementById("experience").value);
+    const achievements = enhanceText(document.getElementById("achievements").value);
+    const objective = enhanceText(document.getElementById("objective").value);
 
     const preview = document.getElementById("resumePreview");
 
-    preview.style.display = "block";
+    try {
 
-    preview.innerHTML = `
-      <h2>${name}</h2>
+      await saveResume({
+        name,
+        email,
+        phone,
+        skills,
+        education,
+        projects,
+        experience,
+        achievements,
+        objective
+      });
 
-      <div class="resume-section">
-        <h3>Skills</h3>
-        <p>${skills}</p>
+      preview.style.display = "block";
+
+      preview.innerHTML = `
+<div class="resume-pro">
+
+  <div class="left">
+
+    <h1>${name || "Your Name"}</h1>
+    <p>${email || ""}</p>
+    <p>${phone || ""}</p>
+
+    <h3>🛠 Skills</h3>
+    ${skills.length ? skills.map(s => `
+      <div class="skill">
+        <span>${s}</span>
+        <div class="bar"><div style="width:${Math.floor(Math.random()*40+60)}%"></div></div>
       </div>
+    `).join("") : "<p>Not specified</p>"}
 
-      <div class="resume-section">
-        <h3>Education</h3>
-        <p>${edu}</p>
-      </div>
+  </div>
 
-      <div class="resume-section">
-        <h3>Projects</h3>
-        <p>${proj}</p>
-      </div>
-    `;
+  <div class="right">
 
-    document.getElementById("printBtn").style.display = "block";
-  });
+    <h3>🎯 Career Objective</h3>
+    <p>${objective || "Looking for opportunities to grow and contribute."}</p>
+
+    <h3>🎓 Education</h3>
+    <p>${education || "Not specified"}</p>
+
+   <h3>💼 Experience</h3>
+<ul>
+  ${convertToPoints(experience)}
+</ul>
+    <h3>🚀 Projects</h3>
+<ul>
+  ${convertToPoints(projects)}
+</ul>
+   <h3>🏆 Achievements</h3>
+<ul>
+  ${convertToPoints(achievements)}
+</ul>
+  </div>
+
+</div>
+`;
+      document.getElementById("printBtn").style.display = "block";
+
+      alert("🔥 Resume Generated & Saved!");
+
+    } catch (err) {
+      console.error(err);
+      alert("Error saving resume ❌");
+    }
+
+    btn.disabled = false;
+    btn.innerText = "Generate Resume 🚀";
+});
 
 
-// PRINT
+// 🖨️ PRINT
 document.getElementById("printBtn")
   .addEventListener("click", () => {
-
-    const content = document.getElementById("resumePreview").innerHTML;
-
-    const win = window.open("", "", "width=800,height=600");
-
-    win.document.write(`
-      <html>
-      <head>
-        <title>Resume</title>
-        <style>
-          body { font-family: Arial; padding: 20px; }
-          h2 { margin-bottom: 5px; }
-          h3 { border-bottom: 1px solid #ccc; }
-        </style>
-      </head>
-      <body>${content}</body>
-      </html>
-    `);
-
-    win.document.close();
-    win.print();
+    
+    const element = document.getElementById("resumePreview");
+    
+    const opt = {
+      margin: 0.5,
+      filename: "My_Resume.pdf",
+      image: { type: "jpeg", quality: 1 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "in", format: "a4", orientation: "portrait" }
+    };
+    
+    html2pdf().set(opt).from(element).save();
+    
   });
 
-</script>
+    
+  
 
+</script>
 </body>
 </html>
