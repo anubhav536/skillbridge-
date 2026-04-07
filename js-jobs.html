@@ -41,88 +41,145 @@
   </div>
 
 </div>
-
 <script type="module">
-import { db, logoutUser } from "./firebase.js";
-import {
-  getDocs,
-  collection,
-  addDoc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+import { db, getSession, applyJob,logoutUser } from "./firebase.js";
+import { getDocs, collection } 
+from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// SESSION
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
+let allJobs = [];
 
-// LOAD JOBS
-async function loadJobs() {
+window.addEventListener("DOMContentLoaded", async () => {
+  
+  document.getElementById("logoutBtn")
+    .addEventListener("click", logoutUser);
+  
+  // baaki code...
 
+  const searchBox = document.getElementById("search"); // ✅ FIXED
   const container = document.getElementById("jobsContainer");
-  container.innerHTML = "Loading...";
 
-  try {
-    const snap = await getDocs(collection(db, "jobs"));
+  if (!searchBox || !container) {
+    console.log("HTML id mismatch ❌");
+    return;
+  }
 
-    if (snap.empty) {
-      container.innerHTML = "<p>No jobs available ❌</p>";
+  // LOAD JOBS
+  const snap = await getDocs(collection(db, "jobs"));
+
+  snap.forEach(doc => {
+  allJobs.push({
+    id: doc.id,   // 🔥 THIS IS IMPORTANT
+    ...doc.data()
+  });
+});
+
+  renderJobs(allJobs);
+
+  // SEARCH
+  searchBox.addEventListener("input", (e) => {
+
+    const value = e.target.value.toLowerCase();
+
+    if (value === "") {
+      renderJobs(allJobs);
       return;
     }
 
-    container.innerHTML = "";
+    const filtered = allJobs.filter(job => {
 
-    snap.forEach(doc => {
-      const job = doc.data();
+      const title = job.title?.toLowerCase() || "";
+      const skills = job.skills?.join(" ").toLowerCase() || "";
 
-      const div = document.createElement("div");
-      div.className = "card";
+      return title.includes(value) || skills.includes(value);
 
-      div.innerHTML = `
-        <h3>${job.title}</h3>
-        <p><b>Skills:</b> ${job.skills.join(", ")}</p>
-        <p><b>Posted by:</b> ${job.recruiter}</p>
-        <button onclick="applyJob('${doc.id}')">Apply 🚀</button>
-      `;
-
-      container.appendChild(div);
     });
 
-  } catch (err) {
-    console.error(err);
-    container.innerHTML = "Error loading jobs ❌";
+    renderJobs(filtered);
+
+  });
+
+});
+
+
+// RENDER FUNCTION
+function renderJobs(jobs){
+
+  const container = document.getElementById("jobsContainer");
+  container.innerHTML = "";
+
+  if(jobs.length === 0){
+    container.innerHTML = "<p>No jobs found 😢</p>";
+    return;
   }
-}
 
-// APPLY JOB
-window.applyJob = async function(jobId) {
+  jobs.forEach((job, index) => {
 
+    container.innerHTML += `
+      <div class="card">
+        <h3>${job.title}</h3>
+        <p>Skills: ${job.skills.join(", ")}</p>
+        <p>Posted by: ${job.recruiter}</p>
+        <button class="applyBtn" data-index="${index}">
+          Apply 🚀
+        </button>
+      </div>
+    `;
+
+  });
+
+  // 🔥 ADD EVENT LISTENER AFTER RENDER
+  document.querySelectorAll(".applyBtn").forEach(btn => {
+
+   btn.addEventListener("click", async () => {
+  
+  const index = btn.dataset.index;
+  const job = jobs[index];
   const user = getSession();
-
+  
   if (!user) {
     alert("Login required ❌");
     return;
   }
+  
+  // ✅ duplicate check (correct place)
+  const alreadyApplied = JSON.parse(localStorage.getItem("appliedJobs")) || [];
+  
+  if (alreadyApplied.includes(job.id)) {
+    alert("Already applied ⚠️");
+    return;
+  }
+  
+  try {
+    
+    await applyJob({
+      jobId: job.id,
+      jobTitle: job.title,
+      recruiter: job.recruiter,
+      seeker: user.email,
+      skills: job.skills
+    });
+    
+    // ✅ save locally
+    alreadyApplied.push(job.id);
+    localStorage.setItem("appliedJobs", JSON.stringify(alreadyApplied));
+    
+    btn.innerText = "Applied ✅";
+    btn.disabled = true;
+    
+    alert("Applied successfully 🚀");
+    
+  } catch (err) {
+    console.log(err);
+    alert("Failed ❌");
+  }
+  
+});   
 
-  await addDoc(collection(db, "applications"), {
-    jobId,
-    user: user.email,
-    status: "Applied",
-    createdAt: new Date().toISOString()
   });
 
-  alert("Applied successfully 🚀");
-};
+}
 
-// LOAD
-loadJobs();
 </script>
-
 </body>
 </html>
