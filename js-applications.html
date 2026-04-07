@@ -85,17 +85,18 @@ async function loadApplications() {
     snap.forEach(doc => {
       const app = doc.data();
 
-      if (app.user === user.email) {
+      if (app.seeker === user.email) {
         found = true;
 
         const div = document.createElement("div");
         div.className = "card";
 
         div.innerHTML = `
-          <h3>Job ID: ${app.jobId}</h3>
-          <p><b>Status:</b> ${app.status}</p>
-          <p><b>Applied On:</b> ${new Date(app.createdAt).toLocaleDateString()}</p>
-        `;
+<h3>${app.jobTitle || "Unknown Job"}</h3>
+<p><b>Status:</b> ${app.status}</p>
+<p><b>Applied On:</b> ${new Date(app.createdAt).toLocaleDateString()}</p>
+<p><b>Skills:</b> ${app.skills ? app.skills.join(", ") : "N/A"}</p>
+`;
 
         container.appendChild(div);
       }
