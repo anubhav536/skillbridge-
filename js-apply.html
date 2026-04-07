@@ -5,7 +5,9 @@
   <meta charset="UTF-8">
   <title>Apply Job | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=30">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css?v=31">
 </head>
 
 <body>
@@ -62,17 +64,20 @@
 </div>
 
 
-<!-- SCRIPT -->
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
-import { addDoc, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { logoutUser, applyJob } from "./firebase.js";
 
-// LOGOUT
-document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+window.addEventListener("DOMContentLoaded", () => {
 
-// SESSION
+  // logout fix
+  document.getElementById("logoutBtn")
+    ?.addEventListener("click", logoutUser);
+
+});
+
+
+// session
 function getSession(){
   try {
     return JSON.parse(localStorage.getItem("session"));
@@ -81,7 +86,8 @@ function getSession(){
   }
 }
 
-// JOB ID
+
+// job id
 let currentJobId = "";
 
 function getJobId(){
@@ -91,7 +97,8 @@ function getJobId(){
   document.getElementById("jobId").innerText = currentJobId || "N/A";
 }
 
-// APPLY
+
+// apply
 document.getElementById("applyForm")
   .addEventListener("submit", async (e) => {
 
@@ -99,31 +106,34 @@ document.getElementById("applyForm")
 
     const user = getSession();
 
-    if(!user){
+    if (!user) {
       alert("Login required ❌");
       window.location.href = "index.html";
       return;
     }
 
-    const skills = document.getElementById("skills").value.trim();
+    const skillsInput = document.getElementById("skills").value;
+
+    const skills = skillsInput
+      .split(",")
+      .map(s => s.trim());
+
     const exp = document.getElementById("experience").value.trim();
     const resume = document.getElementById("resumeText").value.trim();
 
-    if(!skills || !resume){
+    if (!skillsInput || !resume) {
       alert("Fill required fields ⚠️");
       return;
     }
 
     try {
 
-      await addDoc(collection(db, "applications"), {
+      await applyJob({
         user: user.email,
         jobId: currentJobId,
-        skills,
+        skills: skills.length ? skills : [],
         experience: exp || "0",
-        resume,
-        status: "Applied",
-        time: new Date().toISOString()
+        resume
       });
 
       alert("Application Submitted ✅");
@@ -137,7 +147,8 @@ document.getElementById("applyForm")
 
   });
 
-// LOAD
+
+// init
 getJobId();
 
 </script>
