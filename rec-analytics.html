@@ -70,23 +70,13 @@
 
 <script type="module">
 
-import { db, logoutUser, protectPage } from "./firebase.js";
+import { db, logoutUser, protectPage, getSession } from "./firebase.js";
 import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 protectPage("recruiter");
 
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
-
-
-// session
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
 
 
 // LOAD ANALYTICS
@@ -165,7 +155,6 @@ async function loadAnalytics(){
     });
 
 
-    // sort
     const sorted = Object.entries(skillMap)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5);
