@@ -73,24 +73,18 @@
 <!-- SCRIPT -->
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
+import { db, logoutUser, protectPage, getSession } from "./firebase.js";
 import { getDocs, collection } 
 from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
+// 🔥 PROTECT PAGE
+protectPage("recruiter");
 
 
 // LOGOUT
 document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
-
-
-// SESSION
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
 
 
 // SAFE TEXT SET
@@ -104,11 +98,6 @@ function setText(id, value) {
 async function loadRecruiterDashboard() {
 
   const user = getSession();
-
-  if (!user || user.role !== "recruiter") {
-    window.location.href = "index.html";
-    return;
-  }
 
   setText("welcome", "Welcome " + user.name);
 
