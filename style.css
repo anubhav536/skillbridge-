@@ -1296,3 +1296,103 @@ button {
   color: #E2E8F0;
   min-width: 140px;
 }
+.resume-box {
+  background: white;
+  color: black;
+  padding: 25px;
+  border-radius: 10px;
+  max-width: 700px;
+  margin: auto;
+  line-height: 1.6;
+}
+
+.resume-box h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.resume-box p {
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+.resume-box h3 {
+  margin-top: 15px;
+  border-bottom: 2px solid #2563EB;
+  padding-bottom: 3px;
+}
+
+.resume-box ul {
+  margin-top: 5px;
+  padding-left: 20px;
+}
+
+.resume-box li {
+  margin-bottom: 4px;
+}
+.resume-pro {
+  display: flex;
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  color: black;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* LEFT SIDE */
+.resume-pro .left {
+  width: 35%;
+  background: #1E293B;
+  color: white;
+  padding: 20px;
+}
+
+.resume-pro .left h1 {
+  font-size: 20px;
+  margin-bottom: 5px;
+}
+
+/* RIGHT SIDE */
+.resume-pro .right {
+  width: 65%;
+  padding: 20px;
+}
+
+.resume-pro h3 {
+  margin-top: 15px;
+  border-bottom: 2px solid #2563EB;
+}
+
+/* SKILL BAR */
+.skill {
+  margin-top: 10px;
+}
+
+.skill span {
+  font-size: 13px;
+}
+
+.bar {
+  height: 6px;
+  background: #334155;
+  border-radius: 5px;
+  margin-top: 4px;
+}
+
+.bar div {
+  height: 100%;
+  background: #38BDF8;
+  border-radius: 5px;
+}
+@media print {
+  body {
+    background: white;
+  }
+
+  .resume-pro {
+    box-shadow: none;
+    border-radius: 0;
+  }
+}
