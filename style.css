@@ -1279,3 +1279,20 @@ button {
   display: block;
   margin: auto;
 }
+/* FILTER BAR */
+.filters{
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.filters select{
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #1E293B;
+  color: #E2E8F0;
+  min-width: 140px;
+}
