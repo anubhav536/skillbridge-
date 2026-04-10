@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruiter Login | SkillBridge AI</title>
+  <title>Job Seeker Signup | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=9">
+  <link rel="stylesheet" href="style.css?v=8">
 </head>
 
 <body>
@@ -19,15 +19,19 @@
   </div>
 </nav>
 
-<!-- LOGIN -->
+<!-- SIGNUP -->
 <section class="auth-container">
 
   <div class="card login-card">
 
-    <h2>🏢 Recruiter Login</h2>
+    <h2>👨‍🎓 Job Seeker Signup</h2>
     <p class="subtitle">
-      Manage jobs & hire candidates
+      Create your account to start applying for jobs
     </p>
+
+    <!-- NAME -->
+    <label>Full Name</label>
+    <input type="text" id="name" placeholder="Enter Name">
 
     <!-- EMAIL -->
     <label>Email</label>
@@ -36,20 +40,14 @@
     <!-- PASSWORD -->
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter Password">
-    <!-- Forgot Password -->
-    <p style="text-align:right; margin-top:5px;">
-  <a href="#" id="forgotPassword" style="font-size:14px; color:#60A5FA;">
-    Forgot Password?
-  </a>
-</p>
 
     <!-- BUTTON -->
-    <button id="loginBtn">Login 🚀</button>
+    <button id="signupBtn">Signup 🚀</button>
 
-    <!-- SIGNUP -->
+    <!-- LOGIN -->
     <p class="bottom-text">
-      Don’t have an account?
-      <a href="recruiter-signup.html">Signup</a>
+      Already have an account?
+      <a href="jobseeker-login.html">Login</a>
     </p>
 
   </div>
@@ -58,27 +56,15 @@
 
 <!-- FOOTER -->
 <footer>
-  <p> © 2026 SkillBridge AI</p>
+  <p>© 2026 SkillBridge AI</p>
 </footer>
 
 <!-- SCRIPT -->
 <script type="module">
-import { loginUser, resetPassword,checkSessionUI } from "./firebase.js";
-checkSessionUI();
-  document.getElementById("loginBtn")
-    .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
-    document.getElementById("forgotPassword")
-  .addEventListener("click", () => {
+  import { signupUser } from "./firebase.js";
 
-    const email = document.getElementById("email").value;
-
-    if (!email) {
-      alert("Input Email First 📩");
-      return;
-    }
-
-    resetPassword(email);
-});
+  document.getElementById("signupBtn")
+    .addEventListener("click", () => signupUser("seeker", document.getElementById("signupBtn")));
 </script>
 
 </body>
