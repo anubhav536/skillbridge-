@@ -36,6 +36,12 @@
     <!-- PASSWORD -->
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter Password">
+    <!-- Forgot Password -->
+    <p style="text-align:right; margin-top:5px;">
+  <a href="#" id="forgotPassword" style="font-size:14px; color:#60A5FA;">
+    Forgot Password?
+  </a>
+</p>
 
     <!-- BUTTON -->
     <button id="loginBtn">Login 🚀</button>
@@ -52,15 +58,27 @@
 
 <!-- FOOTER -->
 <footer>
-  <p>© 2026 SkillBridge AI</p>
+  <p> © 2026 SkillBridge AI</p>
 </footer>
 
 <!-- SCRIPT -->
 <script type="module">
-  import { loginUser } from "./firebase.js";
-
+import { loginUser, resetPassword,checkSessionUI } from "./firebase.js";
+checkSessionUI();
   document.getElementById("loginBtn")
     .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
+    document.getElementById("forgotPassword")
+  .addEventListener("click", () => {
+
+    const email = document.getElementById("email").value;
+
+    if (!email) {
+      alert("Input Email First 📩");
+      return;
+    }
+
+    resetPassword(email);
+});
 </script>
 
 </body>
