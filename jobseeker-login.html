@@ -36,7 +36,11 @@
     <!-- PASSWORD -->
     <label>Password</label>
     <input type="password" id="password" placeholder="Enter Password">
-
+<p style="text-align:right; margin-top:5px;">
+  <a href="#" id="forgotPassword" style="font-size:14px; color:#60A5FA;">
+    Forgot Password?
+  </a>
+</p>
     <!-- BUTTON -->
     <button id="loginBtn">Login 🚀</button>
 
@@ -56,11 +60,30 @@
 </footer>
 
 <!-- SCRIPT -->
+<!-- SCRIPT -->
+<!-- SCRIPT -->
 <script type="module">
-  import { loginUser } from "./firebase.js";
+import { loginUser, resetPassword,checkSessionUI } from "./firebase.js";
+checkSessionUI();
+document.getElementById("loginBtn")
+.addEventListener("click", () =>
+loginUser(document.getElementById("loginBtn"))
+);
 
-  document.getElementById("loginBtn")
-    .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
+document.getElementById("forgotPassword")
+.addEventListener("click", (e) => {
+
+e.preventDefault();
+
+const email = document.getElementById("email").value.trim();
+
+if (!email) {
+alert("Input Email First 📩");
+return;
+}
+
+resetPassword(email);
+});
 </script>
 
 </body>
