@@ -19,7 +19,29 @@ import {
   updateDoc,
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+// ========= Forgot Password ======
+import {
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+export async function resetPassword(email, btn = null) {
 
+  setLoading(btn, true, "Sending...");
+
+  await safeRun(async () => {
+
+    if (!email) {
+      alert("Enter email first 📩");
+      return;
+    }
+
+    await sendPasswordResetEmail(auth, email);
+
+    alert("Reset link sent to your email ✅");
+
+  });
+
+  setLoading(btn, false);
+}
 
 // ================= INIT =================              
 const firebaseConfig = {
@@ -99,6 +121,7 @@ export async function loginUser(btn = null) {
       alert("Fill all fields ❌");
       return;
     }
+ 
 
     const userCred = await signInWithEmailAndPassword(auth, email, password);
 
@@ -111,16 +134,16 @@ export async function loginUser(btn = null) {
 
     const user = snap.data();
 
-    user.email = user.email || email;
+user.email = user.email || email;
 
-    localStorage.setItem("session", JSON.stringify(user));
+localStorage.setItem("session", JSON.stringify(user));
 
-    setTimeout(() => {
-      window.location.href =
-        user.role === "seeker"
-          ? "js-dashboard.html"
-          : "rec-dashboard.html";
-    }, 200);
+setTimeout(() => {
+  window.location.href =
+    user.role === "seeker" ?
+    "js-dashboard.html" :
+    "rec-dashboard.html";
+}, 200);
   });
 
   setLoading(btn, false);
@@ -129,45 +152,52 @@ export async function loginUser(btn = null) {
 
 // ================= SIGNUP =================              
 export async function signupUser(role, btn = null) {
-
+  
   setLoading(btn, true);
-
+  
   await safeRun(async () => {
-
+    
     const name = document.getElementById("name")?.value.trim();
     const email = document.getElementById("email")?.value.trim();
     const password = document.getElementById("password")?.value.trim();
-
+    
     if (!name || !email || !password) {
       alert("Fill all fields ❌");
       return;
     }
-
+    
     const userCred = await createUserWithEmailAndPassword(auth, email, password);
-
+    
     await setDoc(doc(db, "users", userCred.user.uid), {
       name,
       email,
       role,
       createdAt: Date.now()
     });
-
+    
+    // 🔥 AUTO LOGIN AFTER SIGNUP
+    localStorage.setItem("session", JSON.stringify({
+      name,
+      email,
+      role
+    }));
+    
     setTimeout(() => {
       window.location.href =
-        role === "seeker"
-          ? "jobseeker-login.html"
-          : "recruiter-login.html";
+        role === "seeker" ?
+        "js-dashboard.html" :
+        "rec-dashboard.html";
     }, 200);
+    
   });
-
+  
   setLoading(btn, false);
 }
-
-
-// ================= LOGOUT =================              
-export async function logoutUser() {
-
-  await safeRun(async () => {
+// ===== Forgot Password =====
+// ================= LOGOUT             
+export async function logoutUser()
+{
+     await safeRun(async () => {
     await signOut(auth);
 
     localStorage.removeItem("session");
@@ -332,4 +362,3 @@ window.addEventListener("unhandledrejection", (e) => {
     e.preventDefault();
   }
 });
-
