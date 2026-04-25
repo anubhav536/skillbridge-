@@ -5,47 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Seeker Login | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=7">
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="js-login-body">
 
 <!-- NAVBAR -->
-<nav>
-  <h2>🚀 SkillBridge AI</h2>
-  <div>
+<nav class="js-login-navbar">
+
+  <h2 class="js-login-logo">🚀 SkillBridge AI</h2>
+
+  <div class="js-login-navlinks">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
+
 </nav>
 
 <!-- LOGIN SECTION -->
-<section class="auth-container">
+<section class="js-login-section">
 
-  <div class="card login-card">
+  <div class="js-login-box">
 
     <h2>👨‍🎓 Job Seeker Login</h2>
-    <p class="subtitle">
+
+    <p class="js-login-subtitle">
       Login to access your dashboard and explore jobs
     </p>
 
     <!-- EMAIL -->
     <label>Email</label>
-    <input type="email" id="email" placeholder="Enter Email">
+    <input
+      type="email"
+      id="email"
+      placeholder="Enter Email"
+      class="js-login-input"
+    >
 
     <!-- PASSWORD -->
     <label>Password</label>
-    <input type="password" id="password" placeholder="Enter Password">
-<p style="text-align:right; margin-top:5px;">
-  <a href="#" id="forgotPassword" style="font-size:14px; color:#60A5FA;">
-    Forgot Password?
-  </a>
-</p>
+    <input
+      type="password"
+      id="password"
+      placeholder="Enter Password"
+      class="js-login-input"
+    >
+
+    <!-- FORGOT -->
+    <p class="js-login-forgot-wrap">
+      <a href="#" id="forgotPassword" class="js-login-forgot">
+        Forgot Password?
+      </a>
+    </p>
+
     <!-- BUTTON -->
-    <button id="loginBtn">Login 🚀</button>
+    <button id="loginBtn" class="js-login-btn">
+      Login 🚀
+    </button>
 
     <!-- SIGNUP -->
-    <p class="bottom-text">
+    <p class="js-login-bottom">
       Don’t have an account?
       <a href="jobseeker-signup.html">Signup</a>
     </p>
@@ -55,35 +74,51 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
+<footer class="js-login-footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
 <!-- SCRIPT -->
-<!-- SCRIPT -->
-<!-- SCRIPT -->
 <script type="module">
-import { loginUser, resetPassword,checkSessionUI } from "./firebase.js";
-checkSessionUI();
-document.getElementById("loginBtn")
-.addEventListener("click", () =>
-loginUser(document.getElementById("loginBtn"))
-);
 
+import {
+  loginUser,
+  resetPassword,
+  checkSessionUI
+} from "./firebase.js";
+
+checkSessionUI();
+
+// LOGIN
+document.getElementById("loginBtn")
+.addEventListener("click", () => {
+
+  loginUser(
+    document.getElementById("loginBtn")
+  );
+
+});
+
+// RESET PASSWORD
 document.getElementById("forgotPassword")
 .addEventListener("click", (e) => {
 
-e.preventDefault();
+  e.preventDefault();
 
-const email = document.getElementById("email").value.trim();
+  const email =
+    document.getElementById("email")
+    .value
+    .trim();
 
-if (!email) {
-alert("Input Email First 📩");
-return;
-}
+  if (!email) {
+    alert("Input Email First 📩");
+    return;
+  }
 
-resetPassword(email);
+  resetPassword(email);
+
 });
+
 </script>
 
 </body>
