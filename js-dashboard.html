@@ -1,5 +1,4 @@
-
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,21 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 
-<body>
+<body class="jsdash-page">
 
-<!-- DASHBOARD WRAPPER -->
+<!-- DASHBOARD -->
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
     <nav>
-      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-dashboard.html" class="active">Dashboard</a>
       <a href="js-jobs.html">Jobs</a>
       <a href="js-applications.html">Applications</a>
       <a href="js-resume.html">Resume Builder</a>
@@ -31,117 +30,225 @@
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📊 Dashboard</h2>
-    <p id="welcome">Welcome...</p>
+    <!-- TOP -->
+    <div class="dash-top">
+
+      <div>
+        <h1>📊 Dashboard</h1>
+        <p id="welcome" class="subtext">
+          Welcome...
+        </p>
+      </div>
+
+      <div class="status-chip">
+        🚀 Career Mode Active
+      </div>
+
+    </div>
+
 
     <!-- STATS -->
-    <div class="grid">
+    <section class="stats-grid">
 
-      <div class="card">
+      <div class="dash-card blue-line">
         <h3>📄 Total Applications</h3>
-        <p id="totalApps">Loading...</p>
+        <p id="totalApps">0</p>
       </div>
 
-      <div class="card">
+      <div class="dash-card green-line">
         <h3>✅ Selected</h3>
-        <p id="selectedApps">Loading...</p>
+        <p id="selectedApps">0</p>
       </div>
 
-      <div class="card">
+      <div class="dash-card purple-line">
         <h3>⚡ Employability Score</h3>
-        <p id="score">Calculating...</p>
+        <p id="score">0%</p>
       </div>
 
-    </div>
+    </section>
+
+
+    <!-- PROGRESS -->
+    <section class="dash-card progress-card">
+
+      <h3>📈 Hiring Momentum</h3>
+
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress-bar"></div>
+      </div>
+
+      <p id="progressText">
+        Loading...
+      </p>
+
+    </section>
+
 
     <!-- QUICK ACTIONS -->
-    <h3 style="margin-top:20px;">⚡ Quick Actions</h3>
+    <section class="dash-card quick-card">
 
-    <div class="grid">
+      <h3>⚡ Quick Actions</h3>
 
-      <a href="js-jobs.html">
-        <button>Find Jobs 💼</button>
-      </a>
+      <div class="quick-grid">
 
-      <a href="js-resume.html">
-        <button>Build Resume 📄</button>
-      </a>
+        <a href="js-jobs.html" class="quick-btn">
+          💼 Find Jobs
+        </a>
 
-      <a href="js-analytics.html">
-        <button>View Analytics 📊</button>
-      </a>
+        <a href="js-resume.html" class="quick-btn">
+          📄 Build Resume
+        </a>
 
-    </div>
+        <a href="js-analytics.html" class="quick-btn">
+          📊 View Analytics
+        </a>
 
-  </div>
+        <a href="js-profile.html" class="quick-btn">
+          👤 Update Profile
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- MOTIVATION -->
+    <section class="dash-card quote-card">
+
+      <h3>🔥 Daily Push</h3>
+
+      <p id="quoteText">
+        Every application is a knock on opportunity’s door.
+      </p>
+
+    </section>
+
+  </main>
 
 </div>
 
+
 <!-- SCRIPT -->
 <script type="module">
-  import { db, logoutUser } from "./firebase.js";
-  import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-  // LOGOUT
-  document.getElementById("logoutBtn")
-    .addEventListener("click", logoutUser);
+import {
+  db,
+  logoutUser,
+  getSession,
+  protectPage
+} from "./firebase.js";
 
-  // SESSION
-  function getSession() {
-    try {
-      return JSON.parse(localStorage.getItem("session"));
-    } catch {
-      return null;
-    }
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+protectPage("seeker");
+
+/* LOGOUT */
+document.getElementById("logoutBtn")
+.addEventListener("click", logoutUser);
+
+
+/* DASHBOARD */
+async function loadDashboard(){
+
+  const user = getSession();
+
+  if(!user || !user.email){
+    window.location.href =
+      "js-dashboard.html";
+    return;
   }
 
-  // DASHBOARD
-  async function loadDashboard() {
+  document.getElementById("welcome")
+  .innerText =
+    "Welcome back, " +
+    (user.name || "User") +
+    " 👋";
 
-    const user = getSession();
+  try{
 
-    if (!user || !user.email) {
-      alert("⚠️ Please login first");
-      window.location.href = "index.html";
-      return;
-    }
+    const snapshot =
+      await getDocs(collection(db,"applications"));
 
-    document.getElementById("welcome").innerText =
-      "Welcome " + (user.name || "User");
+    let apps = [];
 
-    try {
+    snapshot.forEach(doc => {
 
-      const snapshot = await getDocs(collection(db, "applications"));
-      const apps = [];
+      const a = doc.data();
 
-      snapshot.forEach(doc => {
-        const a = doc.data();
-        if (a.user === user.email) apps.push(a);
-      });
+      if(
+        a.user === user.email ||
+        a.seeker === user.email ||
+        a.email === user.email
+      ){
+        apps.push(a);
+      }
 
-      document.getElementById("totalApps").innerText = apps.length;
+    });
 
-      const selected = apps.filter(a =>
-        a.status === "Shortlisted" || a.status === "Hired"
-      ).length;
+    const total = apps.length;
 
-      document.getElementById("selectedApps").innerText = selected;
+    const selected = apps.filter(a =>
+      a.status === "Shortlisted" ||
+      a.status === "Hired"
+    ).length;
 
-      const score = Math.min(100, apps.length * 20 + selected * 10);
-      document.getElementById("score").innerText = score + "%";
+    const score = Math.min(
+      100,
+      (total * 18) + (selected * 20)
+    );
 
-    } catch (err) {
-      console.error("Dashboard Error:", err);
-    }
+    document.getElementById("totalApps")
+    .innerText = total;
 
+    document.getElementById("selectedApps")
+    .innerText = selected;
+
+    document.getElementById("score")
+    .innerText = score + "%";
+
+    /* Progress */
+    document.getElementById("progressBar")
+    .style.width = score + "%";
+
+    let level = "Starter 🌱";
+
+    if(score >= 35) level = "Growing 🚀";
+    if(score >= 65) level = "Strong Candidate 💼";
+    if(score >= 90) level = "Elite Talent 👑";
+
+    document.getElementById("progressText")
+    .innerText =
+      "Current Level: " + level;
+
+    /* Quote Engine */
+    const quotes = [
+      "Every application is a knock on opportunity’s door.",
+      "Consistency beats luck in hiring season.",
+      "One strong resume can change the storyline.",
+      "Keep shipping applications. Results follow."
+    ];
+
+    document.getElementById("quoteText")
+    .innerText =
+      quotes[Math.floor(Math.random()*quotes.length)];
+
+  }catch(err){
+    console.error(err);
   }
 
-  loadDashboard();
+}
+
+loadDashboard();
+
 </script>
 
 </body>
