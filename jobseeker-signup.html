@@ -1,25 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Seeker Signup | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css">
+<title>Job Seeker Signup | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* ===================================
+   PAGE CUSTOM STYLE (Matches Your CSS)
+=================================== */
+
+.js-signup-body{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:
+  radial-gradient(circle at top right,#2563eb22 0%,transparent 25%),
+  radial-gradient(circle at bottom left,#06b6d422 0%,transparent 25%),
+  #0f172a;
+}
+
+/* NAVBAR */
+.js-signup-navbar{
+  background:rgba(17,24,39,.92);
+  backdrop-filter:blur(12px);
+}
+
+.js-signup-logo{
+  font-size:24px;
+  font-weight:800;
+  letter-spacing:.4px;
+}
+
+.js-signup-navlinks{
+  display:flex;
+  gap:12px;
+}
+
+.js-signup-navlinks a{
+  padding:10px 16px;
+  border-radius:12px;
+  color:#cbd5e1;
+  transition:.25s;
+}
+
+.js-signup-navlinks a:hover{
+  background:#2563eb;
+  color:#fff;
+}
+
+/* MAIN SECTION */
+.js-signup-section{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:40px 20px;
+}
+
+/* CARD */
+.js-signup-box{
+  width:100%;
+  max-width:470px;
+  background:rgba(30,41,59,.95);
+  border:1px solid rgba(255,255,255,.06);
+  padding:34px;
+  border-radius:24px;
+  box-shadow:0 22px 45px rgba(0,0,0,.25);
+  animation:fadeUp .5s ease;
+}
+
+@keyframes fadeUp{
+  from{
+    opacity:0;
+    transform:translateY(20px);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
+}
+
+.js-signup-box h2{
+  font-size:30px;
+  margin-bottom:10px;
+}
+
+.js-signup-subtitle{
+  color:#cbd5e1;
+  margin-bottom:22px;
+  line-height:1.6;
+}
+
+/* LABEL */
+.js-signup-box label{
+  display:block;
+  margin:14px 0 8px;
+  font-size:14px;
+  font-weight:700;
+  color:#e2e8f0;
+}
+
+/* INPUT */
+.js-signup-input{
+  width:100%;
+  padding:14px 15px;
+  border-radius:14px;
+  background:#0b1220;
+  border:1px solid #334155;
+  color:#fff;
+  transition:.25s;
+}
+
+.js-signup-input:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 4px rgba(59,130,246,.14);
+}
+
+/* BUTTON */
+.js-signup-btn{
+  width:100%;
+  margin-top:22px;
+  padding:15px;
+  border:none;
+  border-radius:16px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.js-signup-btn:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(37,99,235,.35);
+}
+
+/* LOGIN TEXT */
+.js-signup-bottom{
+  margin-top:18px;
+  text-align:center;
+  color:#cbd5e1;
+}
+
+.js-signup-bottom a{
+  color:#60a5fa;
+  font-weight:700;
+}
+
+.js-signup-bottom a:hover{
+  text-decoration:underline;
+}
+
+/* FOOTER */
+.js-signup-footer{
+  background:#111827;
+  text-align:center;
+  padding:18px;
+  color:#94a3b8;
+}
+
+/* MOBILE */
+@media(max-width:600px){
+
+  .js-signup-box{
+    padding:24px;
+    border-radius:18px;
+  }
+
+  .js-signup-box h2{
+    font-size:24px;
+  }
+
+  .js-signup-navbar{
+    flex-direction:column;
+    gap:12px;
+  }
+
+}
+</style>
 </head>
 
 <body class="js-signup-body">
 
 <!-- NAVBAR -->
 <nav class="js-signup-navbar">
-
   <h2 class="js-signup-logo">🚀 SkillBridge AI</h2>
 
   <div class="js-signup-navlinks">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
-
 </nav>
 
 <!-- SIGNUP -->
@@ -30,42 +204,37 @@
     <h2>👨‍🎓 Job Seeker Signup</h2>
 
     <p class="js-signup-subtitle">
-      Create your account to start applying for jobs
+      Create your account and unlock your career runway.
     </p>
 
-    <!-- NAME -->
     <label>Full Name</label>
     <input
       type="text"
       id="name"
-      placeholder="Enter Name"
+      placeholder="Enter your full name"
       class="js-signup-input"
     >
 
-    <!-- EMAIL -->
     <label>Email</label>
     <input
       type="email"
       id="email"
-      placeholder="Enter Email"
+      placeholder="Enter your email"
       class="js-signup-input"
     >
 
-    <!-- PASSWORD -->
     <label>Password</label>
     <input
       type="password"
       id="password"
-      placeholder="Enter Password"
+      placeholder="Create password"
       class="js-signup-input"
     >
 
-    <!-- BUTTON -->
     <button id="signupBtn" class="js-signup-btn">
       Signup 🚀
     </button>
 
-    <!-- LOGIN -->
     <p class="js-signup-bottom">
       Already have an account?
       <a href="jobseeker-login.html">Login</a>
@@ -84,19 +253,20 @@
 <script type="module">
 
 import {
-  signupUser,
-  checkSessionUI
+signupUser,
+checkSessionUI
 } from "./firebase.js";
 
 checkSessionUI();
 
-document.getElementById("signupBtn")
-.addEventListener("click", () => {
+document
+.getElementById("signupBtn")
+.addEventListener("click",()=>{
 
-  signupUser(
-    "seeker",
-    document.getElementById("signupBtn")
-  );
+signupUser(
+"seeker",
+document.getElementById("signupBtn")
+);
 
 });
 
