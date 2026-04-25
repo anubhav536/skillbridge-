@@ -2,20 +2,20 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Analytics | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruiter Analytics | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=90">
 </head>
 
-<body>
+<body class="rec-analytics-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
@@ -24,158 +24,346 @@
       <a href="rec-post-job.html">Post Job</a>
       <a href="rec-manage-jobs.html">Manage Jobs</a>
       <a href="rec-applicants.html">Applicants</a>
-      <a href="rec-analytics.html">Analytics</a>
+      <a href="rec-analytics.html" class="active">Analytics</a>
       <a href="rec-profile.html">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📊 Hiring Analytics</h2>
+    <div class="page-head">
 
-    <div class="grid">
+      <div>
+        <h1>📊 Hiring Analytics</h1>
+        <p>Read the hiring battlefield like a chessboard ♟️</p>
+      </div>
 
-      <div class="card">
+      <div class="live-pill">
+        📡 Live Recruiter Data
+      </div>
+
+    </div>
+
+
+
+    <!-- STATS -->
+    <section class="grid">
+
+      <div class="card stat-card">
         <h3>📄 Total Applications</h3>
         <p id="totalApps">0</p>
       </div>
 
-      <div class="card">
+      <div class="card stat-card">
         <h3>✅ Shortlisted</h3>
         <p id="shortlisted">0</p>
       </div>
 
-      <div class="card">
+      <div class="card stat-card">
         <h3>📈 Hiring Rate</h3>
         <p id="rate">0%</p>
       </div>
 
-    </div>
+      <div class="card stat-card">
+        <h3>🔥 Active Jobs</h3>
+        <p id="jobsCount">0</p>
+      </div>
 
-    <!-- TOP SKILLS -->
-    <div class="card">
-      <h3>🔥 Top Skills in Applicants</h3>
-      <ul id="skillsList"></ul>
-    </div>
+    </section>
 
-  </div>
+
+
+    <!-- CHART ZONE -->
+    <section class="grid two-grid">
+
+      <div class="card">
+        <h3>🎯 Funnel</h3>
+
+        <div class="bar-wrap">
+          <span>Applied</span>
+          <div class="track"><div id="barApplied"></div></div>
+        </div>
+
+        <div class="bar-wrap">
+          <span>Shortlisted</span>
+          <div class="track"><div id="barShort"></div></div>
+        </div>
+
+        <div class="bar-wrap">
+          <span>Hired</span>
+          <div class="track"><div id="barHired"></div></div>
+        </div>
+
+      </div>
+
+
+      <div class="card">
+        <h3>🔥 Top Skills in Applicants</h3>
+        <ul id="skillsList" class="skill-list"></ul>
+      </div>
+
+    </section>
+
+
+
+    <!-- AI INSIGHTS -->
+    <section class="card insight-box">
+
+      <h3>🧠 AI Insights</h3>
+
+      <ul>
+        <li id="insight1">Loading...</li>
+        <li id="insight2"></li>
+        <li id="insight3"></li>
+      </ul>
+
+    </section>
+
+  </main>
 
 </div>
 
 
+
 <script type="module">
 
-import { db, logoutUser, protectPage, getSession } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  db,
+  logoutUser,
+  protectPage,
+  getSession
+} from "./firebase.js";
+
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
 
 protectPage("recruiter");
 
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
 
-// LOAD ANALYTICS
+
 async function loadAnalytics(){
 
   const user = getSession();
 
-  try {
+  if(!user){
+    location.href = "rec-analytics.html";
+    return;
+  }
 
-    // 🔹 STEP 1: get recruiter jobs
-    const jobsSnap = await getDocs(collection(db, "jobs"));
+  try{
+
+    /* JOBS */
+    const jobsSnap =
+      await getDocs(collection(db,"jobs"));
 
     let myJobIds = [];
 
     jobsSnap.forEach(doc => {
+
       const j = doc.data();
+
       if(j.recruiter === user.email){
         myJobIds.push(doc.id);
       }
+
     });
 
+    document.getElementById("jobsCount")
+    .innerText = myJobIds.length;
 
-    // 🔹 STEP 2: get applications
-    const appsSnap = await getDocs(collection(db, "applications"));
+
+
+    /* APPLICATIONS */
+    const appsSnap =
+      await getDocs(collection(db,"applications"));
 
     let apps = [];
 
     appsSnap.forEach(doc => {
+
       const a = doc.data();
 
       if(myJobIds.includes(a.jobId)){
         apps.push(a);
       }
+
     });
 
 
-    // ================= STATS =================
 
-    document.getElementById("totalApps").innerText = apps.length;
+    /* COUNTS */
+    const total = apps.length;
 
-    const shortlisted = apps.filter(a =>
-      a.status === "Shortlisted"
-    ).length;
+    const shortlisted =
+      apps.filter(a =>
+        a.status === "Shortlisted"
+      ).length;
 
-    document.getElementById("shortlisted").innerText = shortlisted;
+    const hired =
+      apps.filter(a =>
+        a.status === "Hired"
+      ).length;
 
-    const hired = apps.filter(a =>
-      a.status === "Hired"
-    ).length;
-
-    const rate = apps.length
-      ? Math.round((hired / apps.length) * 100)
+    const rate =
+      total
+      ? Math.round((hired / total) * 100)
       : 0;
 
-    document.getElementById("rate").innerText = rate + "%";
+
+    document.getElementById("totalApps")
+    .innerText = total;
+
+    document.getElementById("shortlisted")
+    .innerText = shortlisted;
+
+    document.getElementById("rate")
+    .innerText = rate + "%";
 
 
-    // ================= TOP SKILLS =================
 
+    /* FUNNEL BARS */
+    const max = total || 1;
+
+    document.getElementById("barApplied")
+    .style.width =
+      (total/max)*100 + "%";
+
+    document.getElementById("barShort")
+    .style.width =
+      (shortlisted/max)*100 + "%";
+
+    document.getElementById("barHired")
+    .style.width =
+      (hired/max)*100 + "%";
+
+
+
+    /* TOP SKILLS */
     let skillMap = {};
 
     apps.forEach(a => {
 
       if(!a.skills) return;
 
-      const arr = a.skills.split(",");
+      let arr =
+        Array.isArray(a.skills)
+        ? a.skills
+        : a.skills.split(",");
 
       arr.forEach(skill => {
-        const s = skill.trim().toLowerCase();
+
+        const s =
+          skill.trim().toLowerCase();
 
         if(!s) return;
 
-        skillMap[s] = (skillMap[s] || 0) + 1;
+        skillMap[s] =
+          (skillMap[s] || 0) + 1;
+
       });
 
     });
 
 
-    const sorted = Object.entries(skillMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 5);
+    const sorted =
+      Object.entries(skillMap)
+      .sort((a,b)=>b[1]-a[1])
+      .slice(0,5);
 
 
-    const list = document.getElementById("skillsList");
+    const list =
+      document.getElementById("skillsList");
 
     if(sorted.length === 0){
-      list.innerHTML = "<li>No data yet 😢</li>";
-    } else {
-      list.innerHTML = sorted.map(s =>
-        `<li>${s[0]} (${s[1]})</li>`
-      ).join("");
+
+      list.innerHTML =
+        "<li>No applicant data yet 😢</li>";
+
+    }else{
+
+      list.innerHTML =
+        sorted.map(item => `
+          <li>
+            <span>${item[0]}</span>
+            <b>${item[1]}</b>
+          </li>
+        `).join("");
+
     }
 
-  } catch (err){
+
+
+    /* AI INSIGHTS */
+    const i1 =
+      document.getElementById("insight1");
+
+    const i2 =
+      document.getElementById("insight2");
+
+    const i3 =
+      document.getElementById("insight3");
+
+
+    if(total === 0){
+
+      i1.innerText =
+        "Post jobs to start receiving candidates 🚀";
+
+      i2.innerText =
+        "Improve job titles for visibility.";
+
+      i3.innerText =
+        "Add salary range to attract faster.";
+
+    }
+
+    else if(rate < 20){
+
+      i1.innerText =
+        "Low hiring rate detected.";
+
+      i2.innerText =
+        "Shortlist faster to reduce drop-offs.";
+
+      i3.innerText =
+        "Refine screening criteria.";
+
+    }
+
+    else{
+
+      i1.innerText =
+        "Healthy hiring pipeline 🔥";
+
+      i2.innerText =
+        "Strong candidate conversion.";
+
+      i3.innerText =
+        "Scale job postings now.";
+
+    }
+
+  }
+
+  catch(err){
+
     console.log(err);
+
   }
 
 }
-
 
 loadAnalytics();
 
