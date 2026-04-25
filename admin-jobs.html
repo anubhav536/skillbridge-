@@ -3,143 +3,250 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Jobs | SkillBridge AI</title>
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: white;
+    }
+
+    .admin-layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      width: 260px;
+      background: #111827;
+      padding: 25px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 25px;
+    }
+
+    .sidebar nav a {
+      display: block;
+      color: #fff;
+      text-decoration: none;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      transition: 0.3s;
+    }
+
+    .sidebar nav a:hover {
+      background: #1e293b;
+    }
+
+    #logoutBtn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #ef4444;
+      color: white;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+    }
+
+    .main h2 {
+      margin-bottom: 20px;
+    }
+
+    #searchJob {
+      width: 320px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 25px;
+      outline: none;
+    }
+
+    .job-card {
+      background: #1e293b;
+      padding: 18px;
+      border-radius: 14px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+    }
+
+    .job-card b {
+      font-size: 18px;
+    }
+
+    .deleteBtn {
+      margin-top: 12px;
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #dc2626;
+      color: white;
+    }
+
+    .deleteBtn:hover {
+      background: #b91c1c;
+    }
+
+    .empty-box {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      color: #cbd5e1;
+    }
+  </style>
 </head>
 
 <body>
-  
+
+<div class="admin-layout">
+
   <!-- SIDEBAR -->
-  <div>
-    
+  <aside class="sidebar">
+
     <h2>👑 Admin Panel</h2>
-    
+
     <nav>
-      <a href="admin-dashboard.html">Dashboard</a><br>
-      <a href="admin-users.html">Users</a><br>
-      <a href="admin-jobs.html">Jobs</a><br>
-      <a href="admin-applications.html">Applications</a><br>
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="admin-users.html">Users</a>
+      <a href="admin-jobs.html">Jobs</a>
+      <a href="admin-applications.html">Applications</a>
     </nav>
-    
-    <!-- ✅ FIXED LOGOUT -->
+
     <button id="logoutBtn">Logout 👋</button>
-    
-  </div>
-  
-  <hr>
-  
+
+  </aside>
+
   <!-- MAIN -->
-  <div>
-    
+  <main class="main">
+
     <h2>💼 All Jobs</h2>
-    
+
     <input type="text" id="searchJob" placeholder="Search jobs...">
-    
-    <br><br>
-    
+
     <div id="jobsList"></div>
-    
-  </div>
-  
-  <!-- ✅ SINGLE MODULE SCRIPT -->
-  <script type="module">
-    import { db, logoutUser } from "./firebase.js";
-    import {
-      getDocs,
-      collection,
-      deleteDoc,
-      doc
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-    
-    
-    // 🔥 LOGOUT FIX
-    document.getElementById("logoutBtn")
-      .addEventListener("click", logoutUser);
-    
-    
-    // ================= LOAD JOBS =================
-    async function loadAllJobs() {
-      
-      const container = document.getElementById("jobsList");
-      container.innerHTML = "Loading...";
-      
-      try {
-        const snapshot = await getDocs(collection(db, "jobs"));
-        
-        container.innerHTML = "";
-        
-        snapshot.forEach(d => {
-          
-          const j = d.data();
-          
-          const card = document.createElement("div");
-          
-          card.style.border = "1px solid #ccc";
-          card.style.padding = "10px";
-          card.style.marginBottom = "10px";
-          
-          card.innerHTML = `
-        <b>💼 ${j.title || "No Title"}</b><br>
+
+  </main>
+
+</div>
+
+<script type="module">
+
+import { db, logoutUser } from "./firebase.js";
+
+import {
+  getDocs,
+  collection,
+  deleteDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+document.getElementById("logoutBtn")
+  .addEventListener("click", logoutUser);
+
+
+// LOAD JOBS
+async function loadAllJobs() {
+
+  const container = document.getElementById("jobsList");
+  container.innerHTML = `<div class="empty-box">Loading jobs...</div>`;
+
+  try {
+
+    const snapshot = await getDocs(collection(db, "jobs"));
+
+    container.innerHTML = "";
+
+    if (snapshot.empty) {
+      container.innerHTML =
+        `<div class="empty-box">No jobs found 🚫</div>`;
+      return;
+    }
+
+    snapshot.forEach(d => {
+
+      const j = d.data();
+
+      const card = document.createElement("div");
+      card.className = "job-card";
+
+      card.innerHTML = `
+        <b>💼 ${j.title || "No Title"}</b><br><br>
         🛠 Skills: ${j.skills?.join(", ") || "N/A"}<br>
         💰 Salary: ${j.salary || "N/A"}<br>
-        <button class="deleteBtn">Delete ❌</button>
-      `;
-          
-          // 🔥 DELETE BUTTON EVENT
-          card.querySelector(".deleteBtn")
-            .addEventListener("click", async () => {
-              
-              const confirmDelete = confirm("Delete this job?");
-              if (!confirmDelete) return;
-              
-              try {
-                await deleteDoc(doc(db, "jobs", d.id));
-                alert("Job Deleted ❌");
-                
-                loadAllJobs(); // reload
-                
-              } catch (err) {
-                console.error(err);
-                alert("Delete failed ❌");
-              }
-              
-            });
-          
-          container.appendChild(card);
-        });
-        
-        if (!container.innerHTML) {
-          container.innerHTML = "No jobs found";
-        }
-        
-      } catch (err) {
-        console.error("Load Jobs Error:", err);
-        container.innerHTML = "Error loading jobs ❌";
-      }
-    }
-    
-    
-    // ================= SEARCH =================
-    document.getElementById("searchJob")
-      .addEventListener("keyup", function() {
-        
-        const q = this.value.toLowerCase();
-        const jobs = document.querySelectorAll("#jobsList div");
-        
-        jobs.forEach(j => {
-          j.style.display =
-            j.innerText.toLowerCase().includes(q) ?
-            "block" :
-            "none";
-        });
-        
-      });
-    
-    
-    // AUTO LOAD
-    loadAllJobs();
-  </script>
-  
-</body>
 
-</html>""
+        <button class="deleteBtn">
+          🗑 Delete Job
+        </button>
+      `;
+
+      card.querySelector(".deleteBtn")
+        .addEventListener("click", async () => {
+
+          const ok = confirm("Delete this job?");
+
+          if (!ok) return;
+
+          try {
+            await deleteDoc(doc(db, "jobs", d.id));
+            alert("Job Deleted ❌");
+            loadAllJobs();
+
+          } catch (err) {
+            console.error(err);
+            alert("Delete failed ❌");
+          }
+
+        });
+
+      container.appendChild(card);
+
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    container.innerHTML =
+      `<div class="empty-box">Error loading jobs ❌</div>`;
+  }
+}
+
+
+// SEARCH
+document.getElementById("searchJob")
+  .addEventListener("keyup", function () {
+
+    const q = this.value.toLowerCase();
+
+    const jobs =
+      document.querySelectorAll(".job-card");
+
+    jobs.forEach(job => {
+
+      job.style.display =
+        job.innerText.toLowerCase().includes(q)
+        ? "block"
+        : "none";
+
+    });
+
+  });
+
+loadAllJobs();
+
+</script>
+
+</body>
+</html>
