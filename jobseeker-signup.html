@@ -5,47 +5,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Job Seeker Signup | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=8">
+  <link rel="stylesheet" href="style.css">
 </head>
 
-<body>
+<body class="js-signup-body">
 
 <!-- NAVBAR -->
-<nav>
-  <h2>🚀 SkillBridge AI</h2>
-  <div>
+<nav class="js-signup-navbar">
+
+  <h2 class="js-signup-logo">🚀 SkillBridge AI</h2>
+
+  <div class="js-signup-navlinks">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
+
 </nav>
 
 <!-- SIGNUP -->
-<section class="auth-container">
+<section class="js-signup-section">
 
-  <div class="card login-card">
+  <div class="js-signup-box">
 
     <h2>👨‍🎓 Job Seeker Signup</h2>
-    <p class="subtitle">
+
+    <p class="js-signup-subtitle">
       Create your account to start applying for jobs
     </p>
 
     <!-- NAME -->
     <label>Full Name</label>
-    <input type="text" id="name" placeholder="Enter Name">
+    <input
+      type="text"
+      id="name"
+      placeholder="Enter Name"
+      class="js-signup-input"
+    >
 
     <!-- EMAIL -->
     <label>Email</label>
-    <input type="email" id="email" placeholder="Enter Email">
+    <input
+      type="email"
+      id="email"
+      placeholder="Enter Email"
+      class="js-signup-input"
+    >
 
     <!-- PASSWORD -->
     <label>Password</label>
-    <input type="password" id="password" placeholder="Enter Password">
+    <input
+      type="password"
+      id="password"
+      placeholder="Enter Password"
+      class="js-signup-input"
+    >
 
     <!-- BUTTON -->
-    <button id="signupBtn">Signup 🚀</button>
+    <button id="signupBtn" class="js-signup-btn">
+      Signup 🚀
+    </button>
 
     <!-- LOGIN -->
-    <p class="bottom-text">
+    <p class="js-signup-bottom">
       Already have an account?
       <a href="jobseeker-login.html">Login</a>
     </p>
@@ -55,16 +76,30 @@
 </section>
 
 <!-- FOOTER -->
-<footer>
+<footer class="js-signup-footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
 <!-- SCRIPT -->
 <script type="module">
-  import { signupUser } from "./firebase.js";
 
-  document.getElementById("signupBtn")
-    .addEventListener("click", () => signupUser("seeker", document.getElementById("signupBtn")));
+import {
+  signupUser,
+  checkSessionUI
+} from "./firebase.js";
+
+checkSessionUI();
+
+document.getElementById("signupBtn")
+.addEventListener("click", () => {
+
+  signupUser(
+    "seeker",
+    document.getElementById("signupBtn")
+  );
+
+});
+
 </script>
 
 </body>
