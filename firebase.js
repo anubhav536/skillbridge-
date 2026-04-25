@@ -1,7 +1,9 @@
-// ===============================
-// 🔥 SkillBridge AI PRO firebase.js
-// Clean • Fast • Smart • Scalable
-// ===============================
+// =====================================
+// 🔥 SkillBridge AI FINAL firebase.js
+// Production Ready • GitHub Ready
+// =====================================
+
+
 
 // ---------- IMPORTS ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -30,12 +32,19 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 
-// ---------- CONFIG ----------
+
+// ---------- FIREBASE CONFIG ----------
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID"
+  apiKey: "AIzaSyAvT2lDQ8UFfe8iKdJ-SDnJi49H6OSUfxM",
+  authDomain: "skill-bridge-f4316.firebaseapp.com",
+  databaseURL: "https://skill-bridge-f4316-default-rtdb.firebaseio.com",
+  projectId: "skill-bridge-f4316",
+  storageBucket: "skill-bridge-f4316.firebasestorage.app",
+  messagingSenderId: "215570592226",
+  appId: "1:215570592226:web:70812f81c5d3afc2a109bb",
+  measurementId: "G-Y46GR7769S"
 };
+
 
 
 // ---------- INIT ----------
@@ -45,11 +54,11 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 
-// ===============================
-// ⚙️ HELPERS
-// ===============================
 
-// Safe async runner
+// =====================================
+// ⚙️ HELPERS
+// =====================================
+
 async function safeRun(fn) {
   try {
     return await fn();
@@ -57,22 +66,26 @@ async function safeRun(fn) {
 
     if (e?.name === "AbortError") return;
 
-    console.log("Handled:", e);
+    console.error("Firebase Error:", e);
 
     const errors = {
       "auth/wrong-password": "Wrong password ❌",
       "auth/user-not-found": "User not found ❌",
-      "auth/email-already-in-use": "Email already exists ❌",
       "auth/invalid-email": "Invalid email ❌",
-      "auth/weak-password": "Weak password ❌"
+      "auth/email-already-in-use": "Email already exists ❌",
+      "auth/weak-password": "Password must be 6+ chars ❌",
+      "auth/network-request-failed": "Network issue 🌐",
+      "auth/too-many-requests": "Too many attempts ⏳",
+      "auth/operation-not-allowed": "Email signup disabled ❌",
+      "auth/unauthorized-domain": "Domain not authorized ❌"
     };
 
-    alert(errors[e.code] || "Something went wrong ❌");
+    alert(errors[e.code] || e.message || "Something went wrong ❌");
   }
 }
 
 
-// Loading Button
+
 function setLoading(btn, state, text = "Please wait...") {
 
   if (!btn) return;
@@ -88,13 +101,19 @@ function setLoading(btn, state, text = "Please wait...") {
 }
 
 
-// Save Session
+
 function saveSession(user) {
   localStorage.setItem("session", JSON.stringify(user));
 }
 
 
-// Get Session
+
+function clearSession() {
+  localStorage.removeItem("session");
+}
+
+
+
 export function getSession() {
   try {
     return JSON.parse(localStorage.getItem("session"));
@@ -105,29 +124,27 @@ export function getSession() {
 }
 
 
-// Clear Session
-function clearSession() {
-  localStorage.removeItem("session");
-}
 
-
-// Redirect by Role
 function redirectByRole(role) {
-  location.href =
-    role === "seeker"
-      ? "js-dashboard.html"
-      : "rec-dashboard.html";
+
+  if (role === "seeker") {
+    location.href = "js-dashboard.html";
+  } else {
+    location.href = "rec-dashboard.html";
+  }
+
 }
 
 
-// ===============================
+
+// =====================================
 // 🔐 AUTH SYSTEM
-// ===============================
+// =====================================
 
 // LOGIN
 export async function loginUser(btn = null) {
 
-  setLoading(btn, true);
+  setLoading(btn, true, "Logging in...");
 
   await safeRun(async () => {
 
@@ -150,10 +167,12 @@ export async function loginUser(btn = null) {
       );
 
     const snap =
-      await getDoc(doc(db, "users", cred.user.uid));
+      await getDoc(
+        doc(db, "users", cred.user.uid)
+      );
 
     if (!snap.exists()) {
-      alert("User not found ❌");
+      alert("User data not found ❌");
       return;
     }
 
@@ -202,6 +221,7 @@ export async function signupUser(role, btn = null) {
       name,
       email,
       role,
+      company: "",
       createdAt: Date.now()
     };
 
@@ -233,6 +253,7 @@ export async function logoutUser() {
     location.replace("index.html");
 
   });
+
 }
 
 
@@ -260,11 +281,10 @@ export async function resetPassword(email, btn = null) {
 
 
 
-// ===============================
+// =====================================
 // 🛡 PAGE SECURITY
-// ===============================
+// =====================================
 
-// Protect Pages
 export function protectPage(role = null) {
 
   const user = getSession();
@@ -277,10 +297,11 @@ export function protectPage(role = null) {
   if (role && user.role !== role) {
     location.replace("index.html");
   }
+
 }
 
 
-// Login/Signup Redirect
+
 export function checkSessionUI() {
 
   const user = getSession();
@@ -295,33 +316,19 @@ export function checkSessionUI() {
   ) {
     redirectByRole(user.role);
   }
+
 }
 
 
 
-// Firebase Auto Session Sync
-onAuthStateChanged(auth, async (firebaseUser) => {
-
-  if (!firebaseUser) return;
-
-  const snap =
-    await getDoc(doc(db, "users", firebaseUser.uid));
-
-  if (snap.exists()) {
-    saveSession(snap.data());
-  }
-
-});
-
-
-// ===============================
+// =====================================
 // 💼 JOB SYSTEM
-// ===============================
+// =====================================
 
 // POST JOB
 export async function postJob(btn = null) {
 
-  setLoading(btn, true);
+  setLoading(btn, true, "Posting...");
 
   await safeRun(async () => {
 
@@ -340,7 +347,7 @@ export async function postJob(btn = null) {
     const user = getSession();
 
     if (!title || !skills) {
-      alert("Fill details ❌");
+      alert("Fill required fields ❌");
       return;
     }
 
@@ -353,7 +360,7 @@ export async function postJob(btn = null) {
       createdAt: Date.now()
     });
 
-    alert("Job Posted 🚀");
+    alert("Job posted 🚀");
 
     document.getElementById("jobForm")?.reset();
 
@@ -376,6 +383,7 @@ export async function applyJob(data) {
     });
 
   });
+
 }
 
 
@@ -391,15 +399,29 @@ export async function updateApplicationStatus(id, status) {
     );
 
   });
+
 }
 
 
 
-// ===============================
-// 👤 PROFILE SYSTEM
-// ===============================
+// DELETE JOB
+export async function deleteJobById(id) {
 
-// Update User Profile
+  await safeRun(async () => {
+
+    await deleteDoc(doc(db, "jobs", id));
+
+  });
+
+}
+
+
+
+// =====================================
+// 👤 PROFILE SYSTEM
+// =====================================
+
+// UPDATE PROFILE
 export async function updateUserProfile(data) {
 
   const user = getSession();
@@ -419,7 +441,10 @@ export async function updateUserProfile(data) {
 
     const id = snap.docs[0].id;
 
-    await updateDoc(doc(db, "users", id), data);
+    await updateDoc(
+      doc(db, "users", id),
+      data
+    );
 
     const updated = {
       ...user,
@@ -429,11 +454,12 @@ export async function updateUserProfile(data) {
     saveSession(updated);
 
   });
+
 }
 
 
 
-// Save Resume
+// SAVE RESUME
 export async function saveResume(data) {
 
   const user = getSession();
@@ -449,23 +475,58 @@ export async function saveResume(data) {
     });
 
   });
+
 }
 
 
 
-// ===============================
-// 🌪 GLOBAL SILENT FIXES
-// ===============================
+// =====================================
+// 🔄 AUTO SESSION SYNC
+// =====================================
 
-// Abort errors ignore
-window.addEventListener("unhandledrejection", e => {
-  if (e.reason?.name === "AbortError") {
-    e.preventDefault();
+onAuthStateChanged(auth, async (firebaseUser) => {
+
+  if (!firebaseUser) return;
+
+  try {
+
+    const snap = await getDoc(
+      doc(db, "users", firebaseUser.uid)
+    );
+
+    if (snap.exists()) {
+      saveSession(snap.data());
+    }
+
+  } catch (e) {
+    console.log(e);
   }
+
 });
 
-window.addEventListener("error", e => {
-  if (e.message?.includes("AbortError")) {
-    e.preventDefault();
+
+
+// =====================================
+// 🌪 GLOBAL ERROR SILENCER
+// =====================================
+
+window.addEventListener(
+  "unhandledrejection",
+  (e) => {
+    if (e.reason?.name === "AbortError") {
+      e.preventDefault();
+    }
   }
-});
+);
+
+window.addEventListener(
+  "error",
+  (e) => {
+    if (
+      e.message &&
+      e.message.includes("AbortError")
+    ) {
+      e.preventDefault();
+    }
+  }
+);
