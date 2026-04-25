@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body class="login-page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <h2>🚀 SkillBridge AI</h2>
+
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="#" class="active">Admin</a>
+    </div>
+  </nav>
+
+  <!-- LOGIN SECTION -->
+  <section class="auth-container">
+
+    <div class="card login-card">
+
+      <!-- TOP ICON -->
+      <div style="text-align:center; margin-bottom:18px;">
+        <div style="
+          width:78px;
+          height:78px;
+          margin:auto;
+          border-radius:50%;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:34px;
+          background:linear-gradient(135deg,#2563eb,#1d4ed8);
+          box-shadow:0 12px 24px rgba(37,99,235,.35);
+        ">
+          🛡️
+        </div>
+      </div>
+
+      <h2 style="text-align:center;">Admin Login</h2>
+      <p class="subtitle" style="text-align:center;">
+        Control tower access only 🚀
+      </p>
+
+      <!-- FORM -->
+      <label>Email Address</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Enter admin email"
+      />
+
+      <label>Password</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Enter secure password"
+      />
+
+      <!-- EXTRA -->
+      <div style="
+        margin-top:14px;
+        display:flex;
+        justify-content:space-between;
+        gap:10px;
+        flex-wrap:wrap;
+        font-size:14px;
+      ">
+        <span class="muted">🔒 Secure Session</span>
+        <span class="muted">⚡ Fast Access</span>
+      </div>
+
+      <!-- BUTTON -->
+      <button
+        id="loginBtn"
+        class="btn btn-primary"
+        style="width:100%; margin-top:18px;"
+      >
+        Login 🔐
+      </button>
+
+      <!-- BACK -->
+      <p class="bottom-text">
+        <a href="index.html">← Back Home</a>
+      </p>
+
+    </div>
+
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    © 2026 SkillBridge AI • Admin Portal
+  </footer>
+
+  <script type="module">
+    import { loginUser } from "./firebase.js";
+
+    document
+      .getElementById("loginBtn")
+      .addEventListener("click", () => {
+        loginUser(
+          document.getElementById("loginBtn")
+        );
+      });
+  </script>
+
+</body>
+</html>
