@@ -2,254 +2,327 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css?v=12">
+<title>Dashboard | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css?v=12">
+
+<style>
+/* EXTRA CUSTOM DASHBOARD STYLE */
+
+.jsdash-page{
+  background:
+  radial-gradient(circle at top right,#1d4ed8 0%,transparent 20%),
+  radial-gradient(circle at bottom left,#0ea5e9 0%,transparent 18%),
+  #0f172a;
+}
+
+/* MAIN */
+.main{
+  padding:32px;
+}
+
+/* TOP BAR */
+.dash-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:28px;
+}
+
+.dash-top h1{
+  font-size:34px;
+}
+
+.subtext{
+  color:#cbd5e1;
+  margin-top:6px;
+  font-size:15px;
+}
+
+.status-chip{
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  padding:12px 18px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:700;
+  box-shadow:0 10px 20px rgba(37,99,235,.25);
+}
+
+/* STATS */
+.stats-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+  padding:0;
+  margin-bottom:24px;
+}
+
+.dash-card{
+  background:rgba(30,41,59,.95);
+  border-radius:20px;
+  padding:24px;
+  border:1px solid rgba(255,255,255,.06);
+  box-shadow:0 14px 30px rgba(0,0,0,.18);
+}
+
+.dash-card h3{
+  font-size:15px;
+  color:#cbd5e1;
+  margin-bottom:12px;
+}
+
+.dash-card p{
+  font-size:34px;
+  font-weight:800;
+}
+
+.blue-line{
+  border-left:5px solid #3b82f6;
+}
+
+.green-line{
+  border-left:5px solid #22c55e;
+}
+
+.purple-line{
+  border-left:5px solid #a855f7;
+}
+
+/* PROGRESS */
+.progress-card{
+  margin-bottom:24px;
+}
+
+.progress-wrap{
+  width:100%;
+  height:14px;
+  background:#0f172a;
+  border-radius:999px;
+  overflow:hidden;
+  margin:18px 0 14px;
+}
+
+.progress-bar{
+  height:100%;
+  width:0%;
+  border-radius:999px;
+  background:linear-gradient(90deg,#22c55e,#3b82f6,#a855f7);
+  transition:1s;
+}
+
+#progressText{
+  font-size:15px;
+  color:#cbd5e1;
+}
+
+/* QUICK ACTIONS */
+.quick-card{
+  margin-bottom:24px;
+}
+
+.quick-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;
+  margin-top:16px;
+}
+
+.quick-btn{
+  padding:16px;
+  border-radius:16px;
+  background:#0f172a;
+  border:1px solid #334155;
+  text-align:center;
+  font-weight:700;
+  transition:.25s;
+}
+
+.quick-btn:hover{
+  transform:translateY(-3px);
+  background:#1d4ed8;
+}
+
+/* QUOTE */
+.quote-card{
+  background:
+  linear-gradient(135deg,#1e293b,#0f172a);
+}
+
+#quoteText{
+  font-size:18px;
+  color:#e2e8f0;
+  line-height:1.7;
+  margin-top:10px;
+}
+
+/* SIDEBAR IMPROVE */
+.sidebar{
+  background:
+  linear-gradient(180deg,#111827,#0f172a);
+}
+
+.sidebar h2{
+  line-height:1.4;
+  font-size:22px;
+}
+
+.sidebar nav a{
+  padding:13px 14px;
+  border-radius:14px;
+  margin-bottom:10px;
+  transition:.25s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#2563eb;
+  transform:translateX(4px);
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .main{
+    padding:18px;
+  }
+
+  .dash-top h1{
+    font-size:28px;
+  }
+
+  .dash-card p{
+    font-size:28px;
+  }
+
+  .status-chip{
+    width:100%;
+    text-align:center;
+  }
+
+}
+</style>
+
 </head>
 
 <body class="jsdash-page">
 
-<!-- DASHBOARD -->
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar">
 
-    <h2>👨‍🎓 Job Seeker Panel</h2>
+<h2>👨‍🎓 Job Seeker Panel</h2>
 
-    <nav>
-      <a href="js-dashboard.html" class="active">Dashboard</a>
-      <a href="js-jobs.html">Jobs</a>
-      <a href="js-applications.html">Applications</a>
-      <a href="js-resume.html">Resume Builder</a>
-      <a href="js-analytics.html">Analytics</a>
-      <a href="js-profile.html">Profile</a>
-    </nav>
+<nav>
+<a href="js-dashboard.html" class="active">Dashboard</a>
+<a href="js-jobs.html">Jobs</a>
+<a href="js-applications.html">Applications</a>
+<a href="js-resume.html">Resume Builder</a>
+<a href="js-analytics.html">Analytics</a>
+<a href="js-profile.html">Profile</a>
+</nav>
 
-    <button id="logoutBtn">Logout 👋</button>
+<button id="logoutBtn">Logout 👋</button>
 
-  </aside>
+</aside>
 
+<!-- MAIN -->
+<main class="main">
 
-  <!-- MAIN -->
-  <main class="main">
+<div class="dash-top">
 
-    <!-- TOP -->
-    <div class="dash-top">
+<div>
+<h1>📊 Dashboard</h1>
+<p id="welcome" class="subtext">
+Welcome...
+</p>
+</div>
 
-      <div>
-        <h1>📊 Dashboard</h1>
-        <p id="welcome" class="subtext">
-          Welcome...
-        </p>
-      </div>
-
-      <div class="status-chip">
-        🚀 Career Mode Active
-      </div>
-
-    </div>
-
-
-    <!-- STATS -->
-    <section class="stats-grid">
-
-      <div class="dash-card blue-line">
-        <h3>📄 Total Applications</h3>
-        <p id="totalApps">0</p>
-      </div>
-
-      <div class="dash-card green-line">
-        <h3>✅ Selected</h3>
-        <p id="selectedApps">0</p>
-      </div>
-
-      <div class="dash-card purple-line">
-        <h3>⚡ Employability Score</h3>
-        <p id="score">0%</p>
-      </div>
-
-    </section>
-
-
-    <!-- PROGRESS -->
-    <section class="dash-card progress-card">
-
-      <h3>📈 Hiring Momentum</h3>
-
-      <div class="progress-wrap">
-        <div id="progressBar" class="progress-bar"></div>
-      </div>
-
-      <p id="progressText">
-        Loading...
-      </p>
-
-    </section>
-
-
-    <!-- QUICK ACTIONS -->
-    <section class="dash-card quick-card">
-
-      <h3>⚡ Quick Actions</h3>
-
-      <div class="quick-grid">
-
-        <a href="js-jobs.html" class="quick-btn">
-          💼 Find Jobs
-        </a>
-
-        <a href="js-resume.html" class="quick-btn">
-          📄 Build Resume
-        </a>
-
-        <a href="js-analytics.html" class="quick-btn">
-          📊 View Analytics
-        </a>
-
-        <a href="js-profile.html" class="quick-btn">
-          👤 Update Profile
-        </a>
-
-      </div>
-
-    </section>
-
-
-    <!-- MOTIVATION -->
-    <section class="dash-card quote-card">
-
-      <h3>🔥 Daily Push</h3>
-
-      <p id="quoteText">
-        Every application is a knock on opportunity’s door.
-      </p>
-
-    </section>
-
-  </main>
+<div class="status-chip">
+🚀 Career Mode Active
+</div>
 
 </div>
 
+<!-- STATS -->
+<section class="stats-grid">
 
-<!-- SCRIPT -->
-<script type="module">
+<div class="dash-card blue-line">
+<h3>📄 Total Applications</h3>
+<p id="totalApps">0</p>
+</div>
 
-import {
-  db,
-  logoutUser,
-  getSession,
-  protectPage
-} from "./firebase.js";
+<div class="dash-card green-line">
+<h3>✅ Selected</h3>
+<p id="selectedApps">0</p>
+</div>
 
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+<div class="dash-card purple-line">
+<h3>⚡ Employability Score</h3>
+<p id="score">0%</p>
+</div>
 
-protectPage("seeker");
+</section>
 
-/* LOGOUT */
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
+<!-- PROGRESS -->
+<section class="dash-card progress-card">
 
+<h3>📈 Hiring Momentum</h3>
 
-/* DASHBOARD */
-async function loadDashboard(){
+<div class="progress-wrap">
+<div id="progressBar" class="progress-bar"></div>
+</div>
 
-  const user = getSession();
+<p id="progressText">
+Loading...
+</p>
 
-  if(!user || !user.email){
-    window.location.href =
-      "js-dashboard.html";
-    return;
-  }
+</section>
 
-  document.getElementById("welcome")
-  .innerText =
-    "Welcome back, " +
-    (user.name || "User") +
-    " 👋";
+<!-- QUICK ACTIONS -->
+<section class="dash-card quick-card">
 
-  try{
+<h3>⚡ Quick Actions</h3>
 
-    const snapshot =
-      await getDocs(collection(db,"applications"));
+<div class="quick-grid">
 
-    let apps = [];
+<a href="js-jobs.html" class="quick-btn">
+💼 Find Jobs
+</a>
 
-    snapshot.forEach(doc => {
+<a href="js-resume.html" class="quick-btn">
+📄 Build Resume
+</a>
 
-      const a = doc.data();
+<a href="js-analytics.html" class="quick-btn">
+📊 View Analytics
+</a>
 
-      if(
-        a.user === user.email ||
-        a.seeker === user.email ||
-        a.email === user.email
-      ){
-        apps.push(a);
-      }
+<a href="js-profile.html" class="quick-btn">
+👤 Update Profile
+</a>
 
-    });
+</div>
 
-    const total = apps.length;
+</section>
 
-    const selected = apps.filter(a =>
-      a.status === "Shortlisted" ||
-      a.status === "Hired"
-    ).length;
+<!-- QUOTE -->
+<section class="dash-card quote-card">
 
-    const score = Math.min(
-      100,
-      (total * 18) + (selected * 20)
-    );
+<h3>🔥 Daily Push</h3>
 
-    document.getElementById("totalApps")
-    .innerText = total;
+<p id="quoteText">
+Every application is a knock on opportunity’s door.
+</p>
 
-    document.getElementById("selectedApps")
-    .innerText = selected;
+</section>
 
-    document.getElementById("score")
-    .innerText = score + "%";
-
-    /* Progress */
-    document.getElementById("progressBar")
-    .style.width = score + "%";
-
-    let level = "Starter 🌱";
-
-    if(score >= 35) level = "Growing 🚀";
-    if(score >= 65) level = "Strong Candidate 💼";
-    if(score >= 90) level = "Elite Talent 👑";
-
-    document.getElementById("progressText")
-    .innerText =
-      "Current Level: " + level;
-
-    /* Quote Engine */
-    const quotes = [
-      "Every application is a knock on opportunity’s door.",
-      "Consistency beats luck in hiring season.",
-      "One strong resume can change the storyline.",
-      "Keep shipping applications. Results follow."
-    ];
-
-    document.getElementById("quoteText")
-    .innerText =
-      quotes[Math.floor(Math.random()*quotes.length)];
-
-  }catch(err){
-    console.error(err);
-  }
-
-}
-
-loadDashboard();
-
-</script>
+</main>
+</div>
 
 </body>
 </html>
