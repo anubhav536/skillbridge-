@@ -3,35 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Seeker Login | SkillBridge AI</title>
+  <title>Job Seeker Signup | SkillBridge AI</title>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
-<body class="js-login-body">
+<body class="js-signup-body">
 
 <!-- NAVBAR -->
-<nav class="js-login-navbar">
+<nav class="js-signup-navbar">
 
-  <h2 class="js-login-logo">🚀 SkillBridge AI</h2>
+  <h2 class="js-signup-logo">🚀 SkillBridge AI</h2>
 
-  <div class="js-login-navlinks">
+  <div class="js-signup-navlinks">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
 
 </nav>
 
-<!-- LOGIN SECTION -->
-<section class="js-login-section">
+<!-- SIGNUP -->
+<section class="js-signup-section">
 
-  <div class="js-login-box">
+  <div class="js-signup-box">
 
-    <h2>👨‍🎓 Job Seeker Login</h2>
+    <h2>👨‍🎓 Job Seeker Signup</h2>
 
-    <p class="js-login-subtitle">
-      Login to access your dashboard and explore jobs
+    <p class="js-signup-subtitle">
+      Create your account to start applying for jobs
     </p>
+
+    <!-- NAME -->
+    <label>Full Name</label>
+    <input
+      type="text"
+      id="name"
+      placeholder="Enter Name"
+      class="js-signup-input"
+    >
 
     <!-- EMAIL -->
     <label>Email</label>
@@ -39,7 +48,7 @@
       type="email"
       id="email"
       placeholder="Enter Email"
-      class="js-login-input"
+      class="js-signup-input"
     >
 
     <!-- PASSWORD -->
@@ -48,25 +57,18 @@
       type="password"
       id="password"
       placeholder="Enter Password"
-      class="js-login-input"
+      class="js-signup-input"
     >
 
-    <!-- FORGOT -->
-    <p class="js-login-forgot-wrap">
-      <a href="#" id="forgotPassword" class="js-login-forgot">
-        Forgot Password?
-      </a>
-    </p>
-
     <!-- BUTTON -->
-    <button id="loginBtn" class="js-login-btn">
-      Login 🚀
+    <button id="signupBtn" class="js-signup-btn">
+      Signup 🚀
     </button>
 
-    <!-- SIGNUP -->
-    <p class="js-login-bottom">
-      Don’t have an account?
-      <a href="jobseeker-signup.html">Signup</a>
+    <!-- LOGIN -->
+    <p class="js-signup-bottom">
+      Already have an account?
+      <a href="jobseeker-login.html">Login</a>
     </p>
 
   </div>
@@ -74,7 +76,7 @@
 </section>
 
 <!-- FOOTER -->
-<footer class="js-login-footer">
+<footer class="js-signup-footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
@@ -82,40 +84,19 @@
 <script type="module">
 
 import {
-  loginUser,
-  resetPassword,
+  signupUser,
   checkSessionUI
 } from "./firebase.js";
 
 checkSessionUI();
 
-// LOGIN
-document.getElementById("loginBtn")
+document.getElementById("signupBtn")
 .addEventListener("click", () => {
 
-  loginUser(
-    document.getElementById("loginBtn")
+  signupUser(
+    "seeker",
+    document.getElementById("signupBtn")
   );
-
-});
-
-// RESET PASSWORD
-document.getElementById("forgotPassword")
-.addEventListener("click", (e) => {
-
-  e.preventDefault();
-
-  const email =
-    document.getElementById("email")
-    .value
-    .trim();
-
-  if (!email) {
-    alert("Input Email First 📩");
-    return;
-  }
-
-  resetPassword(email);
 
 });
 
