@@ -6,181 +6,317 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Applications | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=15">
+  <link rel="stylesheet" href="style.css?v=16">
 </head>
 
-<body>
+<body class="apps-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
+
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
     <nav>
       <a href="js-dashboard.html">Dashboard</a>
       <a href="js-jobs.html">Jobs</a>
-      <a href="js-applications.html">Applications</a>
+      <a href="js-applications.html" class="active">Applications</a>
       <a href="js-resume.html">Resume Builder</a>
       <a href="js-analytics.html">Analytics</a>
       <a href="js-profile.html">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
-  </div>
+
+  </aside>
+
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📄 My Applications</h2>
-<div class="filters">
+    <div class="page-top">
+      <div>
+        <h1>📄 My Applications</h1>
+        <p class="page-sub">
+          Your job hunt command center 🎯
+        </p>
+      </div>
+    </div>
 
-  <select id="statusFilter">
-    <option value="all">All Status</option>
-    <option value="Applied">Applied</option>
-    <option value="Shortlisted">Accepted</option>
-    <option value="Rejected">Rejected</option>
-  </select>
 
-  <select id="sortFilter">
-    <option value="new">Most Recent</option>
-    <option value="old">Oldest First</option>
-  </select>
+    <!-- FILTERS -->
+    <section class="filter-bar">
+
+      <input
+        type="text"
+        id="search"
+        placeholder="Search job title..."
+      >
+
+      <select id="statusFilter">
+        <option value="all">All Status</option>
+        <option value="Applied">Applied</option>
+        <option value="Shortlisted">Shortlisted</option>
+        <option value="Rejected">Rejected</option>
+        <option value="Hired">Hired</option>
+      </select>
+
+      <select id="sortFilter">
+        <option value="new">Most Recent</option>
+        <option value="old">Oldest First</option>
+      </select>
+
+    </section>
+
+
+    <!-- STATS -->
+    <section class="mini-stats">
+
+      <div class="mini-card">
+        <span>Total</span>
+        <h3 id="totalCount">0</h3>
+      </div>
+
+      <div class="mini-card">
+        <span>Shortlisted</span>
+        <h3 id="shortCount">0</h3>
+      </div>
+
+      <div class="mini-card">
+        <span>Hired</span>
+        <h3 id="hireCount">0</h3>
+      </div>
+
+    </section>
+
+
+    <!-- APPLICATIONS -->
+    <section id="appsContainer" class="apps-grid">
+      Loading...
+    </section>
+
+  </main>
 
 </div>
-    <input type="text" id="search" placeholder="Search applications..." />
 
-    <div id="appsContainer" class="grid"></div>
-
-  </div>
-
-</div>
 
 <script type="module">
-import { db, logoutUser } from "./firebase.js";
+
+import {
+  db,
+  logoutUser,
+  getSession,
+  protectPage
+} from "./firebase.js";
+
 import {
   getDocs,
   collection
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
+protectPage("seeker");
+
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
-// SESSION
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
+let allApps = [];
 
-let allApps = []; // 🔥 important
 
-// LOAD APPLICATIONS
-async function loadApplications() {
+/* LOAD DATA */
+async function loadApplications(){
 
-  const container = document.getElementById("appsContainer");
+  const container =
+    document.getElementById("appsContainer");
+
   container.innerHTML = "Loading...";
 
   const user = getSession();
 
-  if (!user) {
-    alert("Login required ❌");
-    window.location.href = "index.html";
+  if(!user){
+    window.location.href =
+      "js-applications.html";
     return;
   }
 
-  try {
+  try{
 
-    const snap = await getDocs(collection(db, "applications"));
+    const snap =
+      await getDocs(collection(db,"applications"));
 
     allApps = [];
 
     snap.forEach(doc => {
+
       const app = doc.data();
 
-      if (app.seeker === user.email) {
-        allApps.push(app); // 🔥 store all
+      if(
+        app.seeker === user.email ||
+        app.user === user.email ||
+        app.email === user.email
+      ){
+        allApps.push(app);
       }
+
     });
 
-    applyFilters(); // 🔥 first render
+    updateStats();
+    applyFilters();
 
-  } catch (err) {
+  }catch(err){
     console.error(err);
-    container.innerHTML = "Error loading applications ❌";
+    container.innerHTML =
+      "Error loading applications ❌";
   }
+
 }
 
-// 🎯 FILTER FUNCTION
+
+/* STATS */
+function updateStats(){
+
+  document.getElementById("totalCount")
+  .innerText = allApps.length;
+
+  document.getElementById("shortCount")
+  .innerText = allApps.filter(a =>
+    a.status === "Shortlisted"
+  ).length;
+
+  document.getElementById("hireCount")
+  .innerText = allApps.filter(a =>
+    a.status === "Hired"
+  ).length;
+
+}
+
+
+/* FILTERS */
 function applyFilters(){
 
-  const searchVal = document.getElementById("search").value.toLowerCase();
-  const statusVal = document.getElementById("statusFilter")?.value || "all";
-  const sortVal = document.getElementById("sortFilter")?.value || "new";
+  const searchVal =
+    document.getElementById("search")
+    .value.toLowerCase();
+
+  const statusVal =
+    document.getElementById("statusFilter")
+    .value;
+
+  const sortVal =
+    document.getElementById("sortFilter")
+    .value;
 
   let filtered = [...allApps];
 
-  // 🔍 SEARCH
+  // SEARCH
   if(searchVal){
     filtered = filtered.filter(a =>
-      (a.jobTitle || "").toLowerCase().includes(searchVal)
+      (a.jobTitle || "")
+      .toLowerCase()
+      .includes(searchVal)
     );
   }
 
-  // 📌 STATUS
+  // STATUS
   if(statusVal !== "all"){
-    filtered = filtered.filter(a => a.status === statusVal);
+    filtered = filtered.filter(a =>
+      a.status === statusVal
+    );
   }
 
-  // ⏳ SORT
+  // SORT
   filtered.sort((a,b)=>{
+
+    const timeA = a.createdAt || 0;
+    const timeB = b.createdAt || 0;
+
     return sortVal === "new"
-      ? b.createdAt - a.createdAt
-      : a.createdAt - b.createdAt;
+      ? timeB - timeA
+      : timeA - timeB;
+
   });
 
   renderApps(filtered);
+
 }
 
-// 🧱 RENDER
+
+/* RENDER */
 function renderApps(apps){
 
-  const container = document.getElementById("appsContainer");
+  const container =
+    document.getElementById("appsContainer");
 
   if(apps.length === 0){
-    container.innerHTML = "<p>No applications found 😢</p>";
+    container.innerHTML = `
+      <div class="empty-box">
+        No applications found 😶
+      </div>
+    `;
     return;
   }
 
   container.innerHTML = apps.map(app => `
-    <div class="card">
-      <h3>${app.jobTitle || "Unknown Job"}</h3>
-      <p><b>Status:</b>
-  <span class="status-${app.status?.toLowerCase()}">
-    ${app.status}
-  </span>
-</p>
-      <p><b>Applied On:</b> ${new Date(app.createdAt).toLocaleDateString()}</p>
-      <p><b>Skills:</b> ${app.skills ? app.skills.join(", ") : "N/A"}</p>
+
+    <div class="app-card">
+
+      <div class="app-top">
+
+        <h3>
+          ${app.jobTitle || "Unknown Job"}
+        </h3>
+
+        <span class="status-badge status-${(app.status || "Applied").toLowerCase()}">
+          ${app.status || "Applied"}
+        </span>
+
+      </div>
+
+      <p>
+        <strong>Applied On:</strong>
+        ${
+          app.createdAt
+          ? new Date(app.createdAt)
+            .toLocaleDateString()
+          : "N/A"
+        }
+      </p>
+
+      <p>
+        <strong>Skills:</strong>
+        ${
+          app.skills?.join(", ")
+          || "Not Mentioned"
+        }
+      </p>
+
+      <p>
+        <strong>Recruiter:</strong>
+        ${app.recruiter || "N/A"}
+      </p>
+
     </div>
+
   `).join("");
+
 }
 
-// 🎧 LISTENERS
-document.getElementById("search").addEventListener("input", applyFilters);
 
-// optional (agar filters add kare)
-document.addEventListener("change", (e)=>{
-  if(e.target.id === "statusFilter" || e.target.id === "sortFilter"){
-    applyFilters();
-  }
-});
+/* LISTENERS */
+document.getElementById("search")
+.addEventListener("input", applyFilters);
 
-// INIT
+document.getElementById("statusFilter")
+.addEventListener("change", applyFilters);
+
+document.getElementById("sortFilter")
+.addEventListener("change", applyFilters);
+
+
+/* INIT */
 loadApplications();
 
 </script>
+
 </body>
 </html>
