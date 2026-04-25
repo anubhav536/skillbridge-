@@ -3,17 +3,18 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=40">
+  <link rel="stylesheet" href="style.css?v=50">
 </head>
 
-<body>
+<body class="profile-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
@@ -23,112 +24,235 @@
       <a href="js-applications.html">Applications</a>
       <a href="js-resume.html">Resume Builder</a>
       <a href="js-analytics.html">Analytics</a>
-      <a href="js-profile.html">Profile</a>
+      <a href="js-profile.html" class="active">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>👤 My Profile</h2>
+    <!-- TOP -->
+    <div class="profile-top">
 
-    <!-- PROFILE CARD -->
-    <div class="card profile-card">
+      <div>
+        <h1>👤 My Profile</h1>
+        <p>Polish your identity. Recruiters notice details.</p>
+      </div>
 
-      <h3 id="name">Name: Loading...</h3>
-      <p id="email">Email: Loading...</p>
-      <p id="skillsText">Skills: Not added</p>
-      <p id="expText">Experience: Not added</p>
-
-    </div>
-
-
-    <!-- EDIT FORM -->
-    <div class="card">
-
-      <h3>✏️ Edit Profile</h3>
-
-      <form id="profileForm">
-
-        <label>Skills:</label>
-        <input type="text" id="skills" placeholder="HTML, CSS, JS">
-
-        <label>Experience (years):</label>
-        <input type="number" id="exp" placeholder="0">
-
-        <button type="submit">Update Profile 🚀</button>
-
-      </form>
+      <div class="level-badge">
+        🚀 Career Ready
+      </div>
 
     </div>
 
-  </div>
+
+
+    <!-- GRID -->
+    <div class="profile-grid">
+
+      <!-- LEFT CARD -->
+      <section class="profile-card">
+
+        <div class="avatar-circle" id="avatarText">
+          U
+        </div>
+
+        <h2 id="name">Loading...</h2>
+
+        <p id="email">Loading...</p>
+
+        <div class="mini-info">
+          <div>
+            <span>Skills</span>
+            <strong id="skillCount">0</strong>
+          </div>
+
+          <div>
+            <span>Exp</span>
+            <strong id="expCount">0y</strong>
+          </div>
+        </div>
+
+        <div class="profile-lines">
+          <p id="skillsText">Skills: Not added</p>
+          <p id="expText">Experience: Not added</p>
+        </div>
+
+      </section>
+
+
+
+      <!-- RIGHT CARD -->
+      <section class="edit-card">
+
+        <h3>✏️ Edit Profile</h3>
+
+        <form id="profileForm">
+
+          <label>Skills</label>
+          <input
+            type="text"
+            id="skills"
+            placeholder="HTML, CSS, JavaScript"
+          >
+
+          <label>Experience (Years)</label>
+          <input
+            type="number"
+            id="exp"
+            min="0"
+            placeholder="0"
+          >
+
+          <button type="submit" id="saveBtn">
+            Update Profile 🚀
+          </button>
+
+        </form>
+
+      </section>
+
+    </div>
+
+  </main>
 
 </div>
 
 
+
 <script type="module">
 
-import { logoutUser, updateUserProfile } from "./firebase.js"; // ✅ UPDATED
+import {
+  logoutUser,
+  updateUserProfile,
+  protectPage
+} from "./firebase.js";
 
-// LOGOUT
+protectPage("seeker");
+
+
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
-// SESSION
+
+/* SESSION */
 function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
+  try{
+    return JSON.parse(
+      localStorage.getItem("session")
+    );
+  }catch{
     return null;
   }
 }
 
-// LOAD PROFILE
+
+/* LOAD */
 function loadProfile(){
 
   const user = getSession();
 
   if(!user){
-    alert("Login required ❌");
-    window.location.href = "index.html";
+    window.location.href = "js-profile.html";
     return;
   }
 
-  document.getElementById("name").innerText = "Name: " + (user.name || "User");
-  document.getElementById("email").innerText = "Email: " + user.email;
+  const name = user.name || "User";
+  const email = user.email || "No Email";
+  const skills = user.skills || "";
+  const exp = user.exp || "0";
 
-  document.getElementById("skillsText").innerText =
-    "Skills: " + (user.skills || "Not added");
+  document.getElementById("name")
+  .innerText = name;
 
-  document.getElementById("expText").innerText =
-    "Experience: " + (user.exp || "Not added");
+  document.getElementById("email")
+  .innerText = email;
+
+  document.getElementById("avatarText")
+  .innerText = name.charAt(0).toUpperCase();
+
+  document.getElementById("skillsText")
+  .innerText =
+    "Skills: " +
+    (skills || "Not added");
+
+  document.getElementById("expText")
+  .innerText =
+    "Experience: " +
+    exp + " year(s)";
+
+  const skillCount = skills
+    ? skills.split(",").filter(Boolean).length
+    : 0;
+
+  document.getElementById("skillCount")
+  .innerText = skillCount;
+
+  document.getElementById("expCount")
+  .innerText = exp + "y";
+
+  document.getElementById("skills")
+  .value = skills;
+
+  document.getElementById("exp")
+  .value = exp;
 
 }
 
-// UPDATE PROFILE
+
+/* UPDATE */
 document.getElementById("profileForm")
-  .addEventListener("submit", async (e)=>{
+.addEventListener("submit", async (e)=>{
 
-    e.preventDefault();
+  e.preventDefault();
 
-    const skills = document.getElementById("skills").value;
-    const exp = document.getElementById("exp").value;
+  const btn =
+    document.getElementById("saveBtn");
 
-    await updateUserProfile({ skills, exp }); // ✅ FIREBASE SAVE
+  btn.disabled = true;
+  btn.innerText = "Saving...";
 
-    alert("Profile Updated ✅");
+  const skills =
+    document.getElementById("skills")
+    .value.trim();
+
+  const exp =
+    document.getElementById("exp")
+    .value.trim();
+
+  try{
+
+    await updateUserProfile({
+      skills,
+      exp
+    });
 
     loadProfile();
 
-  });
+    alert("Profile Updated ✅");
+
+  }catch(err){
+
+    console.error(err);
+    alert("Failed ❌");
+
+  }
+
+  btn.disabled = false;
+  btn.innerText =
+    "Update Profile 🚀";
+
+});
+
 
 loadProfile();
 
 </script>
+
 </body>
 </html>
