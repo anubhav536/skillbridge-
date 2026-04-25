@@ -2,27 +2,28 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Manage Jobs | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manage Jobs | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=94">
+
 </head>
 
-<body>
+<body class="rec-manage-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
     <nav>
       <a href="rec-dashboard.html">Dashboard</a>
       <a href="rec-post-job.html">Post Job</a>
-      <a href="rec-manage-jobs.html">Manage Jobs</a>
+      <a href="rec-manage-jobs.html" class="active">Manage Jobs</a>
       <a href="rec-applicants.html">Applicants</a>
       <a href="rec-analytics.html">Analytics</a>
       <a href="rec-profile.html">Profile</a>
@@ -30,158 +31,367 @@
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>🛠 Manage Your Jobs</h2>
+    <!-- TOP -->
+    <div class="top-row">
 
-    <input 
-      type="text" 
-      id="search" 
-      placeholder="Search your jobs..."
-      class="search-box"
-    >
+      <div>
+        <h1>🛠 Manage Your Jobs</h1>
+        <p class="muted">
+          Your hiring inventory, polished and ready ⚙️
+        </p>
+      </div>
 
-    <div id="jobsList"></div>
+      <input
+        type="text"
+        id="search"
+        class="search-box"
+        placeholder="Search your jobs..."
+      >
 
-  </div>
+    </div>
+
+
+
+    <!-- STATS -->
+    <section class="grid mini-grid">
+
+      <div class="card mini-card">
+        <h3>Total Jobs</h3>
+        <p id="jobCount">0</p>
+      </div>
+
+      <div class="card mini-card">
+        <h3>Visible</h3>
+        <p id="visibleCount">0</p>
+      </div>
+
+    </section>
+
+
+
+    <!-- JOB LIST -->
+    <section
+      id="jobsList"
+      class="jobs-grid"
+    ></section>
+
+  </main>
 
 </div>
 
 
-<!-- SCRIPT -->
+
 <script type="module">
 
-import { db, logoutUser, protectPage } from "./firebase.js";
-import { 
-  getDocs, 
-  collection, 
-  deleteDoc, 
-  doc 
+import {
+  db,
+  logoutUser,
+  getSession
+} from "./firebase.js";
+
+import {
+  getDocs,
+  collection,
+  deleteDoc,
+  doc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// protect
-protectPage("recruiter");
 
-// logout
-document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+/* =========================
+   PAGE PROTECT
+========================= */
 
+const user = getSession();
 
-// session
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
+if(!user){
+  window.location.href =
+    "rec-manage-jobs.html";
 }
 
+if(user && user.role !== "recruiter"){
+  window.location.href =
+    "index.html";
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+document.getElementById("logoutBtn")
+.addEventListener("click", logoutUser);
+
+
+/* =========================
+   DATA
+========================= */
 
 let allJobs = [];
 
 
-// LOAD JOBS
-async function loadJobs() {
+/* =========================
+   LOAD JOBS
+========================= */
 
-  const user = getSession();
-  const list = document.getElementById("jobsList");
+async function loadJobs(){
 
-  list.innerHTML = "Loading...";
+  const list =
+    document.getElementById("jobsList");
 
-  try {
+  list.innerHTML =
+    `<p class="loading-text">
+      Loading jobs...
+    </p>`;
 
-    const snap = await getDocs(collection(db, "jobs"));
+  try{
+
+    const snap =
+      await getDocs(collection(db,"jobs"));
 
     allJobs = [];
 
-    snap.forEach(d => {
-      const j = d.data();
+    snap.forEach(item => {
 
-      if (j.recruiter === user.email) {
+      const job = item.data();
+
+      if(job.recruiter === user.email){
+
         allJobs.push({
-          id: d.id,
-          ...j
+          id: item.id,
+          ...job
         });
+
       }
+
     });
 
+    updateCounts(allJobs);
     renderJobs(allJobs);
 
-  } catch (err) {
-    console.log(err);
-    list.innerHTML = "Error loading jobs ❌";
+  }catch(err){
+
+    console.error(err);
+
+    list.innerHTML =
+      `<p class="loading-text">
+        Failed to load ❌
+      </p>`;
+
   }
 
 }
 
 
-// RENDER
-function renderJobs(jobs) {
+/* =========================
+   COUNTS
+========================= */
 
-  const list = document.getElementById("jobsList");
+function updateCounts(jobs){
 
-  if (jobs.length === 0) {
-    list.innerHTML = "No jobs found 😢";
+  document.getElementById("jobCount")
+  .innerText = allJobs.length;
+
+  document.getElementById("visibleCount")
+  .innerText = jobs.length;
+
+}
+
+
+/* =========================
+   RENDER
+========================= */
+
+function renderJobs(jobs){
+
+  const list =
+    document.getElementById("jobsList");
+
+  if(jobs.length === 0){
+
+    list.innerHTML =
+      `<p class="loading-text">
+        No jobs found 😢
+      </p>`;
+
     return;
   }
 
-  list.innerHTML = jobs.map(j => `
-    <div class="card job-card">
+  list.innerHTML =
+    jobs.map(job => `
 
-      <h3>${j.title}</h3>
+      <div class="card job-card">
 
-      <p><b>Skills:</b> ${j.skills?.join(", ") || ""}</p>
-      <p><b>Salary:</b> ${j.salary || "Not specified"}</p>
-      <p><b>Location:</b> ${j.location || "Not specified"}</p>
+        <div class="job-head">
 
-      <button onclick="deleteJob('${j.id}')">
-        Delete ❌
-      </button>
+          <h3>
+            ${job.title || "Untitled Job"}
+          </h3>
 
-    </div>
-  `).join("");
+          <span class="job-chip">
+            🔥 Active
+          </span>
+
+        </div>
+
+        <p>
+          <b>Skills:</b>
+          ${
+            Array.isArray(job.skills)
+            ? job.skills.join(", ")
+            : (job.skills || "N/A")
+          }
+        </p>
+
+        <p>
+          <b>Salary:</b>
+          ${job.salary || "Not specified"}
+        </p>
+
+        <p>
+          <b>Location:</b>
+          ${job.location || "Remote / N/A"}
+        </p>
+
+        <div class="btn-row">
+
+          <button
+            class="danger-btn deleteBtn"
+            data-id="${job.id}"
+          >
+            Delete ❌
+          </button>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+  attachDeleteEvents();
 
 }
 
 
-// DELETE
-window.deleteJob = async function(id){
+/* =========================
+   DELETE EVENTS
+========================= */
 
-  if (!confirm("Delete this job?")) return;
+function attachDeleteEvents(){
 
-  try {
-    await deleteDoc(doc(db, "jobs", id));
+  document
+  .querySelectorAll(".deleteBtn")
+  .forEach(btn => {
 
-    alert("Deleted ✅");
-    loadJobs();
+    btn.addEventListener(
+      "click",
+      async ()=>{
 
-  } catch (err) {
-    alert("Delete failed ❌");
-  }
+        const id =
+          btn.dataset.id;
 
-}
+        const ok =
+          confirm(
+            "Delete this job?"
+          );
 
+        if(!ok) return;
 
-// SEARCH
-document.getElementById("search")
-  .addEventListener("input", (e) => {
+        btn.disabled = true;
+        btn.innerText =
+          "Deleting...";
 
-    const val = e.target.value.toLowerCase();
+        try{
 
-    const filtered = allJobs.filter(j =>
-      j.title.toLowerCase().includes(val)
+          await deleteDoc(
+            doc(db,"jobs",id)
+          );
+
+          loadJobs();
+
+        }catch(err){
+
+          console.error(err);
+
+          btn.disabled = false;
+          btn.innerText =
+            "Delete ❌";
+
+          alert(
+            "Delete failed ❌"
+          );
+
+        }
+
+      }
     );
-
-    renderJobs(filtered);
 
   });
 
+}
 
-// INIT
+
+/* =========================
+   SEARCH
+========================= */
+
+document.getElementById("search")
+.addEventListener("input",(e)=>{
+
+  const val =
+    e.target.value
+    .toLowerCase()
+    .trim();
+
+  let filtered =
+    [...allJobs];
+
+  if(val){
+
+    filtered =
+      filtered.filter(job => {
+
+        const title =
+          (job.title || "")
+          .toLowerCase();
+
+        const location =
+          (job.location || "")
+          .toLowerCase();
+
+        const skills =
+          Array.isArray(job.skills)
+          ? job.skills.join(" ")
+              .toLowerCase()
+          : (job.skills || "")
+              .toLowerCase();
+
+        return (
+          title.includes(val) ||
+          location.includes(val) ||
+          skills.includes(val)
+        );
+
+      });
+
+  }
+
+  updateCounts(filtered);
+  renderJobs(filtered);
+
+});
+
+
+/* =========================
+   INIT
+========================= */
+
 loadJobs();
 
 </script>
