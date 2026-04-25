@@ -2,31 +2,31 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Post Job | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Post Job | SkillBridge AI</title>
 
-  <!-- NO CACHE -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=95">
+
 </head>
 
-<body>
+<body class="rec-post-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
     <nav>
       <a href="rec-dashboard.html">Dashboard</a>
-      <a href="rec-post-job.html">Post Job</a>
+      <a href="rec-post-job.html" class="active">Post Job</a>
       <a href="rec-manage-jobs.html">Manage Jobs</a>
       <a href="rec-applicants.html">Applicants</a>
       <a href="rec-analytics.html">Analytics</a>
@@ -35,59 +35,246 @@
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📢 Post a New Job</h2>
+    <!-- HEADER -->
+    <div class="page-head">
 
-    <div class="card">
+      <div>
+        <h1>📢 Post a New Job</h1>
+        <p class="muted">
+          Cast the net, catch the talent 🎯
+        </p>
+      </div>
 
-      <form id="jobForm">
-
-        <label>Job Title</label>
-        <input type="text" id="title" placeholder="Frontend Developer">
-
-        <label>Skills Required</label>
-        <input type="text" id="skills" placeholder="HTML, CSS, JS">
-
-        <label>Salary</label>
-        <input type="text" id="salary" placeholder="₹3-5 LPA">
-
-        <label>Location</label>
-        <input type="text" id="location" placeholder="Remote / Delhi">
-
-        <button type="submit" id="postBtn">Post Job 🚀</button>
-
-      </form>
+      <div class="mini-badge">
+        Recruiter Mode
+      </div>
 
     </div>
 
-  </div>
+
+
+    <!-- FORM -->
+    <section class="card post-card">
+
+      <form id="jobForm" class="job-form">
+
+        <label>Job Title</label>
+        <input
+          type="text"
+          id="title"
+          placeholder="Frontend Developer"
+          required
+        >
+
+        <label>Skills Required</label>
+        <input
+          type="text"
+          id="skills"
+          placeholder="HTML, CSS, JavaScript"
+          required
+        >
+
+        <label>Salary</label>
+        <input
+          type="text"
+          id="salary"
+          placeholder="₹3-5 LPA"
+        >
+
+        <label>Location</label>
+        <input
+          type="text"
+          id="location"
+          placeholder="Remote / Delhi"
+        >
+
+
+        <!-- PREVIEW -->
+        <div class="preview-box">
+
+          <h3>⚡ Quick Preview</h3>
+
+          <p id="pTitle">No title yet</p>
+          <p id="pSkills">Skills: --</p>
+          <p id="pSalary">Salary: --</p>
+          <p id="pLocation">Location: --</p>
+
+        </div>
+
+
+        <button
+          type="submit"
+          id="postBtn"
+          class="primary-btn"
+        >
+          Post Job 🚀
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
 
 </div>
 
 
-<!-- SCRIPT -->
+
 <script type="module">
 
-import { postJob, logoutUser, protectPage } from "./firebase.js";
+import {
+  postJob,
+  logoutUser,
+  getSession
+} from "./firebase.js";
 
-// protect recruiter page
-protectPage("recruiter");
 
-// logout
+/* =========================
+   PAGE PROTECT
+========================= */
+
+const user = getSession();
+
+if(!user){
+  window.location.href =
+    "rec-post-job.html";
+}
+
+if(user && user.role !== "recruiter"){
+  window.location.href =
+    "index.html";
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
-// post job
+
+/* =========================
+   INPUTS
+========================= */
+
+const title =
+document.getElementById("title");
+
+const skills =
+document.getElementById("skills");
+
+const salary =
+document.getElementById("salary");
+
+const location =
+document.getElementById("location");
+
+
+/* =========================
+   LIVE PREVIEW
+========================= */
+
+function updatePreview(){
+
+  document.getElementById("pTitle")
+  .innerText =
+    title.value.trim() ||
+    "No title yet";
+
+  document.getElementById("pSkills")
+  .innerText =
+    "Skills: " +
+    (
+      skills.value.trim() ||
+      "--"
+    );
+
+  document.getElementById("pSalary")
+  .innerText =
+    "Salary: " +
+    (
+      salary.value.trim() ||
+      "--"
+    );
+
+  document.getElementById("pLocation")
+  .innerText =
+    "Location: " +
+    (
+      location.value.trim() ||
+      "--"
+    );
+
+}
+
+
+/* listeners */
+[
+ title,
+ skills,
+ salary,
+ location
+].forEach(input => {
+
+  input.addEventListener(
+    "input",
+    updatePreview
+  );
+
+});
+
+
+updatePreview();
+
+
+/* =========================
+   SUBMIT FORM
+========================= */
+
 document.getElementById("jobForm")
-  .addEventListener("submit", (e) => {
-    e.preventDefault();
-    postJob(document.getElementById("postBtn"));
-  });
+.addEventListener("submit", async (e)=>{
+
+  e.preventDefault();
+
+  const btn =
+    document.getElementById("postBtn");
+
+  btn.disabled = true;
+  btn.innerText =
+    "Posting...";
+
+  try{
+
+    await postJob(btn);
+
+    alert("Job Posted Successfully ✅");
+
+    document.getElementById("jobForm")
+    .reset();
+
+    updatePreview();
+
+  }catch(err){
+
+    console.error(err);
+
+    alert("Failed to post job ❌");
+
+  }
+
+  btn.disabled = false;
+  btn.innerText =
+    "Post Job 🚀";
+
+});
 
 </script>
 
