@@ -3,17 +3,19 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Analytics | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=30">
+  <link rel="stylesheet" href="style.css?v=31">
 </head>
 
-<body>
+<body class="analytics-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
+
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
     <nav>
@@ -21,132 +23,194 @@
       <a href="js-jobs.html">Jobs</a>
       <a href="js-applications.html">Applications</a>
       <a href="js-resume.html">Resume Builder</a>
-      <a href="js-analytics.html">Analytics</a>
+      <a href="js-analytics.html" class="active">Analytics</a>
       <a href="js-profile.html">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
-  </div>
+
+  </aside>
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📊 Career Analytics</h2>
+    <div class="analytics-top">
 
-    <!-- STATS GRID -->
-    <div class="grid">
+      <div>
+        <h1>📊 Career Analytics</h1>
+        <p class="subtext">
+          Your progress decoded by the job-market telescope 🔭
+        </p>
+      </div>
 
-      <div class="card">
+    </div>
+
+    <!-- STATS -->
+    <section class="analytics-grid">
+
+      <div class="analytics-card glow-blue">
         <h3>⚡ Employability Score</h3>
         <p id="score">Loading...</p>
       </div>
 
-      <div class="card">
+      <div class="analytics-card glow-green">
         <h3>📄 Total Applications</h3>
         <p id="totalApps">Loading...</p>
       </div>
 
-      <div class="card">
+      <div class="analytics-card glow-purple">
         <h3>✅ Success Rate</h3>
         <p id="success">Loading...</p>
       </div>
 
-    </div>
+    </section>
 
 
-    <!-- AI SUGGESTIONS -->
-    <div class="card">
+    <!-- PROGRESS -->
+    <section class="analytics-card big-card">
+
+      <h3>📈 Career Meter</h3>
+
+      <div class="meter-wrap">
+        <div id="meterFill" class="meter-fill"></div>
+      </div>
+
+      <p id="meterText">Loading...</p>
+
+    </section>
+
+
+    <!-- AI Suggestions -->
+    <section class="analytics-card big-card">
+
       <h3>🧠 AI Suggestions</h3>
-      <ul>
+
+      <ul class="tips-list">
         <li id="suggest1">Loading...</li>
         <li id="suggest2"></li>
+        <li id="suggest3"></li>
       </ul>
-    </div>
 
-  </div>
+    </section>
+
+  </main>
 
 </div>
 
 
 <script type="module">
 
-import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  db,
+  logoutUser,
+  getSession,
+  protectPage
+} from "./firebase.js";
+
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+protectPage("seeker");
 
 // LOGOUT
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
-// SESSION
-function getSession() {
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
 
 // LOAD ANALYTICS
-async function loadAnalytics() {
+async function loadAnalytics(){
 
   const user = getSession();
 
-  if (!user) {
-    alert("Login required ❌");
-    window.location.href = "index.html";
+  if(!user){
+    window.location.href = "js-analytics.html";
     return;
   }
 
-  try {
+  try{
 
     const snap = await getDocs(collection(db, "applications"));
 
     let apps = [];
 
     snap.forEach(doc => {
-      const a = doc.data();
-      if (a.user === user.email) apps.push(a);
+      const data = doc.data();
+
+      if(
+        data.user === user.email ||
+        data.email === user.email
+      ){
+        apps.push(data);
+      }
     });
 
     // TOTAL
-    document.getElementById("totalApps").innerText = apps.length;
+    const total = apps.length;
+    document.getElementById("totalApps").innerText = total;
 
     // SUCCESS
     const success = apps.filter(a =>
-      a.status === "Hired" || a.status === "Shortlisted"
+      a.status === "Hired" ||
+      a.status === "Shortlisted"
     ).length;
 
-    const successRate = apps.length
-      ? Math.round((success / apps.length) * 100)
+    const successRate = total
+      ? Math.round((success / total) * 100)
       : 0;
 
-    document.getElementById("success").innerText = successRate + "%";
+    document.getElementById("success").innerText =
+      successRate + "%";
 
     // SCORE
-    const score = Math.min(100, apps.length * 20 + success * 15);
-    document.getElementById("score").innerText = score + "%";
+    const score = Math.min(
+      100,
+      (total * 18) + (success * 22)
+    );
 
-    // AI SUGGESTIONS
+    document.getElementById("score").innerText =
+      score + "%";
+
+    // METER
+    document.getElementById("meterFill").style.width =
+      score + "%";
+
+    let level = "Starter 🌱";
+
+    if(score >= 40) level = "Growing 🚀";
+    if(score >= 70) level = "Strong Candidate 💼";
+    if(score >= 90) level = "Elite Talent 👑";
+
+    document.getElementById("meterText").innerText =
+      "Current Level: " + level;
+
+    // SUGGESTIONS
     const s1 = document.getElementById("suggest1");
     const s2 = document.getElementById("suggest2");
+    const s3 = document.getElementById("suggest3");
 
-    if (apps.length === 0) {
-      s1.innerText = "Apply to jobs to boost your profile 🚀";
-      s2.innerText = "Complete your resume for better chances";
-    } 
-    else if (successRate < 30) {
-      s1.innerText = "Improve your skills 📚";
-      s2.innerText = "Apply to more jobs 🎯";
-    } 
-    else {
-      s1.innerText = "Great progress! Keep applying 🔥";
-      s2.innerText = "Focus on interviews now 🎤";
+    if(total === 0){
+      s1.innerText = "Apply to jobs to activate momentum 🚀";
+      s2.innerText = "Build resume with ATS score first 📄";
+      s3.innerText = "Add skills in profile section 🛠";
+    }
+    else if(successRate < 30){
+      s1.innerText = "Improve skills matching with job roles 🎯";
+      s2.innerText = "Apply consistently every week 📬";
+      s3.innerText = "Customize resume for each role ✍️";
+    }
+    else{
+      s1.innerText = "Great progress, keep pipeline active 🔥";
+      s2.innerText = "Focus on interview practice 🎤";
+      s3.innerText = "Target higher salary roles next 💸";
     }
 
-  } catch (err) {
+  }catch(err){
     console.error(err);
   }
+
 }
 
 loadAnalytics();
