@@ -1,120 +1,125 @@
-</html>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Users | SkillBridge AI</title>
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-
-<!-- SIDEBAR -->
-<div>
-
-  <h2>👑 Admin Panel</h2>
-
-  <nav>
-    <a href="admin-dashboard.html">Dashboard</a><br>
-    <a href="admin-users.html">Users</a><br>
-    <a href="admin-jobs.html">Jobs</a><br>
-    <a href="admin-applications.html">Applications</a><br>
-  </nav>
-
-  <!-- ✅ FIXED LOGOUT -->
-  <button id="logoutBtn">Logout 👋</button>
-
-</div>
-
-<hr>
-
-<!-- MAIN -->
-<div>
-
-  <h2>👥 All Users</h2>
-
-  <input type="text" id="searchUser" placeholder="Search users...">
-
-  <br><br>
-
-  <div id="usersList"></div>
-
-</div>
-
-<!-- ✅ SINGLE MODULE SCRIPT -->
-<script type="module">
-
-import { db, logoutUser } from "./firebase.js";
-import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-
-// 🔥 LOGOUT FIX
-document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
-
-
-// ================= LOAD USERS =================
-async function loadAllUsers(){
-
-  const container = document.getElementById("usersList");
-  container.innerHTML = "Loading...";
-
-  try {
-    const snapshot = await getDocs(collection(db, "users"));
-
-    container.innerHTML = "";
-
-    snapshot.forEach(doc => {
-
-      const u = doc.data();
-
-      const card = document.createElement("div");
-
-      card.style.border = "1px solid #ccc";
-      card.style.padding = "10px";
-      card.style.marginBottom = "10px";
-
-      card.innerHTML = `
-        <b>👤 ${u.name || "No Name"}</b><br>
-        📧 ${u.email || "No Email"}<br>
-        🎭 Role: ${u.role || "N/A"}
+  
+  <div class="admin-layout">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      
+      <h2>👑 Admin Panel</h2>
+      
+      <nav>
+        <a href="admin-dashboard.html">Dashboard</a>
+        <a href="admin-users.html" class="active">Users</a>
+        <a href="admin-jobs.html">Jobs</a>
+        <a href="admin-applications.html">Applications</a>
+      </nav>
+      
+      <button id="logoutBtn">Logout 👋</button>
+      
+    </aside>
+    
+    <!-- MAIN -->
+    <main class="main-content">
+      
+      <div class="page-top">
+        <h1>👥 All Users</h1>
+        <input type="text" id="searchUser" placeholder="Search users...">
+      </div>
+      
+      <div id="usersList" class="grid-box"></div>
+      
+    </main>
+    
+  </div>
+  
+  <script type="module">
+    import { db, logoutUser } from "./firebase.js";
+    import {
+      getDocs,
+      collection
+    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+    
+    document.getElementById("logoutBtn")
+      .addEventListener("click", logoutUser);
+    
+    
+    // LOAD USERS
+    async function loadAllUsers() {
+      
+      const container = document.getElementById("usersList");
+      container.innerHTML = `<p class="loading">Loading users...</p>`;
+      
+      try {
+        
+        const snapshot = await getDocs(collection(db, "users"));
+        
+        container.innerHTML = "";
+        
+        if (snapshot.empty) {
+          container.innerHTML = `<p class="loading">No users found 🚫</p>`;
+          return;
+        }
+        
+        snapshot.forEach(doc => {
+          
+          const u = doc.data();
+          
+          const card = document.createElement("div");
+          card.className = "user-card";
+          
+          card.innerHTML = `
+        <h3>👤 ${u.name || "No Name"}</h3>
+        <p>📧 ${u.email || "No Email"}</p>
+        <span class="role-badge">${u.role || "N/A"}</span>
       `;
-
-      container.appendChild(card);
-    });
-
-    if(!container.innerHTML){
-      container.innerHTML = "No users found";
+          
+          container.appendChild(card);
+          
+        });
+        
+      } catch (err) {
+        
+        console.error(err);
+        container.innerHTML = `<p class="loading">Error loading users ❌</p>`;
+        
+      }
+      
     }
-
-  } catch (err) {
-    console.error("Load Users Error:", err);
-    container.innerHTML = "Error loading users ❌";
-  }
-}
-
-
-// ================= SEARCH =================
-document.getElementById("searchUser")
-  .addEventListener("keyup", function(){
-
-    const q = this.value.toLowerCase();
-    const users = document.querySelectorAll("#usersList div");
-
-    users.forEach(u=>{
-      u.style.display =
-        u.innerText.toLowerCase().includes(q)
-          ? "block"
-          : "none";
-    });
-
-  });
-
-
-// AUTO LOAD
-loadAllUsers();
-
-</script>
-
+    
+    
+    // SEARCH
+    document.getElementById("searchUser")
+      .addEventListener("keyup", function() {
+        
+        const q = this.value.toLowerCase();
+        
+        const users = document.querySelectorAll(".user-card");
+        
+        users.forEach(card => {
+          
+          card.style.display =
+            card.innerText.toLowerCase().includes(q) ?
+            "block" :
+            "none";
+          
+        });
+        
+      });
+    
+    
+    loadAllUsers();
+  </script>
+  
 </body>
+
 </html>
