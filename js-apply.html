@@ -3,19 +3,17 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Apply Job | SkillBridge AI</title>
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="style.css?v=31">
+  <title>Apply Job | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css?v=50">
 </head>
 
-<body>
+<body class="apply-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
@@ -30,126 +28,305 @@
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📥 Apply for Job</h2>
+    <!-- HEADER -->
+    <div class="apply-header">
 
-    <p><b>Job ID:</b> <span id="jobId">Loading...</span></p>
+      <div>
+        <h1>📥 Apply for Job</h1>
+        <p class="subtext">
+          One clean shot. One strong application 🎯
+        </p>
+      </div>
 
-    <div class="card">
-
-      <form id="applyForm">
-
-        <label>Your Skills:</label>
-        <input type="text" id="skills" placeholder="HTML, CSS, JS">
-
-        <label>Experience (years):</label>
-        <input type="number" id="experience" placeholder="0">
-
-        <label>Resume:</label>
-        <textarea id="resumeText" rows="5" placeholder="Write your resume..."></textarea>
-
-        <button type="submit">Submit Application 🚀</button>
-
-      </form>
+      <div class="job-pill">
+        Job ID:
+        <span id="jobId">Loading...</span>
+      </div>
 
     </div>
 
-  </div>
+
+    <!-- FORM CARD -->
+    <section class="apply-card">
+
+      <form id="applyForm" class="apply-form">
+
+        <!-- Skills -->
+        <label>Your Skills</label>
+        <input
+          type="text"
+          id="skills"
+          placeholder="HTML, CSS, JavaScript"
+        >
+
+        <!-- Experience -->
+        <label>Experience (Years)</label>
+        <input
+          type="number"
+          id="experience"
+          min="0"
+          placeholder="0"
+        >
+
+        <!-- Resume -->
+        <label>Resume Summary</label>
+        <textarea
+          id="resumeText"
+          rows="7"
+          placeholder="Write about your skills, projects, achievements..."
+        ></textarea>
+
+        <!-- ATS -->
+        <div class="score-box">
+          <span>📊 ATS Readiness Score</span>
+          <strong id="atsScore">0%</strong>
+        </div>
+
+        <!-- BUTTON -->
+        <button type="submit" id="applyBtn">
+          Submit Application 🚀
+        </button>
+
+      </form>
+
+    </section>
+
+  </main>
 
 </div>
 
 
 <script type="module">
 
-import { logoutUser, applyJob } from "./firebase.js";
-
-window.addEventListener("DOMContentLoaded", () => {
-
-  // logout fix
-  document.getElementById("logoutBtn")
-    ?.addEventListener("click", logoutUser);
-
-});
+import {
+  logoutUser,
+  applyJob,
+  getSession
+} from "./firebase.js";
 
 
-// session
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
+/* =========================
+   PAGE PROTECTION
+========================= */
+
+const user = getSession();
+
+if(!user){
+  window.location.href =
+    "jobseeker-login.html";
+}
+
+if(user && user.role !== "seeker"){
+  window.location.href =
+    "index.html";
 }
 
 
-// job id
+/* =========================
+   LOGOUT
+========================= */
+
+document.getElementById("logoutBtn")
+.addEventListener("click", logoutUser);
+
+
+/* =========================
+   GET JOB ID
+========================= */
+
 let currentJobId = "";
 
-function getJobId(){
-  const params = new URLSearchParams(window.location.search);
-  currentJobId = params.get("id");
+function loadJobId(){
 
-  document.getElementById("jobId").innerText = currentJobId || "N/A";
+  const params =
+    new URLSearchParams(window.location.search);
+
+  currentJobId =
+    params.get("id");
+
+  if(!currentJobId){
+    alert("Invalid Job Link ❌");
+    window.location.href =
+      "js-jobs.html";
+    return;
+  }
+
+  document.getElementById("jobId")
+  .innerText = currentJobId;
+
 }
 
+loadJobId();
 
-// apply
+
+/* =========================
+   ATS SCORE
+========================= */
+
+function calculateATS(){
+
+  const skills =
+    document.getElementById("skills")
+    .value.trim();
+
+  const exp =
+    Number(
+      document.getElementById("experience")
+      .value || 0
+    );
+
+  const resume =
+    document.getElementById("resumeText")
+    .value.trim();
+
+  let score = 0;
+
+  if(skills.length >= 5) score += 35;
+  if(exp >= 1) score += 25;
+  if(resume.length >= 80) score += 40;
+
+  score = Math.min(score,100);
+
+  document.getElementById("atsScore")
+  .innerText = score + "%";
+
+}
+
+document.getElementById("skills")
+.addEventListener("input", calculateATS);
+
+document.getElementById("experience")
+.addEventListener("input", calculateATS);
+
+document.getElementById("resumeText")
+.addEventListener("input", calculateATS);
+
+
+/* =========================
+   APPLY JOB
+========================= */
+
 document.getElementById("applyForm")
-  .addEventListener("submit", async (e) => {
+.addEventListener("submit", async (e)=>{
 
-    e.preventDefault();
+  e.preventDefault();
 
-    const user = getSession();
+  const btn =
+    document.getElementById("applyBtn");
 
-    if (!user) {
-      alert("Login required ❌");
-      window.location.href = "index.html";
-      return;
-    }
+  btn.disabled = true;
+  btn.innerText = "Submitting...";
 
-    const skillsInput = document.getElementById("skills").value;
+  const user = getSession();
 
-    const skills = skillsInput
-      .split(",")
-      .map(s => s.trim());
+  if(!user){
+    window.location.href =
+      "jobseeker-login.html";
+    return;
+  }
 
-    const exp = document.getElementById("experience").value.trim();
-    const resume = document.getElementById("resumeText").value.trim();
+  const skillsInput =
+    document.getElementById("skills")
+    .value.trim();
 
-    if (!skillsInput || !resume) {
-      alert("Fill required fields ⚠️");
-      return;
-    }
+  const experience =
+    document.getElementById("experience")
+    .value.trim();
 
-    try {
+  const resume =
+    document.getElementById("resumeText")
+    .value.trim();
 
-      await applyJob({
-        user: user.email,
-        jobId: currentJobId,
-        skills: skills.length ? skills : [],
-        experience: exp || "0",
-        resume
-      });
+  if(!skillsInput || !resume){
 
-      alert("Application Submitted ✅");
+    alert("Fill required fields ⚠️");
 
-      window.location.href = "js-applications.html";
+    btn.disabled = false;
+    btn.innerText =
+      "Submit Application 🚀";
 
-    } catch (err) {
-      console.error(err);
-      alert("Failed ❌");
-    }
+    return;
+  }
 
-  });
+  const skills =
+    skillsInput
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
 
 
-// init
-getJobId();
+  /* duplicate local check */
+  let appliedJobs =
+    JSON.parse(
+      localStorage.getItem("appliedJobs")
+    ) || [];
+
+  if(appliedJobs.includes(currentJobId)){
+
+    alert("Already applied ⚠️");
+
+    btn.disabled = false;
+    btn.innerText =
+      "Submit Application 🚀";
+
+    return;
+  }
+
+
+  try{
+
+    await applyJob({
+
+      user: user.email,
+      seeker: user.email,
+      email: user.email,
+      name: user.name || "",
+
+      jobId: currentJobId,
+      jobTitle: "Applied Job",
+
+      skills: skills,
+      experience:
+        experience || "0",
+
+      resume: resume,
+      status: "Applied"
+
+    });
+
+
+    /* save local */
+    appliedJobs.push(currentJobId);
+
+    localStorage.setItem(
+      "appliedJobs",
+      JSON.stringify(appliedJobs)
+    );
+
+    alert("Application Submitted ✅");
+
+    window.location.href =
+      "js-applications.html";
+
+  }catch(err){
+
+    console.error(err);
+
+    alert("Submission Failed ❌");
+
+    btn.disabled = false;
+    btn.innerText =
+      "Submit Application 🚀";
+
+  }
+
+});
 
 </script>
 
