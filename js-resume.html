@@ -364,98 +364,107 @@ function themeColor(theme){
 }
 
 
-form.addEventListener("submit", e => {
-
-e.preventDefault();
-
-const name = name.value || "Your Name";
-const email = document.getElementById("email").value;
-const phone = document.getElementById("phone").value;
-const linkedin = document.getElementById("linkedin").value;
-const skills = document.getElementById("skills").value.split(",").map(s=>s.trim()).filter(Boolean);
-const education = document.getElementById("education").value;
-const experience = document.getElementById("experience").value;
-const projects = document.getElementById("projects").value;
-const achievements = document.getElementById("achievements").value;
-const objective = document.getElementById("objective").value;
-const theme = document.getElementById("theme").value;
-
-const ats = Math.min(100, 40 + skills.length*7 + (experience.length>20?20:0) + (projects.length>20?20:0));
-
-preview.innerHTML = `
-
+form.addEventListener("submit", (e) => {
+  
+  e.preventDefault();
+  
+  const fullName =
+    document.getElementById("name").value.trim() || "Your Name";
+  
+  const email =
+    document.getElementById("email").value.trim();
+  
+  const phone =
+    document.getElementById("phone").value.trim();
+  
+  const linkedin =
+    document.getElementById("linkedin").value.trim();
+  
+  const skills =
+    document.getElementById("skills").value
+    .split(",")
+    .map(s => s.trim())
+    .filter(Boolean);
+  
+  const education =
+    document.getElementById("education").value.trim();
+  
+  const experience =
+    document.getElementById("experience").value.trim();
+  
+  const projects =
+    document.getElementById("projects").value.trim();
+  
+  const achievements =
+    document.getElementById("achievements").value.trim();
+  
+  const objective =
+    document.getElementById("objective").value.trim();
+  
+  const theme =
+    document.getElementById("theme").value;
+  
+  const ats =
+    Math.min(
+      100,
+      40 + skills.length * 7 +
+      (experience.length > 20 ? 20 : 0) +
+      (projects.length > 20 ? 20 : 0)
+    );
+  
+  preview.innerHTML = `
 <div class="cv">
 
 <div class="cv-left" style="background:${themeColor(theme)}">
 
-${photoURL ? `<img src="${photoURL}" class="photo">` : `<div class="avatar">👤</div>`}
+${photoURL
+? `<img src="${photoURL}" class="photo">`
+: `<div class="avatar">👤</div>`
+}
 
-<h1>${name}</h1>
+<h1>${fullName}</h1>
 <p>${email}</p>
 <p>${phone}</p>
 
-<h3>📊 ATS Score</h3>
-<p style="font-size:30px;font-weight:700">${ats}/100</p>
-
-<h3>🛠 Skills</h3>
-
-${
-skills.length
-? skills.map(s=>`
-<div class="skill-line">
-<span>${s}</span>
-<div class="track">
-<div class="fill" style="width:${70+Math.random()*25}%"></div>
-</div>
-</div>
-`).join("")
-: "<p>No skills</p>"
-}
-
-<h3>🔗 LinkedIn</h3>
-<p>${linkedin || "--"}</p>
+<h3>ATS Score</h3>
+<p style="font-size:30px;font-weight:bold">${ats}/100</p>
 
 </div>
-
 
 <div class="cv-right">
 
-<div class="topbar">
 <h2>Professional Resume</h2>
-<div class="badge">SkillBridge AI</div>
+
+<div class="section">
+<h3>Career Objective</h3>
+<p>${objective}</p>
 </div>
 
 <div class="section">
-<h3>🎯 Career Objective</h3>
-<p>${objective || "Seeking opportunities to contribute and grow."}</p>
+<h3>Education</h3>
+<p>${education}</p>
 </div>
 
 <div class="section">
-<h3>🎓 Education</h3>
-<p>${education || "--"}</p>
-</div>
-
-<div class="section">
-<h3>💼 Experience</h3>
+<h3>Experience</h3>
 <ul>${bullets(experience)}</ul>
 </div>
 
 <div class="section">
-<h3>🚀 Projects</h3>
+<h3>Projects</h3>
 <ul>${bullets(projects)}</ul>
 </div>
 
 <div class="section">
-<h3>🏆 Achievements</h3>
+<h3>Achievements</h3>
 <ul>${bullets(achievements)}</ul>
 </div>
 
 </div>
 
 </div>
-
 `;
-
+  
 });
 
 
