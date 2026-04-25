@@ -12,6 +12,170 @@
 <meta http-equiv="Expires" content="0">
 
 <link rel="stylesheet" href="style.css?v=92">
+
+<style>
+/* ===== EXTRA CUSTOM UI FOR THIS PAGE ===== */
+
+.rec-dashboard-page{
+  background:
+  radial-gradient(circle at top right,#2563eb22,transparent 20%),
+  radial-gradient(circle at bottom left,#06b6d422,transparent 20%),
+  #0f172a;
+}
+
+.hero-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  flex-wrap:wrap;
+  margin-bottom:28px;
+}
+
+.hero-row h1{
+  font-size:34px;
+  margin-bottom:8px;
+}
+
+.pulse-pill{
+  padding:12px 18px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  font-weight:700;
+  box-shadow:0 0 0 0 rgba(37,99,235,.5);
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(37,99,235,.5);}
+  70%{box-shadow:0 0 0 14px rgba(37,99,235,0);}
+  100%{box-shadow:0 0 0 0 rgba(37,99,235,0);}
+}
+
+.stat-grid{
+  margin-bottom:24px;
+}
+
+.stat-card{
+  position:relative;
+  overflow:hidden;
+  transition:.25s;
+}
+
+.stat-card:hover{
+  transform:translateY(-6px);
+}
+
+.stat-card::after{
+  content:"";
+  position:absolute;
+  right:-20px;
+  top:-20px;
+  width:90px;
+  height:90px;
+  background:rgba(255,255,255,.03);
+  border-radius:50%;
+}
+
+.stat-card h3{
+  font-size:16px;
+  color:#cbd5e1;
+  margin-bottom:12px;
+}
+
+.stat-card p{
+  font-size:34px;
+  font-weight:800;
+  color:#60a5fa;
+}
+
+.lower-grid{
+  align-items:start;
+}
+
+.bar-box{
+  margin-top:18px;
+}
+
+.bar-box span{
+  display:block;
+  margin-bottom:8px;
+  color:#cbd5e1;
+  font-size:14px;
+}
+
+.bar-box .track{
+  height:12px;
+  border-radius:30px;
+  background:#0b1220;
+  overflow:hidden;
+}
+
+#barApps,
+#barShort,
+#barHire{
+  height:100%;
+  border-radius:30px;
+  width:0;
+  transition:1s ease;
+}
+
+#barApps{
+  background:linear-gradient(90deg,#3b82f6,#60a5fa);
+}
+
+#barShort{
+  background:linear-gradient(90deg,#22c55e,#4ade80);
+}
+
+#barHire{
+  background:linear-gradient(90deg,#a855f7,#d946ef);
+}
+
+.tips{
+  list-style:none;
+  margin-top:14px;
+}
+
+.tips li{
+  padding:14px;
+  border-radius:14px;
+  background:#0b1220;
+  margin-bottom:12px;
+  border:1px solid #1e293b;
+  color:#e2e8f0;
+}
+
+.sidebar h2{
+  line-height:1.3;
+}
+
+.sidebar nav a{
+  transition:.25s;
+}
+
+.sidebar nav a:hover{
+  transform:translateX(4px);
+}
+
+#logoutBtn:hover{
+  background:#dc2626;
+}
+
+@media(max-width:768px){
+
+  .hero-row h1{
+    font-size:28px;
+  }
+
+  .pulse-pill{
+    width:100%;
+    text-align:center;
+  }
+
+}
+</style>
+
 </head>
 
 <body class="rec-dashboard-page">
@@ -24,12 +188,12 @@
     <h2>🏢 Recruiter Panel</h2>
 
     <nav>
-      <a href="rec-dashboard.html" class="active">Dashboard</a>
-      <a href="rec-post-job.html">Post Job</a>
-      <a href="rec-manage-jobs.html">Manage Jobs</a>
-      <a href="rec-applicants.html">Applicants</a>
-      <a href="rec-analytics.html">Analytics</a>
-      <a href="rec-profile.html">Profile</a>
+      <a href="rec-dashboard.html" class="active">📊 Dashboard</a>
+      <a href="rec-post-job.html">➕ Post Job</a>
+      <a href="rec-manage-jobs.html">🧾 Manage Jobs</a>
+      <a href="rec-applicants.html">👥 Applicants</a>
+      <a href="rec-analytics.html">📈 Analytics</a>
+      <a href="rec-profile.html">👤 Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
@@ -41,14 +205,12 @@
   <!-- MAIN -->
   <main class="main">
 
-    <!-- top -->
+    <!-- TOP -->
     <div class="hero-row">
 
       <div>
         <h1>📊 Dashboard Overview</h1>
-        <p id="welcome" class="muted">
-          Loading...
-        </p>
+        <p id="welcome" class="muted">Loading...</p>
       </div>
 
       <div class="pulse-pill">
@@ -59,7 +221,7 @@
 
 
 
-    <!-- stats -->
+    <!-- STATS -->
     <section class="grid stat-grid">
 
       <div class="card stat-card">
@@ -86,9 +248,10 @@
 
 
 
-    <!-- lower cards -->
+    <!-- LOWER SECTION -->
     <section class="grid lower-grid">
 
+      <!-- Funnel -->
       <div class="card">
         <h3>🎯 Hiring Funnel</h3>
 
@@ -117,6 +280,7 @@
 
 
 
+      <!-- AI Tips -->
       <div class="card">
         <h3>🧠 AI Suggestions</h3>
 
@@ -133,235 +297,6 @@
   </main>
 
 </div>
-
-
-
-<script type="module">
-
-import {
-  db,
-  logoutUser,
-  protectPage,
-  getSession
-} from "./firebase.js";
-
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-
-protectPage("recruiter");
-
-
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
-
-
-
-function setText(id,val){
-
-  const el =
-    document.getElementById(id);
-
-  if(el) el.innerText = val;
-
-}
-
-
-
-async function loadRecruiterDashboard(){
-
-  const user = getSession();
-
-  if(!user){
-    location.href =
-      "rec-dashboard.html";
-    return;
-  }
-
-  setText(
-    "welcome",
-    "Welcome " +
-    (user.name || "Recruiter")
-  );
-
-  try{
-
-    /* JOBS */
-    const jobsSnap =
-      await getDocs(collection(db,"jobs"));
-
-    let myJobIds = [];
-
-    jobsSnap.forEach(doc => {
-
-      const j = doc.data();
-
-      if(j.recruiter === user.email){
-        myJobIds.push(doc.id);
-      }
-
-    });
-
-    setText(
-      "totalJobs",
-      myJobIds.length
-    );
-
-
-
-    /* APPLICATIONS */
-    const appsSnap =
-      await getDocs(
-        collection(db,"applications")
-      );
-
-    let myApps = [];
-
-    appsSnap.forEach(doc => {
-
-      const a = doc.data();
-
-      if(myJobIds.includes(a.jobId)){
-        myApps.push(a);
-      }
-
-    });
-
-    const totalApps =
-      myApps.length;
-
-    setText(
-      "totalApps",
-      totalApps
-    );
-
-
-
-    /* STATUS COUNTS */
-    const shortlisted =
-      myApps.filter(a =>
-        a.status === "Shortlisted"
-      ).length;
-
-    const hired =
-      myApps.filter(a =>
-        a.status === "Hired"
-      ).length;
-
-    setText(
-      "shortlisted",
-      shortlisted
-    );
-
-
-
-    /* RATE */
-    const rate =
-      totalApps
-      ? Math.round(
-          (hired / totalApps) * 100
-        )
-      : 0;
-
-    setText(
-      "hiringRate",
-      rate + "%"
-    );
-
-
-
-    /* BARS */
-    const max =
-      totalApps || 1;
-
-    document.getElementById("barApps")
-    .style.width =
-      (totalApps/max)*100 + "%";
-
-    document.getElementById("barShort")
-    .style.width =
-      (shortlisted/max)*100 + "%";
-
-    document.getElementById("barHire")
-    .style.width =
-      (hired/max)*100 + "%";
-
-
-
-    /* AI TIPS */
-    if(totalApps === 0){
-
-      setText(
-        "tip1",
-        "Post a job to attract candidates 🚀"
-      );
-
-      setText(
-        "tip2",
-        "Mention salary for higher clicks."
-      );
-
-      setText(
-        "tip3",
-        "Use clear job titles."
-      );
-
-    }
-
-    else if(rate < 20){
-
-      setText(
-        "tip1",
-        "Hiring rate is low."
-      );
-
-      setText(
-        "tip2",
-        "Respond faster to applicants."
-      );
-
-      setText(
-        "tip3",
-        "Refine job requirements."
-      );
-
-    }
-
-    else{
-
-      setText(
-        "tip1",
-        "Strong pipeline detected 🔥"
-      );
-
-      setText(
-        "tip2",
-        "Scale hiring campaigns now."
-      );
-
-      setText(
-        "tip3",
-        "Top candidates ready to convert."
-      );
-
-    }
-
-  }
-
-  catch(err){
-
-    console.log(err);
-
-  }
-
-}
-
-
-loadRecruiterDashboard();
-
-</script>
 
 </body>
 </html>
