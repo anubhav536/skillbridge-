@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Dashboard | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 
 <body class="admin-dashboard-page">
 
-<div class="admin-layout">
+<div class="dashboard">
 
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -16,10 +17,10 @@
     <h2>👑 Admin Panel</h2>
 
     <nav>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="admin-users.html">Users</a>
-      <a href="admin-jobs.html">Jobs</a>
-      <a href="admin-applications.html">Applications</a>
+      <a href="admin-dashboard.html" class="active">📊 Dashboard</a>
+      <a href="admin-users.html">👥 Users</a>
+      <a href="admin-jobs.html">💼 Jobs</a>
+      <a href="admin-applications.html">📄 Applications</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
@@ -27,29 +28,97 @@
   </aside>
 
   <!-- MAIN -->
-  <main class="main-content">
+  <main class="main">
 
-    <h2>📊 Dashboard Overview</h2>
-
-    <div class="stats-grid">
-
-      <div class="stat-card">
-        <h3>📌 Total Users</h3>
-        <p id="totalUsers">Loading...</p>
+    <!-- TOP BAR -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:24px;">
+      <div>
+        <h2>📊 Dashboard Overview</h2>
+        <p class="muted">Welcome back, Admin. Here’s today’s command center.</p>
       </div>
 
-      <div class="stat-card">
-        <h3>💼 Total Jobs</h3>
-        <p id="totalJobs">Loading...</p>
+      <span class="badge">⚡ Live Analytics</span>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid">
+
+      <div class="card stat-box">
+        <p class="muted">📌 Total Users</p>
+        <h3 id="totalUsers">Loading...</h3>
+        <p class="muted" style="margin-top:8px;">Registered users on platform</p>
       </div>
 
-      <div class="stat-card">
-        <h3>📄 Total Applications</h3>
-        <p id="totalApps">Loading...</p>
+      <div class="card stat-box">
+        <p class="muted">💼 Total Jobs</p>
+        <h3 id="totalJobs">Loading...</h3>
+        <p class="muted" style="margin-top:8px;">Active + past job posts</p>
+      </div>
+
+      <div class="card stat-box">
+        <p class="muted">📄 Applications</p>
+        <h3 id="totalApps">Loading...</h3>
+        <p class="muted" style="margin-top:8px;">Applications received</p>
       </div>
 
     </div>
 
+    <!-- QUICK ACTIONS -->
+    <section style="padding:28px 0 0;">
+
+      <h2 style="margin-bottom:18px;">⚙ Quick Actions</h2>
+
+      <div class="grid">
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">👥 Manage Users</h3>
+          <p class="muted">View, edit or remove user accounts.</p>
+          <a href="admin-users.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">💼 Manage Jobs</h3>
+          <p class="muted">Create, update or delete job posts.</p>
+          <a href="admin-jobs.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-bottom:10px;">📄 Review Applications</h3>
+          <p class="muted">Track candidate applications easily.</p>
+          <a href="admin-applications.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- RECENT ACTIVITY -->
+    <section style="padding:28px 0 0;">
+
+      <h2 style="margin-bottom:18px;">📈 Recent Activity</h2>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);">
+          <span>New user registered</span>
+          <span class="muted">2 min ago</span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);">
+          <span>Frontend Developer job posted</span>
+          <span class="muted">15 min ago</span>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;padding:12px 0;">
+          <span>3 new applications submitted</span>
+          <span class="muted">1 hour ago</span>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
 </div>
+
+</body>
+</html>
