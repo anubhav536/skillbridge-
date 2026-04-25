@@ -2,20 +2,21 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Recruiter Profile | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruiter Profile | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=96">
+
 </head>
 
-<body>
+<body class="rec-profile-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
@@ -25,137 +26,243 @@
       <a href="rec-manage-jobs.html">Manage Jobs</a>
       <a href="rec-applicants.html">Applicants</a>
       <a href="rec-analytics.html">Analytics</a>
-      <a href="rec-profile.html">Profile</a>
+      <a href="rec-profile.html" class="active">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>👤 Recruiter Profile</h2>
+    <div class="profile-head">
 
-    <!-- PROFILE CARD -->
-    <div class="card">
+      <div>
+        <h1>👤 Recruiter Profile</h1>
+        <p class="muted">
+          Keep your hiring identity sharp ✨
+        </p>
+      </div>
 
-      <p><b>Name:</b> <span id="name"></span></p>
-      <p><b>Email:</b> <span id="email"></span></p>
-      <p><b>Company:</b> <span id="company"></span></p>
+      <div class="status-pill">
+        Recruiter Verified
+      </div>
 
     </div>
 
 
-    <!-- EDIT -->
-    <div class="card">
 
-      <h3>✏️ Edit Profile</h3>
+    <!-- PROFILE CARD -->
+    <section class="card profile-view">
 
-      <input 
-        type="text" 
-        id="companyInput" 
+      <div class="avatar-box">
+        🏢
+      </div>
+
+      <div class="profile-info">
+
+        <h2 id="name">Loading...</h2>
+
+        <p id="email">Loading...</p>
+
+        <p>
+          <strong>Company:</strong>
+          <span id="company">Loading...</span>
+        </p>
+
+        <p>
+          <strong>Role:</strong> Recruiter
+        </p>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- EDIT CARD -->
+    <section class="card edit-card">
+
+      <h3>✏️ Update Company</h3>
+
+      <input
+        type="text"
+        id="companyInput"
         placeholder="Enter company name"
       >
 
-      <button id="updateBtn">
+      <button
+        id="updateBtn"
+        class="save-btn"
+      >
         Update Profile 💾
       </button>
 
-    </div>
+    </section>
 
-  </div>
+  </main>
 
 </div>
 
 
+
 <script type="module">
 
-import { db, logoutUser, protectPage } from "./firebase.js";
-import { doc, updateDoc, getDocs, collection } 
-from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  db,
+  logoutUser,
+  getSession,
+  protectPage
+} from "./firebase.js";
 
+import {
+  doc,
+  updateDoc,
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
+/* PAGE PROTECT */
 protectPage("recruiter");
 
+
+/* LOGOUT */
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
 
-// session
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
-}
 
-
-// LOAD PROFILE
+/* LOAD PROFILE */
 function loadProfile(){
 
   const user = getSession();
 
-  document.getElementById("name").innerText = user.name;
-  document.getElementById("email").innerText = user.email;
-  document.getElementById("company").innerText = user.company || "Not added";
+  if(!user){
+    window.location.href =
+      "rec-profile.html";
+    return;
+  }
+
+  document.getElementById("name")
+  .innerText =
+    user.name || "Recruiter";
+
+  document.getElementById("email")
+  .innerText =
+    user.email || "--";
+
+  document.getElementById("company")
+  .innerText =
+    user.company || "Not added";
+
+  document.getElementById("companyInput")
+  .value =
+    user.company || "";
 
 }
 
 loadProfile();
 
 
-// UPDATE PROFILE
+
+/* UPDATE PROFILE */
 document.getElementById("updateBtn")
-  .addEventListener("click", async () => {
+.addEventListener("click", async ()=>{
 
-    const user = getSession();
-    const company = document.getElementById("companyInput").value.trim();
+  const btn =
+    document.getElementById("updateBtn");
 
-    if(!company){
-      alert("Enter company name ❌");
+  const user =
+    getSession();
+
+  if(!user){
+    window.location.href =
+      "recruiter-login.html";
+    return;
+  }
+
+  const company =
+    document.getElementById("companyInput")
+    .value
+    .trim();
+
+  if(!company){
+    alert("Enter company name ❌");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerText = "Saving...";
+
+  try{
+
+    const snap =
+      await getDocs(
+        collection(db,"users")
+      );
+
+    let userId = null;
+
+    snap.forEach(item => {
+
+      const data =
+        item.data();
+
+      if(data.email === user.email){
+        userId = item.id;
+      }
+
+    });
+
+    if(!userId){
+
+      alert("User not found ❌");
+
+      btn.disabled = false;
+      btn.innerText =
+        "Update Profile 💾";
+
       return;
     }
 
-    try {
-
-      // 🔍 find user doc
-      const snap = await getDocs(collection(db, "users"));
-
-      let userId = null;
-
-      snap.forEach(docSnap => {
-        const d = docSnap.data();
-        if(d.email === user.email){
-          userId = docSnap.id;
-        }
-      });
-
-      if(!userId){
-        alert("User not found ❌");
-        return;
+    await updateDoc(
+      doc(db,"users",userId),
+      {
+        company: company
       }
+    );
 
-      // 🔥 update firestore
-      await updateDoc(doc(db, "users", userId), {
-        company
-      });
+    const updatedUser = {
+      ...user,
+      company: company
+    };
 
-      // 🔥 update session
-      user.company = company;
-      localStorage.setItem("session", JSON.stringify(user));
+    localStorage.setItem(
+      "session",
+      JSON.stringify(updatedUser)
+    );
 
-      alert("Profile updated ✅");
+    loadProfile();
 
-      loadProfile();
+    alert("Profile updated ✅");
 
-    } catch (err){
-      console.log(err);
-      alert("Update failed ❌");
-    }
+  }catch(err){
 
-  });
+    console.error(err);
+
+    alert("Update failed ❌");
+
+  }
+
+  btn.disabled = false;
+  btn.innerText =
+    "Update Profile 💾";
+
+});
 
 </script>
 
