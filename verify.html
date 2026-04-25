@@ -1,93 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Verify Account | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Verify Account | SkillBridge AI</title>
+
+<link rel="stylesheet" href="style.css?v=98">
 </head>
 
-<body>
+<body class="verify-page">
 
 <!-- NAVBAR -->
-<nav>
-  <h2>SkillBridge AI</h2>
+<nav class="navbar">
 
-  <div>
+  <h2>🚀 SkillBridge AI</h2>
+
+  <div class="nav-links">
     <a href="index.html">Home</a>
   </div>
+
 </nav>
 
-<hr>
+
 
 <!-- VERIFY SECTION -->
-<section>
+<section class="verify-wrap">
 
-  <h2>🔐 Verify Your Account</h2>
+  <div class="verify-card">
 
-  <p>Enter the verification code sent to your email</p>
+    <div class="verify-badge">
+      🔐 Secure Access
+    </div>
 
-  <!-- FORM -->
-  <div>
+    <h1>Verify Your Account</h1>
 
-    <label>Verification Code:</label><br>
-    <input type="text" id="otp" placeholder="Enter OTP"><br><br>
+    <p class="subtitle">
+      Enter the verification code sent to your email inbox 📩
+    </p>
 
-    <button onclick="verifyOTP()">Verify ✅</button>
 
-    <p id="error"></p>
+    <!-- FORM -->
+    <label>Verification Code</label>
+
+    <input
+      type="text"
+      id="otp"
+      maxlength="6"
+      placeholder="Enter OTP"
+    >
+
+
+    <button
+      id="verifyBtn"
+      class="verify-btn">
+      Verify ✅
+    </button>
+
+
+    <p id="error" class="error-text"></p>
+
+
+    <div class="resend-box">
+
+      <span>Didn’t receive code?</span>
+
+      <button
+        id="resendBtn"
+        class="link-btn">
+        Resend
+      </button>
+
+    </div>
 
   </div>
-
-  <br>
-
-  <p>
-    Didn’t receive code?
-    <button onclick="resendOTP()">Resend</button>
-  </p>
 
 </section>
 
-<hr>
+
 
 <!-- FOOTER -->
-<footer>
+<footer class="footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
 
-<!-- JS -->
-<script src="script.js"></script>
 
-<!-- VERIFY LOGIC -->
+
 <script>
+
+/* verify */
+document.getElementById("verifyBtn")
+.addEventListener("click", verifyOTP);
+
+
 function verifyOTP(){
 
-  let input = document.getElementById("otp").value;
-  let saved = localStorage.getItem("otp");
+  const input =
+    document.getElementById("otp")
+    .value.trim();
+
+  const saved =
+    localStorage.getItem("otp");
+
+  const error =
+    document.getElementById("error");
 
   if(input === saved){
+
+    localStorage.setItem(
+      "verified",
+      "true"
+    );
+
     alert("Account Verified ✅");
 
-    // mark verified
-    localStorage.setItem("verified", "true");
+    window.location.href =
+      "jobseeker-login.html";
 
-    // redirect to login
-    window.location.href = "jobseeker-login.html";
-  } else {
-    document.getElementById("error").innerText = "Invalid OTP ❌";
+  }else{
+
+    error.innerText =
+      "Invalid OTP ❌";
+
   }
+
 }
 
-// RESEND OTP
+
+/* resend */
+document.getElementById("resendBtn")
+.addEventListener("click", resendOTP);
+
+
 function resendOTP(){
 
-  let newOtp = Math.floor(100000 + Math.random() * 900000);
+  const newOtp =
+    Math.floor(
+      100000 +
+      Math.random() * 900000
+    );
 
-  localStorage.setItem("otp", newOtp);
+  localStorage.setItem(
+    "otp",
+    newOtp
+  );
 
-  alert("New OTP: " + newOtp + " (simulation)");
+  alert(
+    "New OTP: " +
+    newOtp +
+    " (simulation)"
+  );
+
 }
+
 </script>
 
 </body>
 </html>
-<link rel="stylesheet" href="style.css">
