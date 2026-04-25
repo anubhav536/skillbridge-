@@ -1,21 +1,23 @@
-<!DOCTYPE html>
+</body>
+</html><!DOCTYPE html>
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Applicants | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Applicants | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=92">
+
 </head>
 
-<body>
+<body class="rec-applicants-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
@@ -23,207 +25,444 @@
       <a href="rec-dashboard.html">Dashboard</a>
       <a href="rec-post-job.html">Post Job</a>
       <a href="rec-manage-jobs.html">Manage Jobs</a>
-      <a href="rec-applicants.html">Applicants</a>
+      <a href="rec-applicants.html" class="active">Applicants</a>
       <a href="rec-analytics.html">Analytics</a>
       <a href="rec-profile.html">Profile</a>
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>👥 Applicants</h2>
+    <!-- TOP -->
+    <div class="top-row">
 
-    <input 
-      type="text" 
-      id="search" 
-      placeholder="Search applicants..."
-      class="search-box"
-    >
+      <div>
+        <h1>👥 Applicants</h1>
+        <p class="muted">
+          Your talent radar is online 📡
+        </p>
+      </div>
 
-    <div id="appList"></div>
+      <input
+        type="text"
+        id="search"
+        class="search-box"
+        placeholder="Search applicants..."
+      >
 
-  </div>
+    </div>
+
+
+
+    <!-- STATS -->
+    <section class="grid mini-grid">
+
+      <div class="card mini-card">
+        <h3>Total</h3>
+        <p id="totalCount">0</p>
+      </div>
+
+      <div class="card mini-card">
+        <h3>Shortlisted</h3>
+        <p id="shortCount">0</p>
+      </div>
+
+      <div class="card mini-card">
+        <h3>Rejected</h3>
+        <p id="rejectCount">0</p>
+      </div>
+
+    </section>
+
+
+
+    <!-- APPLICANTS -->
+    <section
+      id="appList"
+      class="app-grid"
+    ></section>
+
+  </main>
 
 </div>
 
 
+
 <script type="module">
 
-import { db, logoutUser, protectPage, updateApplicationStatus } from "./firebase.js";
-import { 
-  getDocs, 
-  collection, 
-  updateDoc, 
-  doc 
+import {
+  db,
+  logoutUser,
+  getSession,
+  updateApplicationStatus
+} from "./firebase.js";
+
+import {
+  getDocs,
+  collection
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// protect
-protectPage("recruiter");
 
-// logout
-document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+/* =========================
+   PAGE PROTECT
+========================= */
 
+const user = getSession();
 
-// session
-function getSession(){
-  try {
-    return JSON.parse(localStorage.getItem("session"));
-  } catch {
-    return null;
-  }
+if(!user){
+  window.location.href =
+    "rec-applicants.html";
 }
 
+if(user && user.role !== "recruiter"){
+  window.location.href =
+    "index.html";
+}
+
+
+/* =========================
+   LOGOUT
+========================= */
+
+document.getElementById("logoutBtn")
+.addEventListener("click", logoutUser);
+
+
+
+/* =========================
+   DATA
+========================= */
 
 let allApps = [];
 
 
-// LOAD
+
+/* =========================
+   LOAD APPLICANTS
+========================= */
+
 async function loadApplicants(){
 
-  const user = getSession();
-  const list = document.getElementById("appList");
+  const list =
+    document.getElementById("appList");
 
-  list.innerHTML = "Loading...";
+  list.innerHTML =
+    `<p class="loading-text">
+      Loading applicants...
+    </p>`;
 
-  try {
+  try{
 
-    // 1️⃣ get jobs of recruiter
-    const jobsSnap = await getDocs(collection(db, "jobs"));
+    /* recruiter jobs */
+    const jobsSnap =
+      await getDocs(collection(db,"jobs"));
 
     let myJobIds = [];
 
-    jobsSnap.forEach(d => {
-      const j = d.data();
-      if(j.recruiter === user.email){
-        myJobIds.push(d.id);
+    jobsSnap.forEach(item => {
+
+      const job = item.data();
+
+      if(job.recruiter === user.email){
+        myJobIds.push(item.id);
       }
+
     });
 
 
-    // 2️⃣ get applications
-    const appsSnap = await getDocs(collection(db, "applications"));
+    /* applications */
+    const appsSnap =
+      await getDocs(
+        collection(db,"applications")
+      );
 
     allApps = [];
 
-    appsSnap.forEach(d => {
-      const a = d.data();
+    appsSnap.forEach(item => {
 
-      if(myJobIds.includes(a.jobId)){
+      const app = item.data();
+
+      if(myJobIds.includes(app.jobId)){
+
         allApps.push({
-          id: d.id,
-          ...a
+          id: item.id,
+          ...app
         });
+
       }
+
     });
 
+    updateStats(allApps);
     renderApps(allApps);
 
-  } catch (err){
-    console.log(err);
-    list.innerHTML = "Error loading applicants ❌";
+  }catch(err){
+
+    console.error(err);
+
+    list.innerHTML =
+      `<p class="loading-text">
+        Failed to load ❌
+      </p>`;
+
   }
 
 }
 
 
-// RENDER
+
+/* =========================
+   STATS
+========================= */
+
+function updateStats(apps){
+
+  document.getElementById("totalCount")
+  .innerText = apps.length;
+
+  document.getElementById("shortCount")
+  .innerText =
+    apps.filter(a =>
+      a.status === "Shortlisted"
+    ).length;
+
+  document.getElementById("rejectCount")
+  .innerText =
+    apps.filter(a =>
+      a.status === "Rejected"
+    ).length;
+
+}
+
+
+
+/* =========================
+   RENDER
+========================= */
+
 function renderApps(apps){
 
-  const list = document.getElementById("appList");
+  const list =
+    document.getElementById("appList");
 
   if(apps.length === 0){
-    list.innerHTML = "No applicants found 😢";
+
+    list.innerHTML =
+      `<p class="loading-text">
+        No applicants found 😢
+      </p>`;
+
     return;
   }
 
-  list.innerHTML = apps.map(a => {
-  
-  const skills = Array.isArray(a.skills) ?
-    a.skills.join(", ") :
-    a.skills || "N/A";
-  
-  return `
-    <div class="card app-card">
+  list.innerHTML =
+    apps.map(app => {
 
-      <h3>${a.user}</h3>
+      const skills =
+        Array.isArray(app.skills)
+        ? app.skills.join(", ")
+        : (app.skills || "N/A");
 
-      <p><b>Skills:</b> ${skills}</p>
-      <p><b>Experience:</b> ${a.experience || "0"} yrs</p>
-      <p><b>Status:</b> ${a.status}</p>
+      const status =
+        app.status || "Applied";
 
-      <div class="btn-group">
-        <button onclick="updateStatus('${a.id}', 'Shortlisted')">
-          Shortlist ✅
-        </button>
+      return `
 
-        <button onclick="updateStatus('${a.id}', 'Rejected')">
-          Reject ❌
-        </button>
+      <div class="card applicant-card">
+
+        <div class="head-row">
+
+          <div>
+            <h3>
+              ${app.name || app.user || "Applicant"}
+            </h3>
+
+            <p class="mail">
+              ${app.email || app.user || ""}
+            </p>
+          </div>
+
+          <span class="status-chip ${status.toLowerCase()}">
+            ${status}
+          </span>
+
+        </div>
+
+        <p>
+          <b>Job:</b>
+          ${app.jobTitle || "Applied Job"}
+        </p>
+
+        <p>
+          <b>Skills:</b>
+          ${skills}
+        </p>
+
+        <p>
+          <b>Experience:</b>
+          ${app.experience || 0} yrs
+        </p>
+
+        <div class="btn-row">
+
+          <button
+            class="green-btn actionBtn"
+            data-id="${app.id}"
+            data-status="Shortlisted"
+          >
+            Shortlist ✅
+          </button>
+
+          <button
+            class="red-btn actionBtn"
+            data-id="${app.id}"
+            data-status="Rejected"
+          >
+            Reject ❌
+          </button>
+
+        </div>
+
       </div>
 
-    </div>
-  `;
-}).join("");
+      `;
+
+    }).join("");
+
+  attachActionEvents();
 
 }
 
 
-// UPDATE STATUS
-window.updateStatus = async function(id, status){
 
-  try {
-    await updateApplicationStatus(id, status);
-    alert("Updated 🚀");
-    loadApplicants();
+/* =========================
+   ACTION EVENTS
+========================= */
 
-  } catch {
-    alert("Failed ❌");
-  }
+function attachActionEvents(){
 
-}
+  document
+  .querySelectorAll(".actionBtn")
+  .forEach(btn => {
 
+    btn.addEventListener(
+      "click",
+      async ()=>{
 
-// SEARCH
-document.getElementById("search")
-  .addEventListener("input", (e) => {
-    
-    const val = e.target.value.toLowerCase();
-    
-    if (val === "") {
-      renderApps(allApps);
-      return;
-    }
-    
-    const filtered = allApps.filter(a => {
-      
-      const email = a.user?.toLowerCase() || "";
-      
-      const skills = Array.isArray(a.skills) ?
-        a.skills.join(" ").toLowerCase() :
-        (a.skills || "").toLowerCase();
-      
-      const status = a.status?.toLowerCase() || "";
-      
-      return (
-        email.includes(val) ||
-        skills.includes(val) ||
-        status.includes(val)
-      );
-      
-    });
-    
-    renderApps(filtered);
-    
+        const id =
+          btn.dataset.id;
+
+        const status =
+          btn.dataset.status;
+
+        btn.disabled = true;
+        btn.innerText =
+          "Updating...";
+
+        try{
+
+          await updateApplicationStatus(
+            id,
+            status
+          );
+
+          loadApplicants();
+
+        }catch(err){
+
+          console.error(err);
+
+          btn.disabled = false;
+          btn.innerText =
+            "Retry";
+
+          alert(
+            "Update failed ❌"
+          );
+
+        }
+
+      }
+    );
+
   });
 
+}
 
-// INIT
+
+
+/* =========================
+   SEARCH
+========================= */
+
+document.getElementById("search")
+.addEventListener("input",(e)=>{
+
+  const val =
+    e.target.value
+    .toLowerCase()
+    .trim();
+
+  if(!val){
+    updateStats(allApps);
+    renderApps(allApps);
+    return;
+  }
+
+  const filtered =
+    allApps.filter(app => {
+
+      const name =
+        (app.name ||
+        app.user ||
+        "").toLowerCase();
+
+      const email =
+        (app.email ||
+        app.user ||
+        "").toLowerCase();
+
+      const skills =
+        Array.isArray(app.skills)
+        ? app.skills.join(" ")
+            .toLowerCase()
+        : (app.skills || "")
+            .toLowerCase();
+
+      const status =
+        (app.status || "")
+        .toLowerCase();
+
+      const job =
+        (app.jobTitle || "")
+        .toLowerCase();
+
+      return (
+        name.includes(val) ||
+        email.includes(val) ||
+        skills.includes(val) ||
+        status.includes(val) ||
+        job.includes(val)
+      );
+
+    });
+
+  updateStats(filtered);
+  renderApps(filtered);
+
+});
+
+
+/* =========================
+   INIT
+========================= */
+
 loadApplicants();
 
 </script>
