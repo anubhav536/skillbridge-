@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact | SkillBridge AI</title>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -9,76 +10,87 @@
 <body>
 
 <!-- NAVBAR -->
-<nav>
-  <h2>SkillBridge AI</h2>
-  <div>
+<nav class="navbar">
+
+  <h2>🚀 SkillBridge AI</h2>
+
+  <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
+    <a href="contact.html" class="active">Contact</a>
   </div>
+
 </nav>
 
-<hr>
+<!-- CONTACT SECTION -->
+<section class="contact-section">
 
-<!-- MAIN -->
-<section>
+  <div class="contact-left">
 
-  <h1>📩 Contact Us</h1>
+    <h1>📩 Contact Us</h1>
 
-  <p>
-    Have questions, suggestions, or feedback?  
-    We'd love to hear from you!
-  </p>
+    <p>
+      Have questions, ideas, feedback, or partnership plans?  
+      Send us a message and we’ll get back soon.
+    </p>
 
-  <!-- FORM -->
-  <form onsubmit="sendMessage(event)">
+    <div class="info-box">
+      <p>📧 support@skillbridge.ai</p>
+      <p>📍 India</p>
+      <p>⏰ Mon - Sat | 10 AM to 7 PM</p>
+    </div>
 
-    <label>Name:</label><br>
-    <input type="text" id="cname" required><br><br>
+  </div>
 
-    <label>Email:</label><br>
-    <input type="email" id="cemail" required><br><br>
 
-    <label>Message:</label><br>
-    <textarea id="cmsg" rows="5" required></textarea><br><br>
+  <div class="contact-right">
 
-    <button type="submit">Send Message 🚀</button>
+    <form class="contact-form" onsubmit="sendMessage(event)">
 
-  </form>
+      <label>Full Name</label>
+      <input type="text" id="cname" placeholder="Enter your name" required>
 
-  <br>
+      <label>Email Address</label>
+      <input type="email" id="cemail" placeholder="Enter your email" required>
 
-  <!-- INFO -->
-  <div>
-    <p>📧 Email: support@skillbridge.ai</p>
-    <p>📍 Location: India</p>
+      <label>Your Message</label>
+      <textarea id="cmsg" rows="6" placeholder="Write your message..." required></textarea>
+
+      <button type="submit">Send Message 🚀</button>
+
+    </form>
+
   </div>
 
 </section>
 
-<hr>
-
 <!-- FOOTER -->
-<footer>
-  <p>© 2026 SkillBridge AI</p>
+<footer class="footer">
+  <p>© 2026 SkillBridge AI. All rights reserved.</p>
 </footer>
-
-<!-- JS -->
-<script src="script.js"></script>
 
 <script>
 function sendMessage(e){
+
   e.preventDefault();
 
-  let name = document.getElementById("cname").value;
-  let email = document.getElementById("cemail").value;
-  let msg = document.getElementById("cmsg").value;
+  const btn = document.querySelector(".contact-form button");
 
-  alert("Message sent successfully 🚀");
+  btn.innerText = "Sending...";
+  btn.disabled = true;
 
-  // reset form
-  document.getElementById("cname").value = "";
-  document.getElementById("cemail").value = "";
-  document.getElementById("cmsg").value = "";
+  setTimeout(() => {
+
+    alert("Message sent successfully 🚀");
+
+    document.getElementById("cname").value = "";
+    document.getElementById("cemail").value = "";
+    document.getElementById("cmsg").value = "";
+
+    btn.innerText = "Send Message 🚀";
+    btn.disabled = false;
+
+  }, 1200);
 }
 </script>
 
