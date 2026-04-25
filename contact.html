@@ -1,17 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Contact | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+/* CONTACT PAGE CUSTOM DESIGN */
+.contact-section{
+  width:min(1200px,92%);
+  margin:auto;
+  padding:70px 0;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:28px;
+  align-items:start;
+}
+
+.contact-left,
+.contact-right{
+  background:rgba(30,41,59,.95);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:22px;
+  padding:32px;
+  box-shadow:0 20px 40px rgba(0,0,0,.20);
+}
+
+.contact-left{
+  background:
+  radial-gradient(circle at top right,rgba(59,130,246,.18),transparent 30%),
+  rgba(30,41,59,.95);
+}
+
+.contact-left h1{
+  font-size:42px;
+  margin-bottom:14px;
+}
+
+.contact-left p{
+  color:var(--muted);
+  line-height:1.8;
+  font-size:16px;
+}
+
+.info-box{
+  margin-top:28px;
+  display:grid;
+  gap:14px;
+}
+
+.info-item{
+  padding:16px;
+  border-radius:16px;
+  background:#0b1220;
+  border:1px solid var(--line);
+  font-size:15px;
+  color:#e2e8f0;
+}
+
+.contact-right h2{
+  font-size:28px;
+  margin-bottom:6px;
+}
+
+.form-sub{
+  color:var(--muted);
+  margin-bottom:22px;
+}
+
+.contact-form{
+  display:flex;
+  flex-direction:column;
+}
+
+.contact-form label{
+  margin:14px 0 8px;
+  font-weight:700;
+  font-size:14px;
+}
+
+.contact-form input,
+.contact-form textarea{
+  background:#0b1220;
+  border:1px solid var(--line);
+  color:#fff;
+  padding:14px;
+  border-radius:14px;
+  transition:.25s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus{
+  border-color:#3b82f6;
+  box-shadow:0 0 0 4px rgba(59,130,246,.15);
+}
+
+.contact-form textarea{
+  min-height:150px;
+}
+
+.contact-form button{
+  margin-top:20px;
+  padding:15px;
+  border:none;
+  border-radius:14px;
+  background:linear-gradient(135deg,#2563eb,#1d4ed8);
+  color:#fff;
+  font-weight:800;
+  font-size:15px;
+  cursor:pointer;
+  transition:.25s;
+}
+
+.contact-form button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 25px rgba(37,99,235,.30);
+}
+
+.quick-stats{
+  margin-top:26px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+}
+
+.stat{
+  background:#0b1220;
+  border:1px solid var(--line);
+  padding:14px;
+  border-radius:14px;
+  text-align:center;
+}
+
+.stat h3{
+  color:#60a5fa;
+  font-size:22px;
+}
+
+.stat span{
+  color:var(--muted);
+  font-size:13px;
+}
+
+@media(max-width:900px){
+  .contact-section{
+    grid-template-columns:1fr;
+    padding:50px 0;
+  }
+
+  .contact-left h1{
+    font-size:34px;
+  }
+}
+
+@media(max-width:500px){
+  .contact-left,
+  .contact-right{
+    padding:22px;
+    border-radius:18px;
+  }
+
+  .quick-stats{
+    grid-template-columns:1fr;
+  }
+}
+</style>
 </head>
 
 <body>
 
 <!-- NAVBAR -->
 <nav class="navbar">
-
   <h2>🚀 SkillBridge AI</h2>
 
   <div class="nav-links">
@@ -19,42 +179,63 @@
     <a href="about.html">About</a>
     <a href="contact.html" class="active">Contact</a>
   </div>
-
 </nav>
 
-<!-- CONTACT SECTION -->
+<!-- CONTACT PAGE -->
 <section class="contact-section">
 
+  <!-- LEFT -->
   <div class="contact-left">
 
     <h1>📩 Contact Us</h1>
 
     <p>
-      Have questions, ideas, feedback, or partnership plans?  
-      Send us a message and we’ll get back soon.
+      Questions, collabs, feedback, startup ideas, hiring plans?  
+      Send us a message. We reply faster than cold chai gets cold.
     </p>
 
     <div class="info-box">
-      <p>📧 support@skillbridge.ai</p>
-      <p>📍 India</p>
-      <p>⏰ Mon - Sat | 10 AM to 7 PM</p>
+      <div class="info-item">📧 support@skillbridge.ai</div>
+      <div class="info-item">📍 India</div>
+      <div class="info-item">⏰ Mon - Sat | 10 AM to 7 PM</div>
+      <div class="info-item">🤝 Partnerships & Brand Collaborations Open</div>
+    </div>
+
+    <div class="quick-stats">
+      <div class="stat">
+        <h3>24h</h3>
+        <span>Reply Time</span>
+      </div>
+
+      <div class="stat">
+        <h3>99%</h3>
+        <span>Support Rate</span>
+      </div>
+
+      <div class="stat">
+        <h3>500+</h3>
+        <span>Users Helped</span>
+      </div>
     </div>
 
   </div>
 
-
+  <!-- RIGHT -->
   <div class="contact-right">
+
+    <h2>Send Message 🚀</h2>
+    <p class="form-sub">Fill the form and our team will reach out soon.</p>
 
     <form class="contact-form" onsubmit="sendMessage(event)">
 
       <label>Full Name</label>
-      <input type="text" id="cname" placeholder="Enter your name" required>
+      <input type="text" id="cname" placeholder="Enter your full name" required>
 
       <label>Email Address</label>
-      <input type="email" id="cemail" placeholder="Enter your email" required>
+      <input type="email" id="cemail" placeholder="Enter your email address" required>
 
       <label>Your Message</label>
-      <textarea id="cmsg" rows="6" placeholder="Write your message..." required></textarea>
+      <textarea id="cmsg" placeholder="Tell us what's on your mind..." required></textarea>
 
       <button type="submit">Send Message 🚀</button>
 
@@ -71,7 +252,6 @@
 
 <script>
 function sendMessage(e){
-
   e.preventDefault();
 
   const btn = document.querySelector(".contact-form button");
@@ -80,7 +260,6 @@ function sendMessage(e){
   btn.disabled = true;
 
   setTimeout(() => {
-
     alert("Message sent successfully 🚀");
 
     document.getElementById("cname").value = "";
@@ -89,8 +268,7 @@ function sendMessage(e){
 
     btn.innerText = "Send Message 🚀";
     btn.disabled = false;
-
-  }, 1200);
+  },1200);
 }
 </script>
 
