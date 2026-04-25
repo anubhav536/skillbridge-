@@ -2,30 +2,29 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Recruiter Dashboard | SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruiter Dashboard | SkillBridge AI</title>
 
-  <!-- NO CACHE FIX -->
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta http-equiv="Expires" content="0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=92">
 </head>
 
-<body>
+<body class="rec-dashboard-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
 
     <h2>🏢 Recruiter Panel</h2>
 
     <nav>
-      <a href="rec-dashboard.html">Dashboard</a>
+      <a href="rec-dashboard.html" class="active">Dashboard</a>
       <a href="rec-post-job.html">Post Job</a>
       <a href="rec-manage-jobs.html">Manage Jobs</a>
       <a href="rec-applicants.html">Applicants</a>
@@ -35,124 +34,331 @@
 
     <button id="logoutBtn">Logout 👋</button>
 
-  </div>
+  </aside>
+
 
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>📊 Dashboard Overview</h2>
+    <!-- top -->
+    <div class="hero-row">
 
-    <p id="welcome">Loading...</p>
-
-    <!-- GRID -->
-    <div class="grid">
-
-      <div class="card">
-        <h3>📦 Jobs Posted</h3>
-        <p id="totalJobs">Loading...</p>
+      <div>
+        <h1>📊 Dashboard Overview</h1>
+        <p id="welcome" class="muted">
+          Loading...
+        </p>
       </div>
 
-      <div class="card">
-        <h3>👥 Total Applicants</h3>
-        <p id="totalApps">Loading...</p>
-      </div>
-
-      <div class="card">
-        <h3>📈 Hiring Rate</h3>
-        <p id="hiringRate">Loading...</p>
+      <div class="pulse-pill">
+        🚀 Hiring Engine Active
       </div>
 
     </div>
 
-  </div>
+
+
+    <!-- stats -->
+    <section class="grid stat-grid">
+
+      <div class="card stat-card">
+        <h3>📦 Jobs Posted</h3>
+        <p id="totalJobs">0</p>
+      </div>
+
+      <div class="card stat-card">
+        <h3>👥 Applicants</h3>
+        <p id="totalApps">0</p>
+      </div>
+
+      <div class="card stat-card">
+        <h3>📈 Hiring Rate</h3>
+        <p id="hiringRate">0%</p>
+      </div>
+
+      <div class="card stat-card">
+        <h3>🔥 Shortlisted</h3>
+        <p id="shortlisted">0</p>
+      </div>
+
+    </section>
+
+
+
+    <!-- lower cards -->
+    <section class="grid lower-grid">
+
+      <div class="card">
+        <h3>🎯 Hiring Funnel</h3>
+
+        <div class="bar-box">
+          <span>Applicants</span>
+          <div class="track">
+            <div id="barApps"></div>
+          </div>
+        </div>
+
+        <div class="bar-box">
+          <span>Shortlisted</span>
+          <div class="track">
+            <div id="barShort"></div>
+          </div>
+        </div>
+
+        <div class="bar-box">
+          <span>Hired</span>
+          <div class="track">
+            <div id="barHire"></div>
+          </div>
+        </div>
+
+      </div>
+
+
+
+      <div class="card">
+        <h3>🧠 AI Suggestions</h3>
+
+        <ul class="tips">
+          <li id="tip1">Loading...</li>
+          <li id="tip2"></li>
+          <li id="tip3"></li>
+        </ul>
+
+      </div>
+
+    </section>
+
+  </main>
 
 </div>
 
 
-<!-- SCRIPT -->
+
 <script type="module">
 
-import { db, logoutUser, protectPage, getSession } from "./firebase.js";
-import { getDocs, collection } 
-from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  db,
+  logoutUser,
+  protectPage,
+  getSession
+} from "./firebase.js";
+
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 
-// 🔥 PROTECT PAGE
 protectPage("recruiter");
 
 
-// LOGOUT
 document.getElementById("logoutBtn")
-  .addEventListener("click", logoutUser);
+.addEventListener("click", logoutUser);
 
 
-// SAFE TEXT SET
-function setText(id, value) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = value;
+
+function setText(id,val){
+
+  const el =
+    document.getElementById(id);
+
+  if(el) el.innerText = val;
+
 }
 
 
-// MAIN LOGIC
-async function loadRecruiterDashboard() {
+
+async function loadRecruiterDashboard(){
 
   const user = getSession();
 
-  setText("welcome", "Welcome " + user.name);
+  if(!user){
+    location.href =
+      "rec-dashboard.html";
+    return;
+  }
 
-  try {
+  setText(
+    "welcome",
+    "Welcome " +
+    (user.name || "Recruiter")
+  );
 
-    // ================= JOBS =================
-    const jobsSnap = await getDocs(collection(db, "jobs"));
+  try{
+
+    /* JOBS */
+    const jobsSnap =
+      await getDocs(collection(db,"jobs"));
 
     let myJobIds = [];
 
     jobsSnap.forEach(doc => {
+
       const j = doc.data();
 
-      if (j.recruiter === user.email) {
+      if(j.recruiter === user.email){
         myJobIds.push(doc.id);
       }
+
     });
 
-    setText("totalJobs", myJobIds.length);
+    setText(
+      "totalJobs",
+      myJobIds.length
+    );
 
 
-    // ================= APPLICATIONS =================
-    const appsSnap = await getDocs(collection(db, "applications"));
+
+    /* APPLICATIONS */
+    const appsSnap =
+      await getDocs(
+        collection(db,"applications")
+      );
 
     let myApps = [];
 
     appsSnap.forEach(doc => {
+
       const a = doc.data();
 
-      if (myJobIds.includes(a.jobId)) {
+      if(myJobIds.includes(a.jobId)){
         myApps.push(a);
       }
+
     });
 
-    setText("totalApps", myApps.length);
+    const totalApps =
+      myApps.length;
+
+    setText(
+      "totalApps",
+      totalApps
+    );
 
 
-    // ================= HIRING RATE =================
-    const hired = myApps.filter(a => a.status === "Hired").length;
 
-    const rate = myApps.length
-      ? Math.round((hired / myApps.length) * 100)
+    /* STATUS COUNTS */
+    const shortlisted =
+      myApps.filter(a =>
+        a.status === "Shortlisted"
+      ).length;
+
+    const hired =
+      myApps.filter(a =>
+        a.status === "Hired"
+      ).length;
+
+    setText(
+      "shortlisted",
+      shortlisted
+    );
+
+
+
+    /* RATE */
+    const rate =
+      totalApps
+      ? Math.round(
+          (hired / totalApps) * 100
+        )
       : 0;
 
-    setText("hiringRate", rate + "%");
+    setText(
+      "hiringRate",
+      rate + "%"
+    );
 
 
-  } catch (err) {
-    console.log("Silent Error:", err);
+
+    /* BARS */
+    const max =
+      totalApps || 1;
+
+    document.getElementById("barApps")
+    .style.width =
+      (totalApps/max)*100 + "%";
+
+    document.getElementById("barShort")
+    .style.width =
+      (shortlisted/max)*100 + "%";
+
+    document.getElementById("barHire")
+    .style.width =
+      (hired/max)*100 + "%";
+
+
+
+    /* AI TIPS */
+    if(totalApps === 0){
+
+      setText(
+        "tip1",
+        "Post a job to attract candidates 🚀"
+      );
+
+      setText(
+        "tip2",
+        "Mention salary for higher clicks."
+      );
+
+      setText(
+        "tip3",
+        "Use clear job titles."
+      );
+
+    }
+
+    else if(rate < 20){
+
+      setText(
+        "tip1",
+        "Hiring rate is low."
+      );
+
+      setText(
+        "tip2",
+        "Respond faster to applicants."
+      );
+
+      setText(
+        "tip3",
+        "Refine job requirements."
+      );
+
+    }
+
+    else{
+
+      setText(
+        "tip1",
+        "Strong pipeline detected 🔥"
+      );
+
+      setText(
+        "tip2",
+        "Scale hiring campaigns now."
+      );
+
+      setText(
+        "tip3",
+        "Top candidates ready to convert."
+      );
+
+    }
+
+  }
+
+  catch(err){
+
+    console.log(err);
+
   }
 
 }
 
 
-// LOAD
 loadRecruiterDashboard();
 
 </script>
