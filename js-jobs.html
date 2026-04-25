@@ -5,21 +5,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jobs | SkillBridge AI</title>
-
-  <link rel="stylesheet" href="style.css?v=12">
+  <link rel="stylesheet" href="style.css?v=41">
 </head>
 
-<body>
+<body class="jobs-page">
 
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <div class="sidebar">
+  <aside class="sidebar">
+
     <h2>👨‍🎓 Job Seeker Panel</h2>
 
     <nav>
       <a href="js-dashboard.html">Dashboard</a>
-      <a href="js-jobs.html">Jobs</a>
+      <a href="js-jobs.html" class="active">Jobs</a>
       <a href="js-applications.html">Applications</a>
       <a href="js-resume.html">Resume Builder</a>
       <a href="js-analytics.html">Analytics</a>
@@ -27,159 +27,395 @@
     </nav>
 
     <button id="logoutBtn">Logout 👋</button>
-  </div>
+
+  </aside>
 
   <!-- MAIN -->
-  <div class="main">
+  <main class="main">
 
-    <h2>💼 Available Jobs</h2>
+    <!-- TOP -->
+    <div class="jobs-top">
 
-    <input type="text" id="search" placeholder="Search jobs..." />
+      <div>
+        <h1>💼 Available Jobs</h1>
+        <p>Fresh openings waiting for your click.</p>
+      </div>
 
-    <div id="jobsContainer" class="grid"></div>
+      <div class="jobs-badge">
+        🚀 AI Matched Listings
+      </div>
 
-  </div>
+    </div>
+
+    <!-- FILTER -->
+    <div class="filter-bar">
+
+      <input
+        type="text"
+        id="search"
+        placeholder="Search title or skills..."
+      >
+
+      <select id="sortJobs">
+        <option value="new">Newest First</option>
+        <option value="az">A to Z</option>
+      </select>
+
+    </div>
+
+    <!-- MINI STATS -->
+    <div class="mini-stats">
+
+      <div class="mini-box">
+        <span id="totalJobs">0</span>
+        <small>Total Jobs</small>
+      </div>
+
+      <div class="mini-box">
+        <span id="shownJobs">0</span>
+        <small>Showing</small>
+      </div>
+
+    </div>
+
+    <!-- JOBS -->
+    <div id="jobsContainer" class="jobs-grid"></div>
+
+  </main>
 
 </div>
+
 <script type="module">
 
-import { db, getSession, applyJob,logoutUser } from "./firebase.js";
-import { getDocs, collection } 
-from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  db,
+  getSession,
+  applyJob,
+  logoutUser
+} from "./firebase.js";
 
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+
+/* =========================
+   SAFE PAGE PROTECTION
+========================= */
+
+const user = getSession();
+
+if(!user){
+  window.location.href = "js-jobs.html";
+}
+
+if(user && user.role !== "seeker"){
+  window.location.href = "index.html";
+}
+
+
+/* LOGOUT */
+document.getElementById("logoutBtn")
+.addEventListener("click", logoutUser);
+
+
+/* GLOBAL */
 let allJobs = [];
 
-window.addEventListener("DOMContentLoaded", async () => {
-  
-  document.getElementById("logoutBtn")
-    .addEventListener("click", logoutUser);
-  
-  // baaki code...
 
-  const searchBox = document.getElementById("search"); // ✅ FIXED
-  const container = document.getElementById("jobsContainer");
+/* START */
+window.addEventListener("DOMContentLoaded", async ()=>{
 
-  if (!searchBox || !container) {
-    console.log("HTML id mismatch ❌");
-    return;
-  }
+  await loadJobs();
 
-  // LOAD JOBS
-  const snap = await getDocs(collection(db, "jobs"));
+  document.getElementById("search")
+  .addEventListener("input", filterJobs);
 
-  snap.forEach(doc => {
-  allJobs.push({
-    id: doc.id,   // 🔥 THIS IS IMPORTANT
-    ...doc.data()
-  });
+  document.getElementById("sortJobs")
+  .addEventListener("change", filterJobs);
+
 });
 
-  renderJobs(allJobs);
 
-  // SEARCH
-  searchBox.addEventListener("input", (e) => {
+/* =========================
+   LOAD JOBS
+========================= */
 
-    const value = e.target.value.toLowerCase();
+async function loadJobs(){
 
-    if (value === "") {
-      renderJobs(allJobs);
-      return;
-    }
+  const container =
+    document.getElementById("jobsContainer");
 
-    const filtered = allJobs.filter(job => {
+  container.innerHTML =
+    `<p class="loading-text">Loading jobs...</p>`;
 
-      const title = job.title?.toLowerCase() || "";
-      const skills = job.skills?.join(" ").toLowerCase() || "";
+  try{
 
-      return title.includes(value) || skills.includes(value);
+    const snap =
+      await getDocs(collection(db,"jobs"));
+
+    allJobs = [];
+
+    snap.forEach(docSnap=>{
+
+      allJobs.push({
+        id: docSnap.id,
+        ...docSnap.data()
+      });
 
     });
 
-    renderJobs(filtered);
+    document.getElementById("totalJobs")
+    .innerText = allJobs.length;
 
-  });
+    filterJobs();
 
-});
+  }catch(err){
+
+    console.error(err);
+
+    container.innerHTML =
+      `<p class="loading-text">
+        Failed to load jobs ❌
+      </p>`;
+
+  }
+
+}
 
 
-// RENDER FUNCTION
+/* =========================
+   FILTER + SORT
+========================= */
+
+function filterJobs(){
+
+  const search =
+    document.getElementById("search")
+    .value.toLowerCase().trim();
+
+  const sort =
+    document.getElementById("sortJobs").value;
+
+  let jobs = [...allJobs];
+
+  // search
+  if(search){
+
+    jobs = jobs.filter(job=>{
+
+      const title =
+        (job.title || "")
+        .toLowerCase();
+
+      const recruiter =
+        (job.recruiter || "")
+        .toLowerCase();
+
+      const skills =
+        Array.isArray(job.skills)
+          ? job.skills.join(" ").toLowerCase()
+          : "";
+
+      return (
+        title.includes(search) ||
+        recruiter.includes(search) ||
+        skills.includes(search)
+      );
+
+    });
+
+  }
+
+  // sort
+  if(sort === "az"){
+
+    jobs.sort((a,b)=>
+      (a.title || "")
+      .localeCompare(b.title || "")
+    );
+
+  }else{
+
+    jobs.sort((a,b)=>
+      (b.createdAt || 0) -
+      (a.createdAt || 0)
+    );
+
+  }
+
+  document.getElementById("shownJobs")
+  .innerText = jobs.length;
+
+  renderJobs(jobs);
+
+}
+
+
+/* =========================
+   RENDER JOBS
+========================= */
+
 function renderJobs(jobs){
 
-  const container = document.getElementById("jobsContainer");
-  container.innerHTML = "";
+  const container =
+    document.getElementById("jobsContainer");
 
   if(jobs.length === 0){
-    container.innerHTML = "<p>No jobs found 😢</p>";
+
+    container.innerHTML =
+      `<p class="loading-text">
+        No jobs found 😢
+      </p>`;
+
     return;
   }
 
-  jobs.forEach((job, index) => {
+  const appliedJobs =
+    JSON.parse(
+      localStorage.getItem("appliedJobs")
+    ) || [];
 
-    container.innerHTML += `
-      <div class="card">
-        <h3>${job.title}</h3>
-        <p>Skills: ${job.skills.join(", ")}</p>
-        <p>Posted by: ${job.recruiter}</p>
-        <button class="applyBtn" data-index="${index}">
-          Apply 🚀
-        </button>
+  container.innerHTML =
+    jobs.map((job,index)=>{
+
+      const applied =
+        appliedJobs.includes(job.id);
+
+      const skills =
+        Array.isArray(job.skills)
+        ? job.skills.map(skill =>
+            `<span class="tag">${skill}</span>`
+          ).join("")
+        : "";
+
+      return `
+
+      <div class="job-card">
+
+        <div class="job-head">
+
+          <h3>
+            ${job.title || "Untitled Job"}
+          </h3>
+
+          <span class="job-chip">
+            🔥 Hiring
+          </span>
+
+        </div>
+
+        <p class="company">
+          🏢 ${job.recruiter || "Company"}
+        </p>
+
+        <div class="tags">
+          ${skills}
+        </div>
+
+        <div class="job-actions">
+
+          <button
+            class="applyBtn ${applied ? 'done-btn' : ''}"
+            data-index="${index}"
+            ${applied ? "disabled" : ""}
+          >
+            ${applied ? "Applied ✅" : "Apply 🚀"}
+          </button>
+
+        </div>
+
       </div>
-    `;
 
-  });
+      `;
 
-  // 🔥 ADD EVENT LISTENER AFTER RENDER
-  document.querySelectorAll(".applyBtn").forEach(btn => {
+    }).join("");
 
-   btn.addEventListener("click", async () => {
-  
-  const index = btn.dataset.index;
-  const job = jobs[index];
-  const user = getSession();
-  
-  if (!user) {
-    alert("Login required ❌");
-    return;
-  }
-  
-  // ✅ duplicate check (correct place)
-  const alreadyApplied = JSON.parse(localStorage.getItem("appliedJobs")) || [];
-  
-  if (alreadyApplied.includes(job.id)) {
-    alert("Already applied ⚠️");
-    return;
-  }
-  
-  try {
-    
-    await applyJob({
-      jobId: job.id,
-      jobTitle: job.title,
-      recruiter: job.recruiter,
-      seeker: user.email,
-      skills: job.skills
+  attachApplyEvents(jobs);
+
+}
+
+
+/* =========================
+   APPLY JOB
+========================= */
+
+function attachApplyEvents(jobs){
+
+  document.querySelectorAll(".applyBtn")
+  .forEach(btn=>{
+
+    btn.addEventListener("click", async ()=>{
+
+      const index =
+        Number(btn.dataset.index);
+
+      const job = jobs[index];
+
+      const user = getSession();
+
+      if(!user){
+        location.href =
+          "jobseeker-login.html";
+        return;
+      }
+
+      let appliedJobs =
+        JSON.parse(
+          localStorage.getItem("appliedJobs")
+        ) || [];
+
+      if(appliedJobs.includes(job.id)){
+        alert("Already applied ⚠️");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "Applying...";
+
+      try{
+
+        await applyJob({
+
+          jobId: job.id,
+          jobTitle: job.title || "",
+          recruiter: job.recruiter || "",
+          seeker: user.email,
+          user: user.email,
+          skills: job.skills || [],
+          status: "Applied"
+
+        });
+
+        appliedJobs.push(job.id);
+
+        localStorage.setItem(
+          "appliedJobs",
+          JSON.stringify(appliedJobs)
+        );
+
+        btn.innerText = "Applied ✅";
+        btn.classList.add("done-btn");
+
+      }catch(err){
+
+        console.error(err);
+
+        btn.disabled = false;
+        btn.innerText = "Apply 🚀";
+
+        alert("Application failed ❌");
+
+      }
+
     });
-    
-    // ✅ save locally
-    alreadyApplied.push(job.id);
-    localStorage.setItem("appliedJobs", JSON.stringify(alreadyApplied));
-    
-    btn.innerText = "Applied ✅";
-    btn.disabled = true;
-    
-    alert("Applied successfully 🚀");
-    
-  } catch (err) {
-    console.log(err);
-    alert("Failed ❌");
-  }
-  
-});   
 
   });
 
 }
 
 </script>
+
 </body>
 </html>
