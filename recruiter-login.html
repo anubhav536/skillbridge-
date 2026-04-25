@@ -1,84 +1,141 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recruiter Login | SkillBridge AI</title>
 
-  <link rel="stylesheet" href="style.css?v=9">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Recruiter Login | SkillBridge AI</title>
+
+<link rel="stylesheet" href="style.css?v=96">
 </head>
 
-<body>
+<body class="rec-login-page">
 
 <!-- NAVBAR -->
-<nav>
+<nav class="navbar">
+
   <h2>🚀 SkillBridge AI</h2>
-  <div>
+
+  <div class="nav-links">
     <a href="index.html">Home</a>
     <a href="about.html">About</a>
   </div>
+
 </nav>
+
+
 
 <!-- LOGIN -->
 <section class="auth-container">
 
-  <div class="card login-card">
+  <div class="card login-card recruiter-card">
 
-    <h2>🏢 Recruiter Login</h2>
+    <div class="login-badge">
+      🏢 Recruiter Access
+    </div>
+
+    <h2>Recruiter Login</h2>
+
     <p class="subtitle">
-      Manage jobs & hire candidates
+      Manage jobs, review talent, hire smarter 🎯
     </p>
+
 
     <!-- EMAIL -->
     <label>Email</label>
-    <input type="email" id="email" placeholder="Enter Email">
+    <input
+      type="email"
+      id="email"
+      placeholder="Enter Email"
+    >
+
 
     <!-- PASSWORD -->
     <label>Password</label>
-    <input type="password" id="password" placeholder="Enter Password">
-    <!-- Forgot Password -->
-    <p style="text-align:right; margin-top:5px;">
-  <a href="#" id="forgotPassword" style="font-size:14px; color:#60A5FA;">
-    Forgot Password?
-  </a>
-</p>
+    <input
+      type="password"
+      id="password"
+      placeholder="Enter Password"
+    >
+
+
+    <!-- FORGOT -->
+    <p class="forgot-wrap">
+      <a href="#" id="forgotPassword">
+        Forgot Password?
+      </a>
+    </p>
+
 
     <!-- BUTTON -->
-    <button id="loginBtn">Login 🚀</button>
+    <button id="loginBtn" class="login-btn">
+      Login 🚀
+    </button>
+
 
     <!-- SIGNUP -->
     <p class="bottom-text">
       Don’t have an account?
-      <a href="recruiter-signup.html">Signup</a>
+      <a href="recruiter-signup.html">
+        Signup
+      </a>
     </p>
 
   </div>
 
 </section>
 
+
+
 <!-- FOOTER -->
-<footer>
-  <p> © 2026 SkillBridge AI</p>
+<footer class="footer">
+  <p>© 2026 SkillBridge AI</p>
 </footer>
+
+
 
 <!-- SCRIPT -->
 <script type="module">
-import { loginUser, resetPassword,checkSessionUI } from "./firebase.js";
+
+import {
+  loginUser,
+  resetPassword,
+  checkSessionUI
+} from "./firebase.js";
+
+
 checkSessionUI();
-  document.getElementById("loginBtn")
-    .addEventListener("click", () => loginUser(document.getElementById("loginBtn")));
-    document.getElementById("forgotPassword")
-  .addEventListener("click", () => {
 
-    const email = document.getElementById("email").value;
 
-    if (!email) {
-      alert("Input Email First 📩");
-      return;
-    }
+document.getElementById("loginBtn")
+.addEventListener("click", () => {
 
-    resetPassword(email);
+  loginUser(
+    document.getElementById("loginBtn")
+  );
+
 });
+
+
+document.getElementById("forgotPassword")
+.addEventListener("click", (e) => {
+
+  e.preventDefault();
+
+  const email =
+    document.getElementById("email")
+    .value.trim();
+
+  if(!email){
+    alert("Input Email First 📩");
+    return;
+  }
+
+  resetPassword(email);
+
+});
+
 </script>
 
 </body>
