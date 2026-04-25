@@ -126,14 +126,26 @@ export function getSession() {
 
 
 function redirectByRole(role) {
-
+  
   if (role === "seeker") {
     location.href = "js-dashboard.html";
-  } else {
-    location.href = "rec-dashboard.html";
+    return;
   }
-
+  
+  if (role === "recruiter") {
+    location.href = "rec-dashboard.html";
+    return;
+  }
+  
+  if (role === "admin") {
+    location.href = "admin-dashboard.html";
+    return;
+  }
+  
+  location.href = "index.html";
 }
+
+
 
 
 
