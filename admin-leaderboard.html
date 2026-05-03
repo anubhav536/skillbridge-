@@ -101,12 +101,9 @@ th,td{
 
 /* MOBILE */
 @media(max-width:768px){
-
   .sidebar{left:-100%;}
   .sidebar.active{left:0;}
-
   .main{margin-left:0;}
-
   .menu-btn{display:block;}
 }
 
@@ -144,7 +141,6 @@ th,td{
 <!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div class="top">
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>🏆 Leaderboard</h2>
@@ -154,21 +150,11 @@ th,td{
 <!-- JOB SEEKERS -->
 <div class="card">
   <h2>🔥 Top Job Seekers</h2>
-  <table>
+  <table id="jobseekersTable">
     <tr>
       <th>Rank</th>
       <th>Name</th>
       <th>Score</th>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>Anubhav</td>
-      <td>980</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Rahul</td>
-      <td>920</td>
     </tr>
   </table>
 </div>
@@ -176,21 +162,11 @@ th,td{
 <!-- RECRUITERS -->
 <div class="card">
   <h2>🏢 Top Recruiters</h2>
-  <table>
+  <table id="recruitersTable">
     <tr>
       <th>Rank</th>
       <th>Company</th>
       <th>Hires</th>
-    </tr>
-    <tr>
-      <td>1</td>
-      <td>TechCorp</td>
-      <td>45</td>
-    </tr>
-    <tr>
-      <td>2</td>
-      <td>Innova Ltd</td>
-      <td>38</td>
     </tr>
   </table>
 </div>
@@ -198,22 +174,92 @@ th,td{
 <!-- ACTIVE USERS -->
 <div class="card">
   <h2>⚡ Most Active Users</h2>
-  <table>
+  <table id="activeTable">
     <tr>
       <th>User</th>
       <th>Activity</th>
-    </tr>
-    <tr>
-      <td>user123@gmail.com</td>
-      <td>150 actions</td>
     </tr>
   </table>
 </div>
 
 </main>
-
 </div>
 
+<!-- 🔥 FIREBASE SCRIPT -->
+<script type="module">
+import { db } from "./firebase.js";
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+async function loadLeaderboard(){
+
+  const snap = await getDocs(collection(db,"leaderboard"));
+
+  let jobseekers = [];
+  let recruiters = [];
+  let activeUsers = [];
+
+  snap.forEach(doc=>{
+    const data = doc.data();
+
+    if(data.role === "jobseeker"){
+      jobseekers.push(data);
+    }
+    else if(data.role === "recruiter"){
+      recruiters.push(data);
+    }
+    else if(data.role === "active"){
+      activeUsers.push(data);
+    }
+  });
+
+  // 🔥 SORT BY SCORE
+  jobseekers.sort((a,b)=>b.score - a.score);
+  recruiters.sort((a,b)=>b.score - a.score);
+
+  // 🎯 RENDER JOB SEEKERS
+  const jsTable = document.getElementById("jobseekersTable");
+  jobseekers.forEach((u,i)=>{
+    jsTable.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${u.name}</td>
+        <td>${u.score}</td>
+      </tr>
+    `;
+  });
+
+  // 🎯 RENDER RECRUITERS
+  const rTable = document.getElementById("recruitersTable");
+  recruiters.forEach((u,i)=>{
+    rTable.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${u.name}</td>
+        <td>${u.score}</td>
+      </tr>
+    `;
+  });
+
+  // 🎯 ACTIVE USERS
+  const aTable = document.getElementById("activeTable");
+  activeUsers.forEach(u=>{
+    aTable.innerHTML += `
+      <tr>
+        <td>${u.name}</td>
+        <td>${u.score} actions</td>
+      </tr>
+    `;
+  });
+
+}
+
+loadLeaderboard();
+</script>
+
+<!-- MENU SCRIPT -->
 <script>
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
