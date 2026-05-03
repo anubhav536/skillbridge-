@@ -1,66 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Settings | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Settings | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:15px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-3px);
+}
+
+/* BUTTON */
+.btn{
+  display:inline-block;
+  padding:10px 16px;
+  background:#3b82f6;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  margin-top:15px;
+  border:none;
+  cursor:pointer;
+}
+
+/* INPUT */
+label{
+  display:block;
+  margin:10px 0;
+}
+
+select{
+  padding:8px;
+  border-radius:6px;
+  border:none;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>⚙️ Platform Settings</h1>
+<div class="dashboard">
 
-  <div class="card">
-    <h2>👤 User Settings</h2>
-    <label>
-      <input type="checkbox" checked>
-      Allow New User Signup
-    </label><br><br>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <label>
-      <input type="checkbox">
-      Require Admin Approval for Signup
-    </label>
-  </div>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html" class="active">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-  <div class="card">
-    <h2>💼 Job Settings</h2>
-    <label>
-      <input type="checkbox" checked>
-      Allow Job Posting
-    </label><br><br>
+<a href="index.html" class="btn">Logout 👋</a>
 
-    <label>
-      <input type="checkbox">
-      Manual Approval for Job Posts
-    </label>
-  </div>
+</aside>
 
-  <div class="card">
-    <h2>🔒 Security Settings</h2>
-    <label>
-      <input type="checkbox" checked>
-      Enable Fraud Detection System
-    </label><br><br>
+<!-- MAIN -->
+<main class="main">
 
-    <label>
-      <input type="checkbox">
-      Enable Email Verification
-    </label>
-  </div>
+<!-- TOP -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
 
-  <div class="card">
-    <h2>🛠 Platform Mode</h2>
-    <select>
-      <option>Live Mode</option>
-      <option>Maintenance Mode</option>
-    </select>
-  </div>
+  <h2>⚙ Platform Settings</h2>
+</div>
 
-  <button>💾 Save Settings</button>
+<!-- SETTINGS -->
+
+<div class="card">
+<h3>👤 User Settings</h3>
+
+<label><input type="checkbox" checked> Allow New User Signup</label>
+<label><input type="checkbox"> Require Admin Approval</label>
 
 </div>
+
+<div class="card">
+<h3>💼 Job Settings</h3>
+
+<label><input type="checkbox" checked> Allow Job Posting</label>
+<label><input type="checkbox"> Manual Job Approval</label>
+
+</div>
+
+<div class="card">
+<h3>🔒 Security Settings</h3>
+
+<label><input type="checkbox" checked> Enable Fraud Detection</label>
+<label><input type="checkbox"> Email Verification</label>
+
+</div>
+
+<div class="card">
+<h3>🛠 Platform Mode</h3>
+
+<select>
+<option>Live Mode</option>
+<option>Maintenance Mode</option>
+</select>
+
+</div>
+
+<button class="btn">💾 Save Settings</button>
+
+</main>
+
+</div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
