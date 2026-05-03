@@ -1,52 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>AI Control Panel | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Control Panel | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:18px;
+  border-radius:12px;
+  margin-bottom:20px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+/* INPUTS */
+input, select{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:none;
+}
+
+/* BUTTON */
+.btn{
+  padding:10px 16px;
+  background:#3b82f6;
+  border-radius:8px;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>🤖 AI Control Panel</h1>
+<div class="dashboard">
 
-  <div class="card">
-    <h2>📄 Resume Ranking System</h2>
-    <label>Experience Weight (%)</label>
-    <input type="range" min="0" max="100" value="50">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <label>Skills Weight (%)</label>
-    <input type="range" min="0" max="100" value="70">
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html" class="active">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-    <label>Education Weight (%)</label>
-    <input type="range" min="0" max="100" value="40">
-  </div>
+<a href="index.html" class="btn">Logout 👋</a>
 
-  <div class="card">
-    <h2>🎯 Job Recommendation Logic</h2>
-    <select>
-      <option>Skill Based</option>
-      <option>Location Based</option>
-      <option>Hybrid (AI Smart)</option>
-    </select>
-  </div>
+</aside>
 
-  <div class="card">
-    <h2>🚨 Fraud Detection Sensitivity</h2>
-    <input type="range" min="0" max="100" value="60">
-    <p>Higher value = Strict checking</p>
-  </div>
+<!-- MAIN -->
+<main class="main">
 
-  <div class="card">
-    <h2>⚡ Auto Shortlist Settings</h2>
-    <label>Minimum Match %</label>
-    <input type="number" value="70">
-  </div>
+<!-- TOP -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
 
-  <button>💾 Save Settings</button>
+  <h2>🤖 AI Control Panel</h2>
+</div>
+
+<!-- CARD 1 -->
+<div class="card">
+  <h3>📄 Resume Ranking</h3>
+
+  <label>Experience Weight (%)</label>
+  <input type="range" min="0" max="100" value="50">
+
+  <label>Skills Weight (%)</label>
+  <input type="range" min="0" max="100" value="70">
+
+  <label>Education Weight (%)</label>
+  <input type="range" min="0" max="100" value="40">
+</div>
+
+<!-- CARD 2 -->
+<div class="card">
+  <h3>🎯 Job Recommendation</h3>
+
+  <select>
+    <option>Skill Based</option>
+    <option>Location Based</option>
+    <option>Hybrid AI</option>
+  </select>
+</div>
+
+<!-- CARD 3 -->
+<div class="card">
+  <h3>🚨 Fraud Sensitivity</h3>
+
+  <input type="range" min="0" max="100" value="60">
+  <p style="font-size:12px;opacity:0.7;">Higher = stricter detection</p>
+</div>
+
+<!-- CARD 4 -->
+<div class="card">
+  <h3>⚡ Auto Shortlist</h3>
+
+  <label>Minimum Match %</label>
+  <input type="number" value="70">
+</div>
+
+<!-- SAVE -->
+<button class="btn">💾 Save Settings</button>
+
+</main>
 
 </div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
