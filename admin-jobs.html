@@ -1,143 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Jobs | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Jobs | SkillBridge AI</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: white;
-    }
+<style>
 
-    .admin-layout {
-      display: flex;
-      min-height: 100vh;
-    }
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-    .sidebar {
-      width: 260px;
-      background: #111827;
-      padding: 25px;
-    }
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
 
-    .sidebar h2 {
-      margin-bottom: 25px;
-    }
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
 
-    .sidebar nav a {
-      display: block;
-      color: #fff;
-      text-decoration: none;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      transition: 0.3s;
-    }
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
 
-    .sidebar nav a:hover {
-      background: #1e293b;
-    }
+.sidebar h2{margin-bottom:20px;}
 
-    #logoutBtn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #ef4444;
-      color: white;
-    }
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
 
-    .main {
-      flex: 1;
-      padding: 30px;
-    }
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
 
-    .main h2 {
-      margin-bottom: 20px;
-    }
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
 
-    #searchJob {
-      width: 320px;
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      margin-bottom: 25px;
-      outline: none;
-    }
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:18px;
+  border-radius:14px;
+  margin-bottom:16px;
+  transition:0.3s;
+}
 
-    .job-card {
-      background: #1e293b;
-      padding: 18px;
-      border-radius: 14px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.25);
-    }
+.card:hover{
+  transform:translateY(-4px);
+}
 
-    .job-card b {
-      font-size: 18px;
-    }
+/* INPUT */
+.input{
+  width:100%;
+  max-width:350px;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  margin-bottom:20px;
+  outline:none;
+}
 
-    .deleteBtn {
-      margin-top: 12px;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background: #dc2626;
-      color: white;
-    }
+/* BUTTONS */
+.btn{
+  padding:8px 14px;
+  background:#3b82f6;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
 
-    .deleteBtn:hover {
-      background: #b91c1c;
-    }
+.deleteBtn{
+  margin-top:12px;
+  background:#dc2626;
+}
 
-    .empty-box {
-      background: #1e293b;
-      padding: 20px;
-      border-radius: 12px;
-      color: #cbd5e1;
-    }
-  </style>
+.deleteBtn:hover{
+  background:#b91c1c;
+}
+
+/* EMPTY */
+.empty-box{
+  background:#1e293b;
+  padding:20px;
+  border-radius:12px;
+  color:#cbd5e1;
+}
+
+/* TOP */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.badge{
+  background:#3b82f6;
+  padding:5px 10px;
+  border-radius:20px;
+}
+
+/* MENU */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{left:-100%;}
+  .sidebar.active{left:0;}
+
+  .main{margin-left:0;}
+
+  .menu-btn{display:block;}
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="admin-layout">
+<div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <h2>👑 Admin Panel</h2>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html" class="active">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-    <nav>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="admin-users.html">Users</a>
-      <a href="admin-jobs.html">Jobs</a>
-      <a href="admin-applications.html">Applications</a>
-    </nav>
+<button id="logoutBtn" class="btn">Logout 👋</button>
 
-    <button id="logoutBtn">Logout 👋</button>
+</aside>
 
-  </aside>
+<!-- MAIN -->
+<main class="main">
 
-  <!-- MAIN -->
-  <main class="main">
+<!-- TOP -->
+<div class="top">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h2>💼 All Jobs</h2>
+  <span class="badge">Live</span>
+</div>
 
-    <h2>💼 All Jobs</h2>
+<input type="text" id="searchJob" class="input" placeholder="Search jobs...">
 
-    <input type="text" id="searchJob" placeholder="Search jobs...">
+<div id="jobsList"></div>
 
-    <div id="jobsList"></div>
-
-  </main>
+</main>
 
 </div>
 
@@ -156,57 +204,61 @@ document.getElementById("logoutBtn")
   .addEventListener("click", logoutUser);
 
 
+// MOBILE MENU
+window.toggleMenu = function(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+// AUTO CLOSE MENU
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+
+
 // LOAD JOBS
-async function loadAllJobs() {
+async function loadAllJobs(){
 
   const container = document.getElementById("jobsList");
   container.innerHTML = `<div class="empty-box">Loading jobs...</div>`;
 
-  try {
+  try{
 
-    const snapshot = await getDocs(collection(db, "jobs"));
+    const snapshot = await getDocs(collection(db,"jobs"));
 
     container.innerHTML = "";
 
-    if (snapshot.empty) {
-      container.innerHTML =
-        `<div class="empty-box">No jobs found 🚫</div>`;
+    if(snapshot.empty){
+      container.innerHTML = `<div class="empty-box">No jobs found 🚫</div>`;
       return;
     }
 
-    snapshot.forEach(d => {
+    snapshot.forEach(d=>{
 
       const j = d.data();
 
       const card = document.createElement("div");
-      card.className = "job-card";
+      card.className = "card";
 
       card.innerHTML = `
         <b>💼 ${j.title || "No Title"}</b><br><br>
-        🛠 Skills: ${j.skills?.join(", ") || "N/A"}<br>
-        💰 Salary: ${j.salary || "N/A"}<br>
+        🛠 ${j.skills?.join(", ") || "N/A"}<br>
+        💰 ${j.salary || "N/A"}<br>
 
-        <button class="deleteBtn">
-          🗑 Delete Job
-        </button>
+        <button class="btn deleteBtn">🗑 Delete</button>
       `;
 
       card.querySelector(".deleteBtn")
-        .addEventListener("click", async () => {
+        .addEventListener("click", async()=>{
 
           const ok = confirm("Delete this job?");
+          if(!ok) return;
 
-          if (!ok) return;
-
-          try {
-            await deleteDoc(doc(db, "jobs", d.id));
-            alert("Job Deleted ❌");
-            loadAllJobs();
-
-          } catch (err) {
-            console.error(err);
-            alert("Delete failed ❌");
-          }
+          await deleteDoc(doc(db,"jobs",d.id));
+          loadAllJobs();
 
         });
 
@@ -214,33 +266,24 @@ async function loadAllJobs() {
 
     });
 
-  } catch (err) {
-
-    console.error(err);
-
-    container.innerHTML =
-      `<div class="empty-box">Error loading jobs ❌</div>`;
+  }catch(err){
+    container.innerHTML = `<div class="empty-box">Error loading jobs ❌</div>`;
   }
 }
 
 
 // SEARCH
 document.getElementById("searchJob")
-  .addEventListener("keyup", function () {
+  .addEventListener("keyup",function(){
 
     const q = this.value.toLowerCase();
 
-    const jobs =
-      document.querySelectorAll(".job-card");
-
-    jobs.forEach(job => {
-
-      job.style.display =
-        job.innerText.toLowerCase().includes(q)
-        ? "block"
-        : "none";
-
-    });
+    document.querySelectorAll(".card")
+      .forEach(c=>{
+        c.style.display =
+          c.innerText.toLowerCase().includes(q)
+          ? "block" : "none";
+      });
 
   });
 
