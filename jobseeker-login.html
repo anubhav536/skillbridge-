@@ -304,7 +304,7 @@ document.getElementById("loginBtn")
     // ✅ ROLE SET
     localStorage.setItem("role", "jobseeker");
 
-    // 🚀 Redirect to job seeker dashboard
+    // 🚀 Redirect
     window.location.href = "jobseeker-dashboard.html";
 
   } else {
@@ -332,6 +332,14 @@ document.getElementById("forgotPassword")
   resetPassword(email);
 
 });
+
+
+// 🔥 LOGOUT FUNCTION (GLOBAL USE)
+window.logout = function(){
+  localStorage.clear();   // 🧹 full clean
+  window.location.href = "index.html";
+};
+
 </script>
 </body>
 </html>
