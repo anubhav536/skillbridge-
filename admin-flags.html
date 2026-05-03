@@ -1,27 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Flags | SkillBridge AI</title>
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0">  
+<title>Admin Flags | SkillBridge AI</title>  
 
-<style>
+<style>  
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}  
 
-/* RESET */
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-
-/* BODY */
 body{
   background: linear-gradient(135deg,#0f172a,#020617);
   color:white;
 }
 
-/* LAYOUT */
-.dashboard{
-  display:flex;
-}
+.dashboard{display:flex;}
 
-/* SIDEBAR */
 .sidebar{
   width:240px;
   height:100vh;
@@ -34,8 +27,6 @@ body{
   z-index:1000;
 }
 
-.sidebar h2{margin-bottom:20px;}
-
 .sidebar nav a{
   display:block;
   padding:10px;
@@ -45,19 +36,15 @@ body{
   text-decoration:none;
 }
 
-.sidebar nav a:hover,
-.sidebar nav a.active{
-  background:#3b82f6;
-}
+.sidebar nav a.active,
+.sidebar nav a:hover{background:#3b82f6;}
 
-/* MAIN */
 .main{
   margin-left:240px;
   padding:20px;
   width:100%;
 }
 
-/* CARD */
 .card{
   background:#1e293b;
   padding:15px;
@@ -65,7 +52,6 @@ body{
   margin-bottom:20px;
 }
 
-/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -75,10 +61,8 @@ table{
 th,td{
   padding:10px;
   border-bottom:1px solid #334155;
-  text-align:left;
 }
 
-/* BUTTON */
 .btn{
   padding:6px 12px;
   border:none;
@@ -88,53 +72,29 @@ th,td{
   cursor:pointer;
 }
 
-.btn-danger{
-  background:#ef4444;
-}
+.btn-danger{background:#ef4444;}
 
-/* TOP BAR */
 .top{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:20px;
 }
 
-/* MENU BUTTON */
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
+.menu-btn{display:none;}
 
-/* MOBILE */
 @media(max-width:768px){
-
-  .sidebar{
-    left:-100%;
-  }
-
-  .sidebar.active{
-    left:0;
-  }
-
-  .main{
-    margin-left:0;
-  }
-
-  .menu-btn{
-    display:block;
-  }
+  .sidebar{left:-100%;}
+  .sidebar.active{left:0;}
+  .main{margin-left:0;}
+  .menu-btn{display:block;}
 }
-
 </style>
-</head>
+</head>  
 
-<body>
+<body>  
 
-<div class="dashboard">
+<div class="dashboard">  
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 <h2>👑 Admin</h2>
 
@@ -154,74 +114,108 @@ th,td{
 </nav>
 
 <a href="index.html" class="btn">Logout 👋</a>
-
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div class="top">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>🚨 Fraud Detection Panel</h2>
+<span class="menu-btn" onclick="toggleMenu()">☰</span>
+<h2>🚨 Fraud Detection Panel</h2>
 </div>
 
-<!-- SUSPICIOUS USERS -->
+<!-- USERS -->
 <div class="card">
-  <h3>⚠️ Suspicious Users</h3>
+<h3>⚠️ Suspicious Users</h3>
 
-  <table>
-    <tr>
-      <th>User</th>
-      <th>Issue</th>
-      <th>Action</th>
-    </tr>
+<table>
+<thead>
+<tr>
+<th>User</th>
+<th>Issue</th>
+<th>Action</th>
+</tr>
+</thead>
 
-    <tr>
-      <td>user123@gmail.com</td>
-      <td>Multiple Accounts</td>
-      <td>
-        <button class="btn btn-danger">Ban</button>
-        <button class="btn">Ignore</button>
-      </td>
-    </tr>
+<tbody id="flagsTable"></tbody>
 
-  </table>
-</div>
-
-<!-- SPAM JOBS -->
-<div class="card">
-  <h3>📛 Spam Job Posts</h3>
-
-  <table>
-    <tr>
-      <th>Company</th>
-      <th>Issue</th>
-      <th>Action</th>
-    </tr>
-
-    <tr>
-      <td>Fake Corp</td>
-      <td>Duplicate Posting</td>
-      <td>
-        <button class="btn btn-danger">Remove</button>
-        <button class="btn">Review</button>
-      </td>
-    </tr>
-
-  </table>
+</table>
 </div>
 
 </main>
-
 </div>
+
+<script type="module">
+
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs,
+  deleteDoc,
+  doc,
+  updateDoc,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// 🔥 LOAD FLAGS
+async function loadFlags(){
+  const container = document.getElementById("flagsTable");
+  container.innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
+
+  const snapshot = await getDocs(collection(db,"flags"));
+  container.innerHTML = "";
+
+  snapshot.forEach(docSnap=>{
+    const data = docSnap.data();
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${data.userEmail || "-"}</td>
+      <td>${data.reason || "-"}</td>
+      <td>
+        <button class="btn btn-danger" onclick="banUser('${docSnap.id}','${data.userEmail}')">Ban</button>
+        <button class="btn" onclick="ignoreFlag('${docSnap.id}')">Ignore</button>
+      </td>
+    `;
+
+    container.appendChild(row);
+  });
+}
+
+// 🚫 BAN USER
+window.banUser = async function(id,email){
+
+  await deleteDoc(doc(db,"flags",id));
+
+  await addDoc(collection(db,"logs"),{
+    action:"User Banned",
+    user:email,
+    status:"success",
+    createdAt:Date.now()
+  });
+
+  loadFlags();
+}
+
+// ✅ IGNORE
+window.ignoreFlag = async function(id){
+
+  await updateDoc(doc(db,"flags",id),{
+    status:"ignored"
+  });
+
+  loadFlags();
+}
+
+loadFlags();
+
+</script>
 
 <script>
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* AUTO CLOSE MOBILE */
 document.querySelectorAll(".sidebar a").forEach(link=>{
   link.addEventListener("click",()=>{
     if(window.innerWidth < 768){
@@ -230,7 +224,6 @@ document.querySelectorAll(".sidebar a").forEach(link=>{
   });
 });
 </script>
-
 
 </body>
 </html>
