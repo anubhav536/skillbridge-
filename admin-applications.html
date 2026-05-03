@@ -141,16 +141,9 @@ tr{border-bottom:1px solid #1e293b;}
 
 </main>
 </div>
-
 <script type="module">
-// =====================================
-// 🧠 ADMIN APPLICATION PANEL LOGIC
-// SkillBridge AI
-// =====================================
 
-import {
-  db
-} from "./firebase.js";
+import { db } from "./firebase.js";
 
 import {
   collection,
@@ -160,17 +153,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 
-// =====================================
-// 🎯 DOM
-// =====================================
-
-const table = document.getElementById("applicationsTable");
+// ✅ FIXED ID
+const table = document.getElementById("appTable");
 
 
-// =====================================
-// 🧩 SAFE VALUE PICKER (ULTIMATE FIX)
-// =====================================
-
+// 🧠 SAFE PICK
 function pick(...values) {
   for (let v of values) {
     if (v !== undefined && v !== null && v !== "") {
@@ -181,11 +168,8 @@ function pick(...values) {
 }
 
 
-// =====================================
-// 📥 LOAD APPLICATIONS
-// =====================================
-
-export async function loadApplications() {
+// 📥 LOAD
+async function loadApplications() {
 
   try {
 
@@ -242,19 +226,12 @@ export async function loadApplications() {
 }
 
 
-// =====================================
 // ✅ ACCEPT
-// =====================================
-
 window.accept = async function (id) {
-
   try {
-
     await updateDoc(doc(db, "applications", id), {
-      status: "accepted"
+      status: "approved"   // ⚡ CSS ke saath match
     });
-
-    alert("Application accepted ✅");
 
     loadApplications();
 
@@ -265,20 +242,13 @@ window.accept = async function (id) {
 };
 
 
-// =====================================
 // ❌ REJECT
-// =====================================
-
 window.reject = async function (id) {
-
   try {
-
     await updateDoc(doc(db, "applications", id), {
       status: "rejected"
     });
 
-    alert("Application rejected ❌");
-
     loadApplications();
 
   } catch (e) {
@@ -288,11 +258,9 @@ window.reject = async function (id) {
 };
 
 
-// =====================================
-// 🚀 AUTO LOAD
-// =====================================
-
+// 🚀 START
 loadApplications();
+
 </script>
 
 </body>
