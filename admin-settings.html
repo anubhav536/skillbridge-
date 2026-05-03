@@ -7,119 +7,27 @@
 
 <style>
 
-/* RESET */
+/* (same CSS — unchanged) */
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-
-/* BODY */
-body{
-  background: linear-gradient(135deg,#0f172a,#020617);
-  color:white;
-}
-
-/* LAYOUT */
-.dashboard{
-  display:flex;
-}
-
-/* SIDEBAR */
-.sidebar{
-  width:240px;
-  height:100vh;
-  background:#020617;
-  padding:20px;
-  position:fixed;
-  left:0;
-  top:0;
-  transition:0.3s;
-  z-index:1000;
-}
-
+body{background: linear-gradient(135deg,#0f172a,#020617);color:white;}
+.dashboard{display:flex;}
+.sidebar{width:240px;height:100vh;background:#020617;padding:20px;position:fixed;left:0;top:0;transition:0.3s;z-index:1000;}
 .sidebar h2{margin-bottom:20px;}
+.sidebar nav a{display:block;padding:10px;border-radius:8px;margin-bottom:8px;color:white;text-decoration:none;}
+.sidebar nav a:hover,.sidebar nav a.active{background:#3b82f6;}
+.main{margin-left:240px;padding:20px;width:100%;}
+.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:15px;transition:0.3s;}
+.card:hover{transform:translateY(-3px);}
+.btn{display:inline-block;padding:10px 16px;background:#3b82f6;border-radius:8px;text-decoration:none;color:white;margin-top:15px;border:none;cursor:pointer;}
+label{display:block;margin:10px 0;}
+select{padding:8px;border-radius:6px;border:none;}
+.menu-btn{display:none;font-size:22px;cursor:pointer;}
 
-.sidebar nav a{
-  display:block;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-  color:white;
-  text-decoration:none;
-}
-
-.sidebar nav a:hover,
-.sidebar nav a.active{
-  background:#3b82f6;
-}
-
-/* MAIN */
-.main{
-  margin-left:240px;
-  padding:20px;
-  width:100%;
-}
-
-/* CARD */
-.card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:15px;
-  transition:0.3s;
-}
-
-.card:hover{
-  transform:translateY(-3px);
-}
-
-/* BUTTON */
-.btn{
-  display:inline-block;
-  padding:10px 16px;
-  background:#3b82f6;
-  border-radius:8px;
-  text-decoration:none;
-  color:white;
-  margin-top:15px;
-  border:none;
-  cursor:pointer;
-}
-
-/* INPUT */
-label{
-  display:block;
-  margin:10px 0;
-}
-
-select{
-  padding:8px;
-  border-radius:6px;
-  border:none;
-}
-
-/* MENU BUTTON */
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
-
-/* MOBILE */
 @media(max-width:768px){
-
-  .sidebar{
-    left:-100%;
-  }
-
-  .sidebar.active{
-    left:0;
-  }
-
-  .main{
-    margin-left:0;
-  }
-
-  .menu-btn{
-    display:block;
-  }
+.sidebar{left:-100%;}
+.sidebar.active{left:0;}
+.main{margin-left:0;}
+.menu-btn{display:block;}
 }
 
 </style>
@@ -129,7 +37,6 @@ select{
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 <h2>👑 Admin</h2>
 
@@ -149,16 +56,12 @@ select{
 </nav>
 
 <a href="index.html" class="btn">Logout 👋</a>
-
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
-
   <h2>⚙ Platform Settings</h2>
 </div>
 
@@ -166,43 +69,86 @@ select{
 
 <div class="card">
 <h3>👤 User Settings</h3>
-
-<label><input type="checkbox" checked> Allow New User Signup</label>
-<label><input type="checkbox"> Require Admin Approval</label>
-
+<label><input type="checkbox" id="allowSignup"> Allow New User Signup</label>
+<label><input type="checkbox" id="adminApproval"> Require Admin Approval</label>
 </div>
 
 <div class="card">
 <h3>💼 Job Settings</h3>
-
-<label><input type="checkbox" checked> Allow Job Posting</label>
-<label><input type="checkbox"> Manual Job Approval</label>
-
+<label><input type="checkbox" id="jobPosting"> Allow Job Posting</label>
+<label><input type="checkbox" id="manualJob"> Manual Job Approval</label>
 </div>
 
 <div class="card">
 <h3>🔒 Security Settings</h3>
-
-<label><input type="checkbox" checked> Enable Fraud Detection</label>
-<label><input type="checkbox"> Email Verification</label>
-
+<label><input type="checkbox" id="fraudDetection"> Enable Fraud Detection</label>
+<label><input type="checkbox" id="emailVerify"> Email Verification</label>
 </div>
 
 <div class="card">
 <h3>🛠 Platform Mode</h3>
-
-<select>
-<option>Live Mode</option>
-<option>Maintenance Mode</option>
+<select id="platformMode">
+<option value="live">Live Mode</option>
+<option value="maintenance">Maintenance Mode</option>
 </select>
-
 </div>
 
-<button class="btn">💾 Save Settings</button>
+<button class="btn" id="saveBtn">💾 Save Settings</button>
 
 </main>
-
 </div>
+
+<!-- 🔥 FIREBASE CONNECT -->
+<script type="module">
+
+import { db } from "./firebase.js";
+import {
+  doc,
+  getDoc,
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// 🔹 LOAD SETTINGS
+async function loadSettings(){
+
+  const ref = doc(db, "settings", "main");
+  const snap = await getDoc(ref);
+
+  if(snap.exists()){
+    const s = snap.data();
+
+    document.getElementById("allowSignup").checked = s.allowSignup ?? true;
+    document.getElementById("adminApproval").checked = s.adminApproval ?? false;
+    document.getElementById("jobPosting").checked = s.jobPosting ?? true;
+    document.getElementById("manualJob").checked = s.manualJob ?? false;
+    document.getElementById("fraudDetection").checked = s.fraudDetection ?? true;
+    document.getElementById("emailVerify").checked = s.emailVerify ?? false;
+    document.getElementById("platformMode").value = s.maintenanceMode ? "maintenance" : "live";
+  }
+}
+
+// 🔹 SAVE SETTINGS
+document.getElementById("saveBtn").addEventListener("click", async ()=>{
+
+  const data = {
+    allowSignup: document.getElementById("allowSignup").checked,
+    adminApproval: document.getElementById("adminApproval").checked,
+    jobPosting: document.getElementById("jobPosting").checked,
+    manualJob: document.getElementById("manualJob").checked,
+    fraudDetection: document.getElementById("fraudDetection").checked,
+    emailVerify: document.getElementById("emailVerify").checked,
+    maintenanceMode: document.getElementById("platformMode").value === "maintenance"
+  };
+
+  await setDoc(doc(db, "settings", "main"), data);
+
+  alert("✅ Settings Saved!");
+});
+
+// LOAD ON START
+loadSettings();
+
+</script>
 
 <script>
 function toggleMenu(){
