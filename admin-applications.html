@@ -1,40 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Applications | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Dashboard | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+  transition:0.2s;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+/* BUTTON */
+.btn{
+  display:inline-block;
+  padding:8px 14px;
+  background:#3b82f6;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  margin-top:10px;
+}
+
+/* BADGE */
+.badge{
+  background:#3b82f6;
+  padding:5px 10px;
+  border-radius:20px;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
-<body class="admin-applications-page">
+<body>
 
-<div class="admin-layout">
+<div class="dashboard">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <h2>👑 Admin Panel</h2>
+<nav>
+<a href="admin-dashboard.html" class="active">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-    <nav>
-      <a href="admin-dashboard.html">Dashboard</a>
-      <a href="admin-users.html">Users</a>
-      <a href="admin-jobs.html">Jobs</a>
-      <a href="admin-applications.html">Applications</a>
-    </nav>
+<a href="index.html" class="btn">Logout 👋</a>
 
-    <button id="logoutBtn">Logout 👋</button>
+</aside>
 
-  </aside>
+<!-- MAIN -->
+<main class="main">
 
-  <!-- MAIN -->
-  <main class="main-content">
+<!-- TOP -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
 
-    <h2>📄 All Applications</h2>
+  <h2>Dashboard</h2>
+  <span class="badge">Live</span>
+</div>
 
-    <input type="text" id="searchApp" placeholder="Search by email">
+<!-- STATS -->
+<div class="grid">
 
-    <div id="apps"></div>
+<div class="card">
+<h3>Users</h3>
+<p>Loading...</p>
+</div>
 
-  </main>
+<div class="card">
+<h3>Jobs</h3>
+<p>Loading...</p>
+</div>
+
+<div class="card">
+<h3>Apps</h3>
+<p>Loading...</p>
+</div>
 
 </div>
+
+<!-- ACTIONS -->
+<h2 style="margin:20px 0">Quick Actions</h2>
+
+<div class="grid">
+
+<div class="card"><h3>Users</h3><a href="admin-users.html" class="btn">Open</a></div>
+<div class="card"><h3>Jobs</h3><a href="admin-jobs.html" class="btn">Open</a></div>
+<div class="card"><h3>Apps</h3><a href="admin-applications.html" class="btn">Open</a></div>
+<div class="card"><h3>Flags</h3><a href="admin-flags.html" class="btn">Open</a></div>
+<div class="card"><h3>Analytics</h3><a href="admin-analytics.html" class="btn">Open</a></div>
+<div class="card"><h3>AI</h3><a href="admin-ai-control.html" class="btn">Open</a></div>
+<div class="card"><h3>Rank</h3><a href="admin-leaderboard.html" class="btn">Open</a></div>
+<div class="card"><h3>Settings</h3><a href="admin-settings.html" class="btn">Open</a></div>
+
+</div>
+
+</main>
+
+</div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+/* MOBILE: CLICK KARNE PAR MENU AUTO CLOSE */
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
+
+</body>
+</html>
