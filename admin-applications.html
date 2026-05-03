@@ -6,33 +6,22 @@
 <title>Admin Applications | SkillBridge AI</title>
 
 <style>
-
-/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-/* BODY */
 body{
   background: linear-gradient(135deg,#0f172a,#020617);
   color:white;
 }
 
-/* LAYOUT */
 .dashboard{display:flex;}
 
-/* SIDEBAR */
 .sidebar{
   width:240px;
   height:100vh;
   background:#020617;
   padding:20px;
   position:fixed;
-  left:0;
-  top:0;
-  transition:0.3s;
-  z-index:1000;
 }
-
-.sidebar h2{margin-bottom:20px;}
 
 .sidebar nav a{
   display:block;
@@ -48,25 +37,16 @@ body{
   background:#3b82f6;
 }
 
-/* MAIN */
 .main{
   margin-left:240px;
   padding:20px;
   width:100%;
 }
 
-/* TOP BAR */
 .top{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:20px;
-}
-
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
 }
 
 .badge{
@@ -75,23 +55,6 @@ body{
   border-radius:20px;
 }
 
-/* FILTER BAR */
-.top-bar{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
-}
-
-input,select{
-  padding:10px;
-  border-radius:8px;
-  border:none;
-  outline:none;
-}
-
-/* TABLE */
 .table-container{
   overflow-x:auto;
   background:#020617;
@@ -106,29 +69,22 @@ table{
 
 th,td{
   padding:12px;
-  text-align:left;
 }
 
-th{
-  background:#0f172a;
-}
+th{background:#0f172a;}
 
-tr{
-  border-bottom:1px solid #1e293b;
-}
+tr{border-bottom:1px solid #1e293b;}
 
-/* STATUS */
 .status{
   padding:6px 10px;
   border-radius:6px;
   font-size:12px;
 }
 
-.approved{ background:#16a34a; }
-.pending{ background:#f59e0b; }
-.rejected{ background:#dc2626; }
+.pending{background:#f59e0b;}
+.approved{background:#16a34a;}
+.rejected{background:#dc2626;}
 
-/* BUTTONS */
 .actions button{
   padding:6px 10px;
   border:none;
@@ -137,20 +93,8 @@ tr{
   margin-right:5px;
 }
 
-.view{ background:#3b82f6; color:white; }
-.accept{ background:#22c55e; color:white; }
-.reject{ background:#ef4444; color:white; }
-
-/* MOBILE */
-@media(max-width:768px){
-
-  .sidebar{left:-100%;}
-  .sidebar.active{left:0;}
-
-  .main{margin-left:0;}
-
-  .menu-btn{display:block;}
-}
+.accept{background:#22c55e;color:white;}
+.reject{background:#ef4444;color:white;}
 
 </style>
 </head>
@@ -159,8 +103,7 @@ tr{
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
-<aside class="sidebar" id="sidebar">
+<aside class="sidebar">
 <h2>👑 Admin</h2>
 
 <nav>
@@ -168,43 +111,17 @@ tr{
 <a href="admin-users.html">👥 Users</a>
 <a href="admin-jobs.html">💼 Jobs</a>
 <a href="admin-applications.html" class="active">📄 Applications</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
 </nav>
-
-<a href="index.html" style="display:block;margin-top:20px;padding:10px;background:#3b82f6;border-radius:8px;text-align:center;">Logout 👋</a>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div class="top">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>📄 Applications Panel</h2>
-  <span class="badge">Live</span>
+<h2>📄 Applications Panel</h2>
+<span class="badge">Live</span>
 </div>
 
-<!-- FILTER -->
-<div class="top-bar">
-  <input type="text" placeholder="Search name or skill">
-  <select>
-    <option>All</option>
-    <option>Pending</option>
-    <option>Approved</option>
-    <option>Rejected</option>
-  </select>
-</div>
-
-<!-- TABLE -->
 <div class="table-container">
-
 <table>
 <thead>
 <tr>
@@ -217,64 +134,70 @@ tr{
 </tr>
 </thead>
 
-<tbody>
+<tbody id="appTable"></tbody>
 
-<tr>
-<td>Rahul Verma</td>
-<td>rahul@gmail.com</td>
-<td>Frontend Dev</td>
-<td>2 Years</td>
-<td><span class="status pending">Pending</span></td>
-<td class="actions">
-<button class="view">View</button>
-<button class="accept">Accept</button>
-<button class="reject">Reject</button>
-</td>
-</tr>
-
-<tr>
-<td>Anjali Sharma</td>
-<td>anjali@gmail.com</td>
-<td>UI/UX</td>
-<td>1 Year</td>
-<td><span class="status approved">Approved</span></td>
-<td class="actions">
-<button class="view">View</button>
-</td>
-</tr>
-
-<tr>
-<td>Rohit Singh</td>
-<td>rohit@gmail.com</td>
-<td>Backend</td>
-<td>3 Years</td>
-<td><span class="status rejected">Rejected</span></td>
-<td class="actions">
-<button class="view">View</button>
-</td>
-</tr>
-
-</tbody>
 </table>
-
 </div>
 
 </main>
-
 </div>
 
-<script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
+<script type="module">
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  doc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+const table = document.getElementById("appTable");
+
+// LOAD APPLICATIONS
+async function loadApps(){
+
+  const snap = await getDocs(collection(db,"applications"));
+
+  table.innerHTML = "";
+
+  snap.forEach(d=>{
+    const app = d.data();
+
+    table.innerHTML += `
+    <tr>
+      <td>${app.name}</td>
+      <td>${app.email}</td>
+      <td>${app.skill}</td>
+      <td>${app.experience}</td>
+      <td><span class="status ${app.status}">${app.status}</span></td>
+      <td class="actions">
+        ${app.status==="pending" ? `
+        <button class="accept" onclick="accept('${d.id}')">Accept</button>
+        <button class="reject" onclick="reject('${d.id}')">Reject</button>
+        ` : ""}
+      </td>
+    </tr>`;
+  });
+
 }
 
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+// ACCEPT
+window.accept = async(id)=>{
+  await updateDoc(doc(db,"applications",id),{
+    status:"approved"
   });
-});
+  loadApps();
+}
+
+// REJECT
+window.reject = async(id)=>{
+  await updateDoc(doc(db,"applications",id),{
+    status:"rejected"
+  });
+  loadApps();
+}
+
+loadApps();
 </script>
 
 </body>
