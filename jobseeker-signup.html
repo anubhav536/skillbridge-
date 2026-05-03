@@ -248,24 +248,38 @@
 <footer class="js-signup-footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
-
-<!-- SCRIPT -->
 <script type="module">
 
 import {
-signupUser,
-checkSessionUI
+  signupUser,
+  checkSessionUI
 } from "./firebase.js";
 
 
+
+// 🚀 SIGNUP BUTTON
 document
 .getElementById("signupBtn")
-.addEventListener("click",()=>{
+.addEventListener("click", async () => {
 
-signupUser(
-"seeker",
-document.getElementById("signupBtn")
-);
+  const btn = document.getElementById("signupBtn");
+
+  const user = await signupUser(
+    "jobseeker",
+    btn
+  );
+
+  if(user){
+
+    // ✅ ROLE SET
+    localStorage.setItem("role", "jobseeker");
+
+    // 🚀 Direct entry
+    window.location.href = "jobseeker-dashboard.html";
+
+  } else {
+    alert("Signup Failed ❌");
+  }
 
 });
 
