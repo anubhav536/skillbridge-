@@ -95,7 +95,6 @@
 
 
 
-<!-- SCRIPT -->
 <script type="module">
 
 import {
@@ -104,20 +103,34 @@ import {
   checkSessionUI
 } from "./firebase.js";
 
-
+// Already logged-in user handling
 checkSessionUI();
 
 
+// 🔥 LOGIN BUTTON
 document.getElementById("loginBtn")
-.addEventListener("click", () => {
+.addEventListener("click", async () => {
 
-  loginUser(
-    document.getElementById("loginBtn")
-  );
+  const btn = document.getElementById("loginBtn");
+
+  const user = await loginUser(btn);
+
+  if(user){
+
+    // ✅ SET ROLE AFTER SUCCESS
+    localStorage.setItem("role", "recruiter");
+
+    // 🚀 Redirect to recruiter dashboard
+    window.location.href = "recruiter-dashboard.html";
+
+  } else {
+    alert("Login Failed ❌");
+  }
 
 });
 
 
+// 🔁 FORGOT PASSWORD
 document.getElementById("forgotPassword")
 .addEventListener("click", (e) => {
 
@@ -137,6 +150,5 @@ document.getElementById("forgotPassword")
 });
 
 </script>
-
 </body>
 </html>
