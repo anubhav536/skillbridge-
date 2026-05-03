@@ -97,30 +97,37 @@
   <footer class="footer">
     © 2026 SkillBridge AI • Admin Portal
   </footer>
+<script type="module">
+import { loginUser } from "./firebase.js";
 
-  <script type="module">
-  import { loginUser } from "./firebase.js";
+// 🔐 LOGIN BUTTON
+document
+  .getElementById("loginBtn")
+  .addEventListener("click", async () => {
 
-  document
-    .getElementById("loginBtn")
-    .addEventListener("click", async () => {
+    const btn = document.getElementById("loginBtn");
 
-      const btn = document.getElementById("loginBtn");
+    const user = await loginUser(btn);
 
-      // Firebase login call
-      const user = await loginUser(btn);
+    if (user) {
+      // ✅ ROLE SET
+      localStorage.setItem("role", "admin");
 
-      if (user) {
-        // ✅ Role set only after success
-        localStorage.setItem("role", "admin");
+      // 🚀 Redirect
+      window.location.href = "admin-dashboard.html";
+    } else {
+      alert("Invalid Admin Credentials 🚫");
+    }
 
-        // Redirect to admin dashboard
-        window.location.href = "admin-dashboard.html";
-      } else {
-        alert("Invalid Admin Credentials 🚫");
-      }
+  });
 
-    });
+
+// 🔥 LOGOUT FUNCTION (GLOBAL)
+window.logout = function(){
+  localStorage.clear();   // 🧹 full clean
+  window.location.href = "index.html";
+};
+
 </script>
 </body>
 </html>
