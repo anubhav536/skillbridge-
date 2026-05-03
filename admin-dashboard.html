@@ -43,6 +43,7 @@ body{
   margin-bottom:8px;
   color:white;
   text-decoration:none;
+  transition:0.2s;
 }
 
 .sidebar nav a:hover,
@@ -133,21 +134,21 @@ body{
 <h2>👑 Admin</h2>
 
 <nav>
-<a class="active">📊 Dashboard</a>
-<a>👥 Users</a>
-<a>💼 Jobs</a>
-<a>📄 Apps</a>
-<a>🚨 Flags</a>
-<a>📈 Analytics</a>
-<a>🤖 AI</a>
-<a>🏆 Rank</a>
-<a>⚙ Settings</a>
-<a>📜 Logs</a>
-<a>📩 Notify</a>
-<a>🛠 Mod</a>
+<a href="admin-dashboard.html" class="active">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
 </nav>
 
-<a class="btn">Logout</a>
+<a href="index.html" class="btn">Logout 👋</a>
 
 </aside>
 
@@ -187,14 +188,14 @@ body{
 
 <div class="grid">
 
-<div class="card"><h3>Users</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Jobs</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Apps</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Flags</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Analytics</h3><a class="btn">Open</a></div>
-<div class="card"><h3>AI</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Rank</h3><a class="btn">Open</a></div>
-<div class="card"><h3>Settings</h3><a class="btn">Open</a></div>
+<div class="card"><h3>Users</h3><a href="admin-users.html" class="btn">Open</a></div>
+<div class="card"><h3>Jobs</h3><a href="admin-jobs.html" class="btn">Open</a></div>
+<div class="card"><h3>Apps</h3><a href="admin-applications.html" class="btn">Open</a></div>
+<div class="card"><h3>Flags</h3><a href="admin-flags.html" class="btn">Open</a></div>
+<div class="card"><h3>Analytics</h3><a href="admin-analytics.html" class="btn">Open</a></div>
+<div class="card"><h3>AI</h3><a href="admin-ai-control.html" class="btn">Open</a></div>
+<div class="card"><h3>Rank</h3><a href="admin-leaderboard.html" class="btn">Open</a></div>
+<div class="card"><h3>Settings</h3><a href="admin-settings.html" class="btn">Open</a></div>
 
 </div>
 
@@ -206,6 +207,15 @@ body{
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
+
+/* MOBILE: CLICK KARNE PAR MENU AUTO CLOSE */
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
 </script>
 
 </body>
