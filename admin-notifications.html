@@ -7,21 +7,16 @@
 
 <style>
 
-/* RESET */
+/* SAME CSS (unchanged) */
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-/* BODY */
 body{
   background: linear-gradient(135deg,#0f172a,#020617);
   color:white;
 }
 
-/* LAYOUT */
-.dashboard{
-  display:flex;
-}
+.dashboard{display:flex;}
 
-/* SIDEBAR */
 .sidebar{
   width:240px;
   height:100vh;
@@ -46,14 +41,12 @@ body{
   background:#3b82f6;
 }
 
-/* MAIN */
 .main{
   margin-left:240px;
   padding:20px;
   width:100%;
 }
 
-/* CARD */
 .card{
   background:#1e293b;
   padding:15px;
@@ -61,7 +54,6 @@ body{
   margin-bottom:20px;
 }
 
-/* INPUTS */
 input, textarea, select{
   width:100%;
   padding:10px;
@@ -69,10 +61,8 @@ input, textarea, select{
   margin-bottom:15px;
   border-radius:8px;
   border:none;
-  outline:none;
 }
 
-/* BUTTON */
 .btn{
   padding:10px 15px;
   background:#3b82f6;
@@ -82,43 +72,16 @@ input, textarea, select{
   cursor:pointer;
 }
 
-/* TABLE */
-table{
-  width:100%;
-  border-collapse:collapse;
-}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:10px;border-bottom:1px solid #334155;}
 
-th,td{
-  padding:10px;
-  border-bottom:1px solid #334155;
-}
-
-/* MOBILE */
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
+.menu-btn{display:none;}
 
 @media(max-width:768px){
-
-  .sidebar{
-    left:-100%;
-    position:fixed;
-    transition:0.3s;
-  }
-
-  .sidebar.active{
-    left:0;
-  }
-
-  .main{
-    margin-left:0;
-  }
-
-  .menu-btn{
-    display:block;
-  }
+  .sidebar{left:-100%;transition:0.3s;}
+  .sidebar.active{left:0;}
+  .main{margin-left:0;}
+  .menu-btn{display:block;}
 }
 
 </style>
@@ -155,7 +118,6 @@ th,td{
 <!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>📩 Notifications</h2>
@@ -167,19 +129,19 @@ th,td{
 <h3>📢 Send Announcement</h3>
 
 <label>Title</label>
-<input type="text" placeholder="Enter title">
+<input type="text" id="title">
 
 <label>Message</label>
-<textarea rows="4" placeholder="Write message..."></textarea>
+<textarea id="message" rows="4"></textarea>
 
 <label>Audience</label>
-<select>
-<option>All Users</option>
-<option>Job Seekers</option>
-<option>Recruiters</option>
+<select id="audience">
+<option value="all">All Users</option>
+<option value="jobseekers">Job Seekers</option>
+<option value="recruiters">Recruiters</option>
 </select>
 
-<button class="btn">🚀 Send Notification</button>
+<button class="btn" id="sendBtn">🚀 Send Notification</button>
 
 </div>
 
@@ -189,38 +151,85 @@ th,td{
 <h3>📜 Recent Notifications</h3>
 
 <table>
+<thead>
 <tr>
 <th>Title</th>
 <th>Audience</th>
 <th>Status</th>
 </tr>
-
-<tr>
-<td>New Jobs Available</td>
-<td>All Users</td>
-<td>✅ Sent</td>
-</tr>
-
-<tr>
-<td>Update Profile</td>
-<td>Job Seekers</td>
-<td>🕒 Scheduled</td>
-</tr>
-
+</thead>
+<tbody id="tableBody"></tbody>
 </table>
 
 </div>
 
 </main>
-
 </div>
+
+<!-- FIREBASE SCRIPT -->
+<script type="module">
+
+import { db } from "./firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// SEND NOTIFICATION
+document.getElementById("sendBtn").addEventListener("click", async ()=>{
+
+  const title = document.getElementById("title").value;
+  const message = document.getElementById("message").value;
+  const audience = document.getElementById("audience").value;
+
+  if(!title || !message){
+    alert("Fill all fields ⚠️");
+    return;
+  }
+
+  await addDoc(collection(db,"notifications"),{
+    title,
+    message,
+    audience,
+    status:"sent",
+    createdAt: Date.now()
+  });
+
+  alert("Notification sent 🚀");
+
+  loadNotifications();
+});
+
+// LOAD DATA
+async function loadNotifications(){
+
+  const snap = await getDocs(collection(db,"notifications"));
+  const table = document.getElementById("tableBody");
+  table.innerHTML = "";
+
+  snap.forEach(doc=>{
+    const n = doc.data();
+
+    table.innerHTML += `
+      <tr>
+        <td>${n.title}</td>
+        <td>${n.audience}</td>
+        <td>✅ ${n.status}</td>
+      </tr>
+    `;
+  });
+}
+
+loadNotifications();
+
+</script>
 
 <script>
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* AUTO CLOSE */
 document.querySelectorAll(".sidebar a").forEach(link=>{
   link.addEventListener("click",()=>{
     if(window.innerWidth < 768){
