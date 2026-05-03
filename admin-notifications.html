@@ -1,62 +1,234 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Notifications | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Notifications | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  margin-bottom:8px;
+  border-radius:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+/* INPUTS */
+input, textarea, select{
+  width:100%;
+  padding:10px;
+  margin-top:8px;
+  margin-bottom:15px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+}
+
+/* BUTTON */
+.btn{
+  padding:10px 15px;
+  background:#3b82f6;
+  border:none;
+  border-radius:8px;
+  color:white;
+  cursor:pointer;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #334155;
+}
+
+/* MOBILE */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+    position:fixed;
+    transition:0.3s;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>📩 Notifications Center</h1>
+<div class="dashboard">
 
-  <div class="card">
-    <h2>📢 Send Announcement</h2>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
 
-    <label>Title</label>
-    <input type="text" placeholder="Enter notification title">
+<h2>👑 Admin</h2>
 
-    <label>Message</label>
-    <textarea rows="4" placeholder="Write your message..."></textarea>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html" class="active">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-    <label>Target Audience</label>
-    <select>
-      <option>All Users</option>
-      <option>Job Seekers</option>
-      <option>Recruiters</option>
-    </select>
+<a href="index.html" class="btn">Logout 👋</a>
 
-    <br><br>
-    <button>🚀 Send Notification</button>
-  </div>
+</aside>
 
-  <div class="card">
-    <h2>📜 Recent Notifications</h2>
+<!-- MAIN -->
+<main class="main">
 
-    <table>
-      <tr>
-        <th>Title</th>
-        <th>Audience</th>
-        <th>Status</th>
-      </tr>
+<!-- TOP -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h2>📩 Notifications</h2>
+</div>
 
-      <tr>
-        <td>New Jobs Available</td>
-        <td>All Users</td>
-        <td>✅ Sent</td>
-      </tr>
+<!-- SEND -->
+<div class="card">
 
-      <tr>
-        <td>Profile Update Reminder</td>
-        <td>Job Seekers</td>
-        <td>🕒 Scheduled</td>
-      </tr>
+<h3>📢 Send Announcement</h3>
 
-    </table>
-  </div>
+<label>Title</label>
+<input type="text" placeholder="Enter title">
+
+<label>Message</label>
+<textarea rows="4" placeholder="Write message..."></textarea>
+
+<label>Audience</label>
+<select>
+<option>All Users</option>
+<option>Job Seekers</option>
+<option>Recruiters</option>
+</select>
+
+<button class="btn">🚀 Send Notification</button>
 
 </div>
+
+<!-- HISTORY -->
+<div class="card">
+
+<h3>📜 Recent Notifications</h3>
+
+<table>
+<tr>
+<th>Title</th>
+<th>Audience</th>
+<th>Status</th>
+</tr>
+
+<tr>
+<td>New Jobs Available</td>
+<td>All Users</td>
+<td>✅ Sent</td>
+</tr>
+
+<tr>
+<td>Update Profile</td>
+<td>Job Seekers</td>
+<td>🕒 Scheduled</td>
+</tr>
+
+</table>
+
+</div>
+
+</main>
+
+</div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+/* AUTO CLOSE */
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
