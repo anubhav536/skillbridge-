@@ -6,20 +6,15 @@
 <title>Admin Moderation | SkillBridge AI</title>
 
 <style>
-
-/* RESET */
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-/* BODY */
 body{
   background: linear-gradient(135deg,#0f172a,#020617);
   color:white;
 }
 
-/* LAYOUT */
 .dashboard{display:flex}
 
-/* SIDEBAR */
 .sidebar{
   width:240px;
   height:100vh;
@@ -28,7 +23,6 @@ body{
   position:fixed;
   left:0;
   top:0;
-  transition:0.3s;
 }
 
 .sidebar nav a{
@@ -45,14 +39,12 @@ body{
   background:#3b82f6;
 }
 
-/* MAIN */
 .main{
   margin-left:240px;
   padding:20px;
   width:100%;
 }
 
-/* CARD */
 .card{
   background:#1e293b;
   padding:15px;
@@ -60,7 +52,6 @@ body{
   margin-bottom:20px;
 }
 
-/* TABLE */
 table{
   width:100%;
   border-collapse:collapse;
@@ -71,7 +62,6 @@ th, td{
   border-bottom:1px solid #334155;
 }
 
-/* BUTTON */
 .btn{
   padding:6px 12px;
   border:none;
@@ -94,31 +84,20 @@ input{
   margin-top:10px;
 }
 
-/* TOP BAR */
 .top{
   display:flex;
   justify-content:space-between;
-  align-items:center;
   margin-bottom:20px;
 }
 
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
+.menu-btn{display:none}
 
-/* MOBILE */
 @media(max-width:768px){
-
   .sidebar{left:-100%}
   .sidebar.active{left:0}
-
   .main{margin-left:0}
-
   .menu-btn{display:block}
 }
-
 </style>
 </head>
 
@@ -126,7 +105,6 @@ input{
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 <h2>👑 Admin</h2>
 
@@ -146,90 +124,139 @@ input{
 </nav>
 
 <a href="index.html" class="btn safe">Logout 👋</a>
-
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div class="top">
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>🛠 Moderation Panel</h2>
 </div>
 
-<!-- REPORTED USERS -->
+<!-- USERS -->
 <div class="card">
-  <h3>🚫 Reported Users</h3>
-
-  <table>
-    <tr>
-      <th>User</th>
-      <th>Reason</th>
-      <th>Action</th>
-    </tr>
-
-    <tr>
-      <td>user123@gmail.com</td>
-      <td>Spam Activity</td>
-      <td>
-        <button class="btn ban">Ban</button>
-        <button class="btn ignore">Ignore</button>
-      </td>
-    </tr>
-  </table>
+<h3>🚫 Reported Users</h3>
+<table id="userTable">
+<tr><th>User</th><th>Reason</th><th>Action</th></tr>
+</table>
 </div>
 
-<!-- REPORTED JOBS -->
+<!-- JOBS -->
 <div class="card">
-  <h3>📛 Reported Jobs</h3>
-
-  <table>
-    <tr>
-      <th>Company</th>
-      <th>Issue</th>
-      <th>Action</th>
-    </tr>
-
-    <tr>
-      <td>Fake Corp</td>
-      <td>Fraud Posting</td>
-      <td>
-        <button class="btn delete">Delete</button>
-        <button class="btn review">Review</button>
-      </td>
-    </tr>
-  </table>
+<h3>📛 Reported Jobs</h3>
+<table id="jobTable">
+<tr><th>Company</th><th>Issue</th><th>Action</th></tr>
+</table>
 </div>
 
-<!-- USER CONTROL -->
+<!-- CONTROL -->
 <div class="card">
-  <h3>🔒 User Control</h3>
-
-  <input type="text" placeholder="Enter user email">
-
-  <br><br>
-
-  <button class="btn ban">Ban User</button>
-  <button class="btn safe">Unban User</button>
+<h3>🔒 User Control</h3>
+<input type="text" id="emailInput" placeholder="Enter user email">
+<br><br>
+<button class="btn ban" onclick="manualBan()">Ban User</button>
+<button class="btn safe" onclick="manualUnban()">Unban User</button>
 </div>
 
 </main>
-
 </div>
 
-<script>
-function toggleMenu(){
+<script type="module">
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+  addDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+/* LOAD DATA */
+async function loadModeration(){
+
+  const userTable = document.getElementById("userTable");
+  const jobTable = document.getElementById("jobTable");
+
+  const snap = await getDocs(collection(db,"moderation"));
+
+  snap.forEach(d=>{
+    const data = d.data();
+
+    if(data.type === "user"){
+      userTable.innerHTML += `
+      <tr>
+        <td>${data.targetId}</td>
+        <td>${data.reason}</td>
+        <td>
+          <button class="btn ban" onclick="ban('${d.id}')">Ban</button>
+          <button class="btn ignore" onclick="ignore('${d.id}')">Ignore</button>
+        </td>
+      </tr>`;
+    }
+
+    if(data.type === "job"){
+      jobTable.innerHTML += `
+      <tr>
+        <td>${data.targetId}</td>
+        <td>${data.reason}</td>
+        <td>
+          <button class="btn delete" onclick="removeJob('${d.id}')">Delete</button>
+          <button class="btn review" onclick="review('${d.id}')">Review</button>
+        </td>
+      </tr>`;
+    }
+  });
+}
+
+/* ACTIONS */
+window.ban = async(id)=>{
+  await updateDoc(doc(db,"moderation",id),{action:"banned"});
+  await addDoc(collection(db,"logs"),{
+    action:"User Banned",
+    createdAt:Date.now()
+  });
+  location.reload();
+}
+
+window.ignore = async(id)=>{
+  await deleteDoc(doc(db,"moderation",id));
+  location.reload();
+}
+
+window.removeJob = async(id)=>{
+  await deleteDoc(doc(db,"moderation",id));
+  location.reload();
+}
+
+window.review = async(id)=>{
+  alert("Marked for review");
+}
+
+/* MANUAL */
+window.manualBan = async()=>{
+  const email = document.getElementById("emailInput").value;
+
+  await addDoc(collection(db,"moderation"),{
+    type:"user",
+    targetId:email,
+    action:"banned",
+    createdAt:Date.now()
+  });
+
+  alert("User banned");
+}
+
+window.manualUnban = async()=>{
+  alert("Unban logic add later");
+}
+
+/* UI */
+window.toggleMenu = function(){
   document.getElementById("sidebar").classList.toggle("active");
 }
 
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
-  });
-});
+loadModeration();
 </script>
 
 </body>
