@@ -7,138 +7,59 @@
 
 <style>
 
-/* RESET */
+/* SAME CSS (unchanged) */
 *{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-/* BODY */
 body{
   background: linear-gradient(135deg,#0f172a,#020617);
   color:white;
 }
 
-/* LAYOUT */
-.dashboard{
-  display:flex;
-}
+.dashboard{display:flex;}
 
-/* SIDEBAR */
 .sidebar{
-  width:240px;
-  height:100vh;
-  background:#020617;
-  padding:20px;
-  position:fixed;
-  left:0;
-  top:0;
-  transition:0.3s;
-  z-index:1000;
+  width:240px;height:100vh;background:#020617;padding:20px;
+  position:fixed;left:0;top:0;transition:0.3s;z-index:1000;
 }
-
-.sidebar h2{margin-bottom:20px;}
 
 .sidebar nav a{
-  display:block;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-  color:white;
-  text-decoration:none;
+  display:block;padding:10px;border-radius:8px;margin-bottom:8px;
+  color:white;text-decoration:none;
 }
 
-.sidebar nav a:hover,
-.sidebar nav a.active{
-  background:#3b82f6;
+.sidebar nav a:hover,.sidebar nav a.active{background:#3b82f6;}
+
+.main{margin-left:240px;padding:20px;width:100%;}
+
+.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:20px;}
+
+table{width:100%;border-collapse:collapse;}
+
+th,td{padding:12px;border-bottom:1px solid #334155;text-align:left;}
+th{color:#94a3b8;}
+
+input,select{
+  width:100%;padding:10px;margin:10px 0;border-radius:8px;
+  border:none;background:#0f172a;color:white;
 }
 
-/* MAIN */
-.main{
-  margin-left:240px;
-  padding:20px;
-  width:100%;
-}
-
-/* CARD */
-.card{
-  background:#1e293b;
-  padding:20px;
-  border-radius:12px;
-  margin-bottom:20px;
-}
-
-/* TABLE */
-table{
-  width:100%;
-  border-collapse:collapse;
-}
-
-th, td{
-  padding:12px;
-  border-bottom:1px solid #334155;
-  text-align:left;
-}
-
-th{
-  color:#94a3b8;
-}
-
-/* INPUTS */
-input, select{
-  width:100%;
-  padding:10px;
-  margin:10px 0;
-  border-radius:8px;
-  border:none;
-  background:#0f172a;
-  color:white;
-}
-
-/* BUTTON */
 .btn{
-  padding:10px 15px;
-  background:#3b82f6;
-  border:none;
-  border-radius:8px;
-  color:white;
-  cursor:pointer;
+  padding:10px 15px;background:#3b82f6;border:none;
+  border-radius:8px;color:white;cursor:pointer;
 }
 
-/* TOP */
 .topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:20px;
+  display:flex;justify-content:space-between;
+  align-items:center;margin-bottom:20px;
 }
 
-/* MENU BUTTON */
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
+.menu-btn{display:none;font-size:22px;cursor:pointer;}
 
-/* MOBILE */
 @media(max-width:768px){
-
-  .sidebar{
-    left:-100%;
-  }
-
-  .sidebar.active{
-    left:0;
-  }
-
-  .main{
-    margin-left:0;
-  }
-
-  .menu-btn{
-    display:block;
-  }
-
-  table{
-    font-size:14px;
-  }
+  .sidebar{left:-100%;}
+  .sidebar.active{left:0;}
+  .main{margin-left:0;}
+  .menu-btn{display:block;}
 }
 
 </style>
@@ -148,7 +69,6 @@ input, select{
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
 <h2>👑 Admin</h2>
 
@@ -168,86 +88,127 @@ input, select{
 </nav>
 
 <a href="index.html" class="btn">Logout 👋</a>
-
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
 <div class="topbar">
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>📜 Activity Logs</h2>
 </div>
 
-<!-- LOG TABLE -->
 <div class="card">
 
 <h3 style="margin-bottom:10px;">🧾 System Activity</h3>
 
-<table>
+<table id="logsTable">
 <tr>
 <th>Time</th>
 <th>User</th>
 <th>Action</th>
 <th>Status</th>
 </tr>
-
-<tr>
-<td>10:45 AM</td>
-<td>admin@skillbridge.com</td>
-<td>Deleted Job Post</td>
-<td>✅ Success</td>
-</tr>
-
-<tr>
-<td>11:10 AM</td>
-<td>user123@gmail.com</td>
-<td>Applied for Job</td>
-<td>✅ Success</td>
-</tr>
-
-<tr>
-<td>11:30 AM</td>
-<td>unknown</td>
-<td>Multiple Login Attempts</td>
-<td>⚠️ Suspicious</td>
-</tr>
-
 </table>
 
 </div>
 
-<!-- FILTERS -->
 <div class="card">
 
 <h3>🔍 Filters</h3>
 
-<label>User Email</label>
-<input type="text" placeholder="Enter email">
-
-<label>Action</label>
-<select>
-<option>All</option>
+<input type="text" id="filterUser" placeholder="Enter email">
+<select id="filterAction">
+<option value="">All</option>
 <option>Login</option>
 <option>Job Post</option>
 <option>Delete</option>
 </select>
 
-<button class="btn">Apply Filters</button>
+<button class="btn" onclick="applyFilters()">Apply Filters</button>
 
 </div>
 
 </main>
-
 </div>
+
+<script type="module">
+
+import { db } from "./firebase.js";
+import {
+  collection,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+let allLogs = [];
+
+// 🔥 LOAD LOGS
+async function loadLogs(){
+  const table = document.getElementById("logsTable");
+
+  const snapshot = await getDocs(collection(db,"logs"));
+
+  allLogs = [];
+
+  snapshot.forEach(doc=>{
+    const data = doc.data();
+    allLogs.push(data);
+  });
+
+  renderLogs(allLogs);
+}
+
+// 🧠 RENDER
+function renderLogs(logs){
+  const table = document.getElementById("logsTable");
+
+  table.innerHTML = `
+  <tr>
+    <th>Time</th>
+    <th>User</th>
+    <th>Action</th>
+    <th>Status</th>
+  </tr>`;
+
+  logs.forEach(l=>{
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+      <td>${l.time || "-"}</td>
+      <td>${l.user || "-"}</td>
+      <td>${l.action || "-"}</td>
+      <td>${l.status || "-"}</td>
+    `;
+
+    table.appendChild(row);
+  });
+}
+
+// 🔍 FILTER
+window.applyFilters = function(){
+
+  const user = document.getElementById("filterUser").value.toLowerCase();
+  const action = document.getElementById("filterAction").value;
+
+  const filtered = allLogs.filter(log=>{
+    return (
+      (!user || (log.user && log.user.toLowerCase().includes(user))) &&
+      (!action || log.action?.includes(action))
+    );
+  });
+
+  renderLogs(filtered);
+}
+
+// LOAD ON START
+loadLogs();
+
+</script>
 
 <script>
 function toggleMenu(){
   document.getElementById("sidebar").classList.toggle("active");
 }
 
-/* Mobile auto close */
 document.querySelectorAll(".sidebar a").forEach(link=>{
   link.addEventListener("click",()=>{
     if(window.innerWidth < 768){
