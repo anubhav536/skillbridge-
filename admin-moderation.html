@@ -1,69 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Moderation | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Admin Moderation | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{display:flex}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th, td{
+  padding:10px;
+  border-bottom:1px solid #334155;
+}
+
+/* BUTTON */
+.btn{
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  margin-right:5px;
+}
+
+.ban{background:#ef4444;color:white;}
+.ignore{background:#475569;color:white;}
+.delete{background:#dc2626;color:white;}
+.review{background:#3b82f6;color:white;}
+.safe{background:#10b981;color:white;}
+
+input{
+  padding:8px;
+  width:100%;
+  border-radius:6px;
+  border:none;
+  margin-top:10px;
+}
+
+/* TOP BAR */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{left:-100%}
+  .sidebar.active{left:0}
+
+  .main{margin-left:0}
+
+  .menu-btn{display:block}
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>🛠 Moderation Panel</h1>
+<div class="dashboard">
 
-  <div class="card">
-    <h2>🚫 Reported Users</h2>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <table>
-      <tr>
-        <th>User</th>
-        <th>Reason</th>
-        <th>Action</th>
-      </tr>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html" class="active">🛠 Mod</a>
+</nav>
 
-      <tr>
-        <td>user123@gmail.com</td>
-        <td>Spam Activity</td>
-        <td>
-          <button>Ban</button>
-          <button>Ignore</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+<a href="index.html" class="btn safe">Logout 👋</a>
 
-  <div class="card">
-    <h2>📛 Reported Jobs</h2>
+</aside>
 
-    <table>
-      <tr>
-        <th>Company</th>
-        <th>Issue</th>
-        <th>Action</th>
-      </tr>
+<!-- MAIN -->
+<main class="main">
 
-      <tr>
-        <td>Fake Corp</td>
-        <td>Fraud Job Posting</td>
-        <td>
-          <button>Delete</button>
-          <button>Review</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+<!-- TOP -->
+<div class="top">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h2>🛠 Moderation Panel</h2>
+</div>
 
-  <div class="card">
-    <h2>🔒 User Control</h2>
+<!-- REPORTED USERS -->
+<div class="card">
+  <h3>🚫 Reported Users</h3>
 
-    <input type="text" placeholder="Enter user email">
+  <table>
+    <tr>
+      <th>User</th>
+      <th>Reason</th>
+      <th>Action</th>
+    </tr>
 
-    <br><br>
-    <button>Ban User</button>
-    <button>Unban User</button>
-  </div>
+    <tr>
+      <td>user123@gmail.com</td>
+      <td>Spam Activity</td>
+      <td>
+        <button class="btn ban">Ban</button>
+        <button class="btn ignore">Ignore</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- REPORTED JOBS -->
+<div class="card">
+  <h3>📛 Reported Jobs</h3>
+
+  <table>
+    <tr>
+      <th>Company</th>
+      <th>Issue</th>
+      <th>Action</th>
+    </tr>
+
+    <tr>
+      <td>Fake Corp</td>
+      <td>Fraud Posting</td>
+      <td>
+        <button class="btn delete">Delete</button>
+        <button class="btn review">Review</button>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- USER CONTROL -->
+<div class="card">
+  <h3>🔒 User Control</h3>
+
+  <input type="text" placeholder="Enter user email">
+
+  <br><br>
+
+  <button class="btn ban">Ban User</button>
+  <button class="btn safe">Unban User</button>
+</div>
+
+</main>
 
 </div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
