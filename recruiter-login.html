@@ -149,6 +149,13 @@ document.getElementById("forgotPassword")
 
 });
 
+
+// 🔥 LOGOUT FUNCTION (GLOBAL)
+window.logout = function(){
+  localStorage.clear();   // 🧹 full clean
+  window.location.href = "index.html";
+};
+
 </script>
 </body>
 </html>
