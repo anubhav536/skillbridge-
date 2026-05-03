@@ -1,46 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Analytics | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Analytics | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:18px;
+  border-radius:14px;
+  transition:0.3s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+/* BUTTON */
+.btn{
+  display:inline-block;
+  padding:8px 14px;
+  background:#3b82f6;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  margin-top:10px;
+}
+
+/* BADGE */
+.badge{
+  background:#3b82f6;
+  padding:5px 10px;
+  border-radius:20px;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>📊 Platform Analytics</h1>
+<div class="dashboard">
 
-  <div class="grid">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-    <div class="card">
-      <h2>Total Users</h2>
-      <p>1,245</p>
-    </div>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
 
-    <div class="card">
-      <h2>Total Jobs</h2>
-      <p>320</p>
-    </div>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html" class="active">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
 
-    <div class="card">
-      <h2>Applications</h2>
-      <p>2,870</p>
-    </div>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
 
-    <div class="card">
-      <h2>Active Users</h2>
-      <p>860</p>
-    </div>
+<a href="index.html" class="btn">Logout 👋</a>
 
-  </div>
+</aside>
 
-  <div class="card">
-    <h2>📈 Growth Overview</h2>
-    <p>(Graph yaha future me add hoga)</p>
-  </div>
+<!-- MAIN -->
+<main class="main">
+
+<!-- TOP -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+
+  <h2>📈 Analytics Dashboard</h2>
+  <span class="badge">Live</span>
+</div>
+
+<!-- STATS -->
+<div class="grid">
+
+<div class="card">
+<h3>👥 Total Users</h3>
+<p>1,245</p>
+</div>
+
+<div class="card">
+<h3>💼 Total Jobs</h3>
+<p>320</p>
+</div>
+
+<div class="card">
+<h3>📄 Applications</h3>
+<p>2,870</p>
+</div>
+
+<div class="card">
+<h3>⚡ Active Users</h3>
+<p>860</p>
+</div>
 
 </div>
+
+<!-- GROWTH -->
+<h2 style="margin:25px 0 10px;">📊 Growth Overview</h2>
+
+<div class="card">
+<p>📈 Graph coming soon (Chart.js add karenge next step me)</p>
+</div>
+
+</main>
+
+</div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
