@@ -242,8 +242,6 @@
 <footer class="footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
-
-<!-- SCRIPT -->
 <script type="module">
 
 import {
@@ -252,14 +250,28 @@ import {
 } from "./firebase.js";
 
 
-
+// 🚀 SIGNUP BUTTON
 document.getElementById("signupBtn")
-.addEventListener("click", () => {
+.addEventListener("click", async () => {
 
-  signupUser(
+  const btn = document.getElementById("signupBtn");
+
+  const user = await signupUser(
     "recruiter",
-    document.getElementById("signupBtn")
+    btn
   );
+
+  if(user){
+
+    // ✅ ROLE SET
+    localStorage.setItem("role", "recruiter");
+
+    // 🚀 Direct dashboard entry
+    window.location.href = "recruiter-dashboard.html";
+
+  } else {
+    alert("Signup Failed ❌");
+  }
 
 });
 
