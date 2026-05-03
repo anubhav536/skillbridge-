@@ -5,6 +5,129 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Dashboard | SkillBridge AI</title>
 <link rel="stylesheet" href="style.css" />
+
+<style>
+
+/* 🌌 PREMIUM BACKGROUND */
+body{
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+  overflow-x: hidden;
+}
+
+/* ✨ SIDEBAR */
+.sidebar{
+  background: rgba(15,23,42,0.9);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  transition: 0.3s;
+}
+
+.sidebar a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  transition:0.2s;
+}
+
+.sidebar a:hover{
+  background:#3b82f6;
+  transform:translateX(5px);
+}
+
+/* 🔥 ACTIVE LINK GLOW */
+.sidebar a.active{
+  background:#3b82f6;
+  box-shadow:0 0 10px #3b82f6;
+}
+
+/* 🎯 CARD STYLE */
+.card{
+  background: rgba(30,41,59,0.6);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 🌊 HOVER EFFECT */
+.card:hover{
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* 💡 CARD GLOW LINE */
+.card::before{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:2px;
+  background:linear-gradient(90deg,#3b82f6,transparent);
+  top:0;
+  left:0;
+}
+
+/* ⚡ BUTTONS */
+.btn{
+  padding:8px 14px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.btn-primary{
+  background:#3b82f6;
+  color:white;
+}
+
+.btn:hover{
+  transform:scale(1.05);
+  box-shadow:0 0 10px #3b82f6;
+}
+
+/* 🎬 FADE ANIMATION */
+.fade-in{
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0; transform:translateY(20px);}
+  to{opacity:1; transform:translateY(0);}
+}
+
+/* 🔔 BADGE ANIMATION */
+.badge{
+  background:#3b82f6;
+  padding:6px 10px;
+  border-radius:20px;
+  animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(59,130,246,0.7);}
+  70%{box-shadow:0 0 0 10px transparent;}
+  100%{box-shadow:0 0 0 0 transparent;}
+}
+
+/* 📱 RESPONSIVE */
+@media(max-width:768px){
+  .dashboard{flex-direction:column;}
+  .sidebar{
+    width:100%;
+    display:flex;
+    overflow-x:auto;
+  }
+  .sidebar nav{
+    display:flex;
+    gap:10px;
+  }
+  .main{padding:15px;}
+}
+
+</style>
+
 </head>
 
 <body class="admin-dashboard-page">
@@ -12,7 +135,7 @@
 <div class="dashboard">
 
   <!-- SIDEBAR -->
-  <aside class="sidebar">
+  <aside class="sidebar fade-in">
 
     <h2>👑 Admin Panel</h2>
 
@@ -21,97 +144,86 @@
       <a href="admin-users.html">👥 Users</a>
       <a href="admin-jobs.html">💼 Jobs</a>
       <a href="admin-applications.html">📄 Applications</a>
+
+      <a href="admin-flags.html">🚨 Flags</a>
+      <a href="admin-analytics.html">📈 Analytics</a>
+      <a href="admin-ai-control.html">🤖 AI</a>
+      <a href="admin-leaderboard.html">🏆 Leaderboard</a>
+
+      <a href="admin-settings.html">⚙ Settings</a>
+      <a href="admin-logs.html">📜 Logs</a>
+      <a href="admin-notifications.html">📩 Notify</a>
+      <a href="admin-moderation.html">🛠 Moderation</a>
     </nav>
 
-    <button id="logoutBtn">Logout 👋</button>
+    <button id="logoutBtn" class="btn">Logout 👋</button>
 
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <main class="main fade-in">
 
     <!-- TOP BAR -->
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:24px;">
       <div>
         <h2>📊 Dashboard Overview</h2>
-        <p class="muted">Welcome back, Admin. Here’s today’s command center.</p>
+        <p class="muted">Command center is live ⚡</p>
       </div>
 
-      <span class="badge">⚡ Live Analytics</span>
+      <span class="badge">Live</span>
     </div>
 
     <!-- STATS -->
-    <div class="grid">
+    <div class="grid fade-in">
 
       <div class="card stat-box">
-        <p class="muted">📌 Total Users</p>
+        <p class="muted">📌 Users</p>
         <h3 id="totalUsers">Loading...</h3>
-        <p class="muted" style="margin-top:8px;">Registered users on platform</p>
       </div>
 
       <div class="card stat-box">
-        <p class="muted">💼 Total Jobs</p>
+        <p class="muted">💼 Jobs</p>
         <h3 id="totalJobs">Loading...</h3>
-        <p class="muted" style="margin-top:8px;">Active + past job posts</p>
       </div>
 
       <div class="card stat-box">
-        <p class="muted">📄 Applications</p>
+        <p class="muted">📄 Apps</p>
         <h3 id="totalApps">Loading...</h3>
-        <p class="muted" style="margin-top:8px;">Applications received</p>
       </div>
 
     </div>
 
     <!-- QUICK ACTIONS -->
-    <section style="padding:28px 0 0;">
-
-      <h2 style="margin-bottom:18px;">⚙ Quick Actions</h2>
+    <section style="padding:28px 0 0;" class="fade-in">
+      <h2>⚙ Quick Actions</h2>
 
       <div class="grid">
 
-        <div class="card">
-          <h3 style="margin-bottom:10px;">👥 Manage Users</h3>
-          <p class="muted">View, edit or remove user accounts.</p>
-          <a href="admin-users.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
-        </div>
+        <div class="card"><h3>👥 Users</h3><a href="admin-users.html" class="btn btn-primary">Open</a></div>
+        <div class="card"><h3>💼 Jobs</h3><a href="admin-jobs.html" class="btn btn-primary">Open</a></div>
+        <div class="card"><h3>📄 Apps</h3><a href="admin-applications.html" class="btn btn-primary">Open</a></div>
 
-        <div class="card">
-          <h3 style="margin-bottom:10px;">💼 Manage Jobs</h3>
-          <p class="muted">Create, update or delete job posts.</p>
-          <a href="admin-jobs.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
-        </div>
+        <div class="card"><h3>🚨 Flags</h3><a href="admin-flags.html" class="btn">Open</a></div>
+        <div class="card"><h3>📈 Analytics</h3><a href="admin-analytics.html" class="btn">Open</a></div>
+        <div class="card"><h3>🤖 AI</h3><a href="admin-ai-control.html" class="btn">Open</a></div>
+        <div class="card"><h3>🏆 Rank</h3><a href="admin-leaderboard.html" class="btn">Open</a></div>
 
-        <div class="card">
-          <h3 style="margin-bottom:10px;">📄 Review Applications</h3>
-          <p class="muted">Track candidate applications easily.</p>
-          <a href="admin-applications.html" class="btn btn-primary" style="margin-top:16px;">Open</a>
-        </div>
+        <div class="card"><h3>⚙ Settings</h3><a href="admin-settings.html" class="btn">Open</a></div>
+        <div class="card"><h3>📜 Logs</h3><a href="admin-logs.html" class="btn">Open</a></div>
+        <div class="card"><h3>📩 Notify</h3><a href="admin-notifications.html" class="btn">Open</a></div>
+        <div class="card"><h3>🛠 Mod</h3><a href="admin-moderation.html" class="btn">Open</a></div>
 
       </div>
-
     </section>
 
     <!-- RECENT ACTIVITY -->
-    <section style="padding:28px 0 0;">
-
-      <h2 style="margin-bottom:18px;">📈 Recent Activity</h2>
+    <section style="padding:28px 0 0;" class="fade-in">
+      <h2>📈 Activity</h2>
 
       <div class="card">
-        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);">
-          <span>New user registered</span>
-          <span class="muted">2 min ago</span>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);">
-          <span>Frontend Developer job posted</span>
-          <span class="muted">15 min ago</span>
-        </div>
-
-        <div style="display:flex;justify-content:space-between;padding:12px 0;">
-          <span>3 new applications submitted</span>
-          <span class="muted">1 hour ago</span>
-        </div>
+        <div style="display:flex;justify-content:space-between;padding:12px;">User joined <span class="muted">2m</span></div>
+        <div style="display:flex;justify-content:space-between;padding:12px;">Job posted <span class="muted">15m</span></div>
+        <div style="display:flex;justify-content:space-between;padding:12px;">Apps received <span class="muted">1h</span></div>
       </div>
 
     </section>
