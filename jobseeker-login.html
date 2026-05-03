@@ -287,13 +287,34 @@ import {
   checkSessionUI
 } from "./firebase.js";
 
+// Already logged-in user ko handle karo
 checkSessionUI();
 
+
+// 🔐 LOGIN BUTTON
 document.getElementById("loginBtn")
-.addEventListener("click", () => {
-  loginUser(document.getElementById("loginBtn"));
+.addEventListener("click", async () => {
+
+  const btn = document.getElementById("loginBtn");
+
+  const user = await loginUser(btn);
+
+  if(user){
+
+    // ✅ ROLE SET
+    localStorage.setItem("role", "jobseeker");
+
+    // 🚀 Redirect to job seeker dashboard
+    window.location.href = "jobseeker-dashboard.html";
+
+  } else {
+    alert("Login Failed ❌");
+  }
+
 });
 
+
+// 🔁 FORGOT PASSWORD
 document.getElementById("forgotPassword")
 .addEventListener("click", (e) => {
 
@@ -312,6 +333,5 @@ document.getElementById("forgotPassword")
 
 });
 </script>
-
 </body>
 </html>
