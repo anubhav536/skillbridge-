@@ -1,125 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Users | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Users | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* HEADER */
+.page-top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+/* SEARCH */
+#searchUser{
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  outline:none;
+  background:#1e293b;
+  color:white;
+}
+
+/* GRID */
+.grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap:15px;
+}
+
+/* CARD */
+.user-card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  transition:0.3s;
+}
+
+.user-card:hover{
+  transform:translateY(-5px);
+}
+
+/* ROLE BADGE */
+.role-badge{
+  display:inline-block;
+  margin-top:8px;
+  padding:4px 8px;
+  border-radius:6px;
+  background:#3b82f6;
+  font-size:12px;
+}
+
+/* LOADING */
+.loading{
+  text-align:center;
+  margin-top:20px;
+}
+
+/* BUTTON */
+.btn{
+  display:inline-block;
+  padding:8px 14px;
+  background:#3b82f6;
+  border-radius:8px;
+  text-decoration:none;
+  color:white;
+  margin-top:10px;
+  cursor:pointer;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
-  
-  <div class="admin-layout">
-    
-    <!-- SIDEBAR -->
-    <aside class="sidebar">
-      
-      <h2>👑 Admin Panel</h2>
-      
-      <nav>
-        <a href="admin-dashboard.html">Dashboard</a>
-        <a href="admin-users.html" class="active">Users</a>
-        <a href="admin-jobs.html">Jobs</a>
-        <a href="admin-applications.html">Applications</a>
-      </nav>
-      
-      <button id="logoutBtn">Logout 👋</button>
-      
-    </aside>
-    
-    <!-- MAIN -->
-    <main class="main-content">
-      
-      <div class="page-top">
-        <h1>👥 All Users</h1>
-        <input type="text" id="searchUser" placeholder="Search users...">
-      </div>
-      
-      <div id="usersList" class="grid-box"></div>
-      
-    </main>
-    
-  </div>
-  
-  <script type="module">
-    import { db, logoutUser } from "./firebase.js";
-    import {
-      getDocs,
-      collection
-    } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-    
-    document.getElementById("logoutBtn")
-      .addEventListener("click", logoutUser);
-    
-    
-    // LOAD USERS
-    async function loadAllUsers() {
-      
-      const container = document.getElementById("usersList");
-      container.innerHTML = `<p class="loading">Loading users...</p>`;
-      
-      try {
-        
-        const snapshot = await getDocs(collection(db, "users"));
-        
-        container.innerHTML = "";
-        
-        if (snapshot.empty) {
-          container.innerHTML = `<p class="loading">No users found 🚫</p>`;
-          return;
-        }
-        
-        snapshot.forEach(doc => {
-          
-          const u = doc.data();
-          
-          const card = document.createElement("div");
-          card.className = "user-card";
-          
-          card.innerHTML = `
+
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+
+<h2>👑 Admin</h2>
+
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html" class="active">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
+
+<a href="index.html" class="btn">Logout 👋</a>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- TOP -->
+<div class="page-top">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h1>👥 All Users</h1>
+  <input type="text" id="searchUser" placeholder="Search users...">
+</div>
+
+<!-- USERS LIST -->
+<div id="usersList" class="grid"></div>
+
+</main>
+
+</div>
+
+<script type="module">
+import { db, logoutUser } from "./firebase.js";
+import {
+  getDocs,
+  collection
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// LOGOUT
+document.querySelector(".btn").addEventListener("click", logoutUser);
+
+// LOAD USERS
+async function loadAllUsers(){
+
+  const container = document.getElementById("usersList");
+  container.innerHTML = `<p class="loading">Loading users...</p>`;
+
+  try{
+
+    const snapshot = await getDocs(collection(db,"users"));
+    container.innerHTML = "";
+
+    if(snapshot.empty){
+      container.innerHTML = `<p class="loading">No users found 🚫</p>`;
+      return;
+    }
+
+    snapshot.forEach(doc=>{
+      const u = doc.data();
+
+      const card = document.createElement("div");
+      card.className = "user-card";
+
+      card.innerHTML = `
         <h3>👤 ${u.name || "No Name"}</h3>
         <p>📧 ${u.email || "No Email"}</p>
         <span class="role-badge">${u.role || "N/A"}</span>
       `;
-          
-          container.appendChild(card);
-          
-        });
-        
-      } catch (err) {
-        
-        console.error(err);
-        container.innerHTML = `<p class="loading">Error loading users ❌</p>`;
-        
-      }
-      
-    }
-    
-    
-    // SEARCH
-    document.getElementById("searchUser")
-      .addEventListener("keyup", function() {
-        
-        const q = this.value.toLowerCase();
-        
-        const users = document.querySelectorAll(".user-card");
-        
-        users.forEach(card => {
-          
-          card.style.display =
-            card.innerText.toLowerCase().includes(q) ?
-            "block" :
-            "none";
-          
-        });
-        
-      });
-    
-    
-    loadAllUsers();
-  </script>
-  
-</body>
 
+      container.appendChild(card);
+    });
+
+  }catch(err){
+    console.error(err);
+    container.innerHTML = `<p class="loading">Error loading users ❌</p>`;
+  }
+}
+
+// SEARCH
+document.getElementById("searchUser")
+.addEventListener("keyup",function(){
+
+  const q = this.value.toLowerCase();
+  const users = document.querySelectorAll(".user-card");
+
+  users.forEach(card=>{
+    card.style.display =
+      card.innerText.toLowerCase().includes(q)
+      ? "block"
+      : "none";
+  });
+
+});
+
+// MOBILE MENU
+window.toggleMenu = function(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+
+loadAllUsers();
+</script>
+
+</body>
 </html>
