@@ -1,55 +1,235 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Admin Flags | Skillbridge</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Flags | SkillBridge AI</title>
+
+<style>
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+
+/* BODY */
+body{
+  background: linear-gradient(135deg,#0f172a,#020617);
+  color:white;
+}
+
+/* LAYOUT */
+.dashboard{
+  display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+  width:240px;
+  height:100vh;
+  background:#020617;
+  padding:20px;
+  position:fixed;
+  left:0;
+  top:0;
+  transition:0.3s;
+  z-index:1000;
+}
+
+.sidebar h2{margin-bottom:20px;}
+
+.sidebar nav a{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-bottom:8px;
+  color:white;
+  text-decoration:none;
+}
+
+.sidebar nav a:hover,
+.sidebar nav a.active{
+  background:#3b82f6;
+}
+
+/* MAIN */
+.main{
+  margin-left:240px;
+  padding:20px;
+  width:100%;
+}
+
+/* CARD */
+.card{
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  margin-bottom:20px;
+}
+
+/* TABLE */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+
+th,td{
+  padding:10px;
+  border-bottom:1px solid #334155;
+  text-align:left;
+}
+
+/* BUTTON */
+.btn{
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  background:#3b82f6;
+  color:white;
+  cursor:pointer;
+}
+
+.btn-danger{
+  background:#ef4444;
+}
+
+/* TOP BAR */
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+/* MENU BUTTON */
+.menu-btn{
+  display:none;
+  font-size:22px;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .sidebar{
+    left:-100%;
+  }
+
+  .sidebar.active{
+    left:0;
+  }
+
+  .main{
+    margin-left:0;
+  }
+
+  .menu-btn{
+    display:block;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-<div class="container">
-  <h1>🚨 Fraud Detection Panel</h1>
+<div class="dashboard">
 
-  <div class="card">
-    <h2>⚠️ Suspicious Users</h2>
-    <table>
-      <tr>
-        <th>User</th>
-        <th>Issue</th>
-        <th>Action</th>
-      </tr>
-      <tr>
-        <td>user123@gmail.com</td>
-        <td>Multiple Accounts</td>
-        <td>
-          <button>Ban</button>
-          <button>Ignore</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<h2>👑 Admin</h2>
 
-  <div class="card">
-    <h2>📛 Spam Job Posts</h2>
-    <table>
-      <tr>
-        <th>Company</th>
-        <th>Issue</th>
-        <th>Action</th>
-      </tr>
-      <tr>
-        <td>Fake Corp</td>
-        <td>Duplicate Posting</td>
-        <td>
-          <button>Remove</button>
-          <button>Review</button>
-        </td>
-      </tr>
-    </table>
-  </div>
+<nav>
+<a href="admin-dashboard.html">📊 Dashboard</a>
+<a href="admin-users.html">👥 Users</a>
+<a href="admin-jobs.html">💼 Jobs</a>
+<a href="admin-applications.html">📄 Apps</a>
+<a href="admin-flags.html" class="active">🚨 Flags</a>
+<a href="admin-analytics.html">📈 Analytics</a>
+<a href="admin-ai-control.html">🤖 AI</a>
+<a href="admin-leaderboard.html">🏆 Rank</a>
+<a href="admin-settings.html">⚙ Settings</a>
+<a href="admin-logs.html">📜 Logs</a>
+<a href="admin-notifications.html">📩 Notify</a>
+<a href="admin-moderation.html">🛠 Mod</a>
+</nav>
+
+<a href="index.html" class="btn">Logout 👋</a>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+<!-- TOP -->
+<div class="top">
+  <span class="menu-btn" onclick="toggleMenu()">☰</span>
+  <h2>🚨 Fraud Detection Panel</h2>
+</div>
+
+<!-- SUSPICIOUS USERS -->
+<div class="card">
+  <h3>⚠️ Suspicious Users</h3>
+
+  <table>
+    <tr>
+      <th>User</th>
+      <th>Issue</th>
+      <th>Action</th>
+    </tr>
+
+    <tr>
+      <td>user123@gmail.com</td>
+      <td>Multiple Accounts</td>
+      <td>
+        <button class="btn btn-danger">Ban</button>
+        <button class="btn">Ignore</button>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+<!-- SPAM JOBS -->
+<div class="card">
+  <h3>📛 Spam Job Posts</h3>
+
+  <table>
+    <tr>
+      <th>Company</th>
+      <th>Issue</th>
+      <th>Action</th>
+    </tr>
+
+    <tr>
+      <td>Fake Corp</td>
+      <td>Duplicate Posting</td>
+      <td>
+        <button class="btn btn-danger">Remove</button>
+        <button class="btn">Review</button>
+      </td>
+    </tr>
+
+  </table>
+</div>
+
+</main>
 
 </div>
+
+<script>
+function toggleMenu(){
+  document.getElementById("sidebar").classList.toggle("active");
+}
+
+/* AUTO CLOSE MOBILE */
+document.querySelectorAll(".sidebar a").forEach(link=>{
+  link.addEventListener("click",()=>{
+    if(window.innerWidth < 768){
+      document.getElementById("sidebar").classList.remove("active");
+    }
+  });
+});
+</script>
 
 </body>
 </html>
