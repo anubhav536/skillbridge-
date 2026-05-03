@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Logs | Skillbridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+  <h1>📜 Activity Logs</h1>
+
+  <div class="card">
+    <h2>🧾 System Activity</h2>
+
+    <table>
+      <tr>
+        <th>Time</th>
+        <th>User</th>
+        <th>Action</th>
+        <th>Status</th>
+      </tr>
+
+      <tr>
+        <td>10:45 AM</td>
+        <td>admin@skillbridge.com</td>
+        <td>Deleted Job Post</td>
+        <td>✅ Success</td>
+      </tr>
+
+      <tr>
+        <td>11:10 AM</td>
+        <td>user123@gmail.com</td>
+        <td>Applied for Job</td>
+        <td>✅ Success</td>
+      </tr>
+
+      <tr>
+        <td>11:30 AM</td>
+        <td>unknown</td>
+        <td>Multiple Login Attempts</td>
+        <td>⚠️ Suspicious</td>
+      </tr>
+
+    </table>
+
+  </div>
+
+  <div class="card">
+    <h2>🔍 Filters</h2>
+
+    <label>Filter by User:</label>
+    <input type="text" placeholder="Enter email">
+
+    <label>Filter by Action:</label>
+    <select>
+      <option>All</option>
+      <option>Login</option>
+      <option>Job Post</option>
+      <option>Delete</option>
+    </select>
+
+    <br><br>
+    <button>Apply Filters</button>
+
+  </div>
+
+</div>
+
+</body>
+</html>
