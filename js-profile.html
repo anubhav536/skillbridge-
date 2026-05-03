@@ -135,30 +135,48 @@ import {
 
 protectPage("seeker");
 
-
 document.getElementById("logoutBtn")
 .addEventListener("click", logoutUser);
 
 
-/* SESSION */
+/* =========================
+   SESSION
+========================= */
+
 function getSession(){
   try{
-    return JSON.parse(
-      localStorage.getItem("session")
-    );
+    return JSON.parse(localStorage.getItem("session"));
   }catch{
     return null;
   }
 }
 
 
-/* LOAD */
+/* =========================
+   CHECK PROFILE COMPLETE
+========================= */
+
+function isProfileComplete(user){
+  return (
+    user.skills &&
+    user.skills.trim().length > 0 &&
+    user.exp !== undefined &&
+    user.exp !== null &&
+    user.exp !== ""
+  );
+}
+
+
+/* =========================
+   LOAD PROFILE
+========================= */
+
 function loadProfile(){
 
   const user = getSession();
 
   if(!user){
-    window.location.href = "js-profile.html";
+    window.location.href = "jobseeker-login.html";
     return;
   }
 
@@ -167,69 +185,70 @@ function loadProfile(){
   const skills = user.skills || "";
   const exp = user.exp || "0";
 
-  document.getElementById("name")
-  .innerText = name;
-
-  document.getElementById("email")
-  .innerText = email;
+  document.getElementById("name").innerText = name;
+  document.getElementById("email").innerText = email;
 
   document.getElementById("avatarText")
   .innerText = name.charAt(0).toUpperCase();
 
   document.getElementById("skillsText")
-  .innerText =
-    "Skills: " +
-    (skills || "Not added");
+  .innerText = "Skills: " + (skills || "Not added");
 
   document.getElementById("expText")
-  .innerText =
-    "Experience: " +
-    exp + " year(s)";
+  .innerText = "Experience: " + exp + " year(s)";
 
   const skillCount = skills
     ? skills.split(",").filter(Boolean).length
     : 0;
 
-  document.getElementById("skillCount")
-  .innerText = skillCount;
+  document.getElementById("skillCount").innerText = skillCount;
+  document.getElementById("expCount").innerText = exp + "y";
 
-  document.getElementById("expCount")
-  .innerText = exp + "y";
+  document.getElementById("skills").value = skills;
+  document.getElementById("exp").value = exp;
 
-  document.getElementById("skills")
-  .value = skills;
 
-  document.getElementById("exp")
-  .value = exp;
+  // 🔥 AUTO WARNING IF INCOMPLETE
+  if(!isProfileComplete(user)){
+    alert("⚠️ Please complete your profile before applying for jobs");
+  }
 
 }
 
 
-/* UPDATE */
+/* =========================
+   UPDATE PROFILE (MANDATORY)
+========================= */
+
 document.getElementById("profileForm")
 .addEventListener("submit", async (e)=>{
 
   e.preventDefault();
 
-  const btn =
-    document.getElementById("saveBtn");
+  const btn = document.getElementById("saveBtn");
 
   btn.disabled = true;
   btn.innerText = "Saving...";
 
-  const skills =
-    document.getElementById("skills")
-    .value.trim();
+  const skills = document.getElementById("skills").value.trim();
+  const exp = document.getElementById("exp").value.trim();
 
-  const exp =
-    document.getElementById("exp")
-    .value.trim();
+
+  // ❗ HARD VALIDATION
+  if(!skills || !exp){
+
+    alert("⚠️ Skills and Experience are mandatory!");
+
+    btn.disabled = false;
+    btn.innerText = "Update Profile 🚀";
+    return;
+  }
 
   try{
 
     await updateUserProfile({
       skills,
-      exp
+      exp: Number(exp)
     });
 
     loadProfile();
@@ -244,8 +263,7 @@ document.getElementById("profileForm")
   }
 
   btn.disabled = false;
-  btn.innerText =
-    "Update Profile 🚀";
+  btn.innerText = "Update Profile 🚀";
 
 });
 
@@ -253,6 +271,5 @@ document.getElementById("profileForm")
 loadProfile();
 
 </script>
-
 </body>
 </html>
