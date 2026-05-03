@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AI Control Panel | Skillbridge</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🤖 AI Control Panel</h1>
+
+  <div class="card">
+    <h2>📄 Resume Ranking System</h2>
+    <label>Experience Weight (%)</label>
+    <input type="range" min="0" max="100" value="50">
+
+    <label>Skills Weight (%)</label>
+    <input type="range" min="0" max="100" value="70">
+
+    <label>Education Weight (%)</label>
+    <input type="range" min="0" max="100" value="40">
+  </div>
+
+  <div class="card">
+    <h2>🎯 Job Recommendation Logic</h2>
+    <select>
+      <option>Skill Based</option>
+      <option>Location Based</option>
+      <option>Hybrid (AI Smart)</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h2>🚨 Fraud Detection Sensitivity</h2>
+    <input type="range" min="0" max="100" value="60">
+    <p>Higher value = Strict checking</p>
+  </div>
+
+  <div class="card">
+    <h2>⚡ Auto Shortlist Settings</h2>
+    <label>Minimum Match %</label>
+    <input type="number" value="70">
+  </div>
+
+  <button>💾 Save Settings</button>
+
+</div>
+
+</body>
+</html>
