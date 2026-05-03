@@ -272,7 +272,10 @@ document
   if(user){
 
     // ✅ ROLE SET
-    localStorage.setItem("role", "jobseeker");
+if (role === "seeker" || role === "jobseeker") {
+  location.href = "js-dashboard.html";
+  return;
+};
 
     // 🚀 Direct entry
     window.location.href = "jobseeker-dashboard.html";
