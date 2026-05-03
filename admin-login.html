@@ -99,16 +99,28 @@
   </footer>
 
   <script type="module">
-    import { loginUser } from "./firebase.js";
+  import { loginUser } from "./firebase.js";
 
-    document
-      .getElementById("loginBtn")
-      .addEventListener("click", () => {
-        loginUser(
-          document.getElementById("loginBtn")
-        );
-      });
-  </script>
+  document
+    .getElementById("loginBtn")
+    .addEventListener("click", async () => {
 
+      const btn = document.getElementById("loginBtn");
+
+      // Firebase login call
+      const user = await loginUser(btn);
+
+      if (user) {
+        // ✅ Role set only after success
+        localStorage.setItem("role", "admin");
+
+        // Redirect to admin dashboard
+        window.location.href = "admin-dashboard.html";
+      } else {
+        alert("Invalid Admin Credentials 🚫");
+      }
+
+    });
+</script>
 </body>
 </html>
