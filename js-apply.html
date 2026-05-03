@@ -217,8 +217,7 @@ document.getElementById("applyForm")
 
   e.preventDefault();
 
-  const btn =
-    document.getElementById("applyBtn");
+  const btn = document.getElementById("applyBtn");
 
   btn.disabled = true;
   btn.innerText = "Submitting...";
@@ -226,82 +225,81 @@ document.getElementById("applyForm")
   const user = getSession();
 
   if(!user){
-    window.location.href =
-      "jobseeker-login.html";
+    window.location.href = "jobseeker-login.html";
     return;
   }
 
   const skillsInput =
-    document.getElementById("skills")
-    .value.trim();
+    document.getElementById("skills").value.trim();
 
   const experience =
-    document.getElementById("experience")
-    .value.trim();
+    document.getElementById("experience").value.trim();
 
   const resume =
-    document.getElementById("resumeText")
-    .value.trim();
+    document.getElementById("resumeText").value.trim();
 
   if(!skillsInput || !resume){
 
     alert("Fill required fields ⚠️");
 
     btn.disabled = false;
-    btn.innerText =
-      "Submit Application 🚀";
-
+    btn.innerText = "Submit Application 🚀";
     return;
   }
 
-  const skills =
-    skillsInput
+  const skills = skillsInput
     .split(",")
     .map(s => s.trim())
     .filter(Boolean);
 
 
-  /* duplicate local check */
+  // 🔥 DUPLICATE CHECK
   let appliedJobs =
-    JSON.parse(
-      localStorage.getItem("appliedJobs")
-    ) || [];
+    JSON.parse(localStorage.getItem("appliedJobs")) || [];
 
   if(appliedJobs.includes(currentJobId)){
 
     alert("Already applied ⚠️");
 
     btn.disabled = false;
-    btn.innerText =
-      "Submit Application 🚀";
-
+    btn.innerText = "Submit Application 🚀";
     return;
   }
 
 
   try{
 
-    await applyJob({
+    // 🚀 CLEAN + CONSISTENT DATA
+    const applicationData = {
 
-      user: user.email,
-      seeker: user.email,
+      // 👤 USER
+      name: user.name || "N/A",
       email: user.email,
-      name: user.name || "",
 
+      // 💼 JOB
       jobId: currentJobId,
       jobTitle: "Applied Job",
 
+      // 🧠 PROFILE
       skills: skills,
-      experience:
-        experience || "0",
-
+      experience: Number(experience) || 0,
       resume: resume,
-      status: "Applied"
 
-    });
+      // 📊 EXTRA (PRO LEVEL)
+      atsScore: document.getElementById("atsScore").innerText,
+
+      // 🟡 STATUS (IMPORTANT)
+      status: "pending",
+
+      // ⏱️ META
+      createdAt: Date.now()
+
+    };
+
+    await applyJob(applicationData);
 
 
-    /* save local */
+    // 💾 LOCAL SAVE
     appliedJobs.push(currentJobId);
 
     localStorage.setItem(
@@ -311,8 +309,7 @@ document.getElementById("applyForm")
 
     alert("Application Submitted ✅");
 
-    window.location.href =
-      "js-applications.html";
+    window.location.href = "js-applications.html";
 
   }catch(err){
 
@@ -321,13 +318,10 @@ document.getElementById("applyForm")
     alert("Submission Failed ❌");
 
     btn.disabled = false;
-    btn.innerText =
-      "Submit Application 🚀";
-
+    btn.innerText = "Submit Application 🚀";
   }
 
 });
-
 </script>
 
 </body>
