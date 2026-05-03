@@ -206,6 +206,8 @@ export async function signupUser(role, btn = null) {
 
   setLoading(btn, true, "Creating...");
 
+  let createdUser = null;
+
   await safeRun(async () => {
 
     const name =
@@ -244,11 +246,15 @@ export async function signupUser(role, btn = null) {
 
     saveSession(userData);
 
+    createdUser = cred.user;
+
     redirectByRole(role);
 
   });
 
   setLoading(btn, false);
+
+  return createdUser;
 }
 
 
