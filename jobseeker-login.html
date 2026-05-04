@@ -286,27 +286,21 @@ import {
   checkSessionUI
 } from "./firebase.js";
 
-// 🧠 Agar already login hai to redirect
+// 🧠 already logged-in ho to redirect
 checkSessionUI();
 
-
 // 🔐 LOGIN BUTTON
-import { loginUser } from "./firebase.js";
-
 document.getElementById("loginBtn")
 .addEventListener("click", async () => {
   await loginUser();
 });
 
-
 // 🔁 FORGOT PASSWORD
 document.getElementById("forgotPassword")
 .addEventListener("click", (e) => {
-
   e.preventDefault();
 
-  const email =
-    document.getElementById("email").value.trim();
+  const email = document.getElementById("email").value.trim();
 
   if(!email){
     alert("Input Email First 📩");
@@ -314,16 +308,13 @@ document.getElementById("forgotPassword")
   }
 
   resetPassword(email);
-
 });
 
-
-// 🔥 LOGOUT (global use)
+// 🔥 LOGOUT
 window.logout = function(){
   localStorage.clear();
   window.location.href = "index.html";
 };
-
 </script>
 </body>
 </html>
