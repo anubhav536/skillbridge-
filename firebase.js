@@ -44,12 +44,13 @@ import {
 
 // ---------- CONFIG ----------
 const firebaseConfig = {
-  apiKey: "YOUR_REAL_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
+  apiKey: "AIzaSyAvT2lDQ8UFfe8iKdJ-SDnJi49H6OSUfxM",
+  authDomain: "skill-bridge-f4316.firebaseapp.com",
+  projectId: "skill-bridge-f4316",
 };
 
 const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
