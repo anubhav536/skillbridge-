@@ -272,11 +272,12 @@ document
   if(user){
 
     // ✅ ROLE SET
-if (role === "seeker" || role === "jobseeker") {
-  location.href = "js-dashboard.html";
-  return;
-};
+import { signupUser } from "./firebase.js";
 
+document.getElementById("signupBtn")
+.addEventListener("click", async () => {
+  await signupUser("jobseeker");
+});
     // 🚀 Direct entry
     window.location.href = "jobseeker-dashboard.html";
 
