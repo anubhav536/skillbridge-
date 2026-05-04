@@ -1,7 +1,6 @@
 // =====================================
-// 🔥 SkillBridge AI FINAL firebase.js (FIXED)
+// 🔥 SkillBridge AI CLEAN firebase.js
 // =====================================
-
 
 // ---------- IMPORTS ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
@@ -19,22 +18,38 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  getDocs,
-  collection,
-  query,
-  where
+  setDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+// =====================================
+// 🔥 SkillBridge AI CLEAN firebase.js
+// =====================================
+
+// ---------- IMPORTS ----------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 
 // ---------- CONFIG ----------
 const firebaseConfig = {
-  apiKey: "AIzaSyAvT2lDQ8UFfe8iKdJ-SDnJi49H6OSUfxM",
-  authDomain: "skill-bridge-f4316.firebaseapp.com",
-  projectId: "skill-bridge-f4316",
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -47,23 +62,7 @@ export const db = getFirestore(app);
 // ⚙️ HELPERS
 // =====================================
 
-async function safeRun(fn) {
-  try {
-    return await fn();
-  } catch (e) {
-    console.error("Firebase Error:", e);
-
-    const errors = {
-      "auth/wrong-password": "Wrong password ❌",
-      "auth/user-not-found": "User not found ❌",
-      "auth/email-already-in-use": "Email already exists ❌",
-      "auth/weak-password": "Password must be 6+ chars ❌",
-    };
-
-    alert(errors[e.code] || e.message);
-  }
-}
-
+// Loading button
 function setLoading(btn, state, text = "Please wait...") {
   if (!btn) return;
 
@@ -96,35 +95,32 @@ export function getSession() {
 function redirectByRole(role) {
 
   if (role === "jobseeker") {
-    location.href = "jobseeker-dashboard.html";
+    window.location.href = "jobseeker-dashboard.html";
     return;
   }
 
   if (role === "recruiter") {
-    location.href = "recruiter-dashboard.html";
+    window.location.href = "recruiter-dashboard.html";
     return;
   }
 
   if (role === "admin") {
-    location.href = "admin-dashboard.html";
+    window.location.href = "admin-dashboard.html";
     return;
   }
 
-  location.href = "index.html";
+  window.location.href = "index.html";
 }
 
 
-
 // =====================================
-// 🔐 AUTH SYSTEM
+// 🔐 LOGIN
 // =====================================
-
-// LOGIN
 export async function loginUser(btn = null) {
 
   setLoading(btn, true, "Logging in...");
 
-  await safeRun(async () => {
+  try {
 
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
@@ -139,7 +135,7 @@ export async function loginUser(btn = null) {
     const snap = await getDoc(doc(db, "users", cred.user.uid));
 
     if (!snap.exists()) {
-      alert("User data missing ❌");
+      alert("User data not found ❌");
       return;
     }
 
@@ -149,20 +145,31 @@ export async function loginUser(btn = null) {
 
     redirectByRole(user.role);
 
-  });
+  } catch (e) {
+    console.error(e);
+
+    const errors = {
+      "auth/user-not-found": "User not found ❌",
+      "auth/wrong-password": "Wrong password ❌",
+      "auth/invalid-email": "Invalid email ❌",
+      "auth/too-many-requests": "Too many attempts ❌"
+    };
+
+    alert(errors[e.code] || e.message);
+  }
 
   setLoading(btn, false);
 }
 
 
-// SIGNUP
+// =====================================
+// 🔐 SIGNUP
+// =====================================
 export async function signupUser(role, btn = null) {
 
   setLoading(btn, true, "Creating...");
 
-  let createdUser = null;
-
-  await safeRun(async () => {
+  try {
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
@@ -173,12 +180,17 @@ export async function signupUser(role, btn = null) {
       return;
     }
 
+    if (password.length < 6) {
+      alert("Password must be 6+ characters ❌");
+      return;
+    }
+
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
     const userData = {
       name,
       email,
-      role, // 🔥 consistent role
+      role, // 🔥 IMPORTANT
       createdAt: Date.now()
     };
 
@@ -186,74 +198,293 @@ export async function signupUser(role, btn = null) {
 
     saveSession(userData);
 
-    createdUser = cred.user;
-
     redirectByRole(role);
 
-  });
+  } catch (e) {
+
+    console.error(e);
+
+    const errors = {
+      "auth/email-already-in-use": "Email already exists ❌",
+      "auth/invalid-email": "Invalid email ❌",
+      "auth/weak-password": "Weak password ❌"
+    };
+
+    alert(errors[e.code] || e.message);
+  }
 
   setLoading(btn, false);
-
-  return createdUser;
 }
 
 
-// LOGOUT
+// =====================================
+// 🔐 LOGOUT
+// =====================================
 export async function logoutUser() {
+
   await signOut(auth);
+
   clearSession();
-  location.href = "index.html";
+
+  window.location.href = "index.html";
 }
 
 
-// RESET PASSWORD
+// =====================================
+// 🔐 RESET PASSWORD
+// =====================================
 export async function resetPassword(email) {
-  await safeRun(async () => {
+
+  try {
     await sendPasswordResetEmail(auth, email);
     alert("Reset link sent ✅");
-  });
+  } catch (e) {
+    alert(e.message);
+  }
 }
 
 
-
 // =====================================
-// 🛡 PAGE SECURITY
+// 🛡 PAGE PROTECTION
 // =====================================
-
-export function protectPage(role = null) {
+export function protectPage(role) {
 
   const user = getSession();
 
   if (!user) {
-    location.href = "index.html";
+    window.location.href = "index.html";
     return;
   }
 
   if (role && user.role !== role) {
-    location.href = "index.html";
+    window.location.href = "index.html";
   }
 }
 
 
-// LOGIN PAGE REDIRECT FIX
-export function checkSessionUI() {
+// =====================================
+// 🔄 AUTO SESSION
+// =====================================
+onAuthStateChanged(auth, async (firebaseUser) => {
 
-  const user = getSession();
-  if (!user) return;
+  if (!firebaseUser) return;
 
-  const path = location.pathname;
+  const snap = await getDoc(doc(db, "users", firebaseUser.uid));
 
-  // ❌ login/signup pe force redirect mat karo
-  if (path.includes("login") || path.includes("signup")) return;
+  if (snap.exists()) {
+    saveSession(snap.data());
+  }
 
-  redirectByRole(user.role);
+});
+
+
+// =====================================
+// ⚙️ HELPERS
+// =====================================
+
+// Loading button
+function setLoading(btn, state, text = "Please wait...") {
+  if (!btn) return;
+
+  if (state) {
+    btn.dataset.old = btn.innerText;
+    btn.innerText = text;
+    btn.disabled = true;
+  } else {
+    btn.innerText = btn.dataset.old || "Submit";
+    btn.disabled = false;
+  }
+}
+
+
+// ---------- SESSION ----------
+function saveSession(user) {
+  localStorage.setItem("session", JSON.stringify(user));
+}
+
+function clearSession() {
+  localStorage.removeItem("session");
+}
+
+export function getSession() {
+  return JSON.parse(localStorage.getItem("session"));
+}
+
+
+// ---------- REDIRECT ----------
+function redirectByRole(role) {
+
+  if (role === "jobseeker") {
+    window.location.href = "jobseeker-dashboard.html";
+    return;
+  }
+
+  if (role === "recruiter") {
+    window.location.href = "recruiter-dashboard.html";
+    return;
+  }
+
+  if (role === "admin") {
+    window.location.href = "admin-dashboard.html";
+    return;
+  }
+
+  window.location.href = "index.html";
 }
 
 
 // =====================================
-// 🔄 AUTO SESSION SYNC
+// 🔐 LOGIN
 // =====================================
+export async function loginUser(btn = null) {
 
+  setLoading(btn, true, "Logging in...");
+
+  try {
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!email || !password) {
+      alert("Fill all fields ❌");
+      return;
+    }
+
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+
+    const snap = await getDoc(doc(db, "users", cred.user.uid));
+
+    if (!snap.exists()) {
+      alert("User data not found ❌");
+      return;
+    }
+
+    const user = snap.data();
+
+    saveSession(user);
+
+    redirectByRole(user.role);
+
+  } catch (e) {
+    console.error(e);
+
+    const errors = {
+      "auth/user-not-found": "User not found ❌",
+      "auth/wrong-password": "Wrong password ❌",
+      "auth/invalid-email": "Invalid email ❌",
+      "auth/too-many-requests": "Too many attempts ❌"
+    };
+
+    alert(errors[e.code] || e.message);
+  }
+
+  setLoading(btn, false);
+}
+
+
+// =====================================
+// 🔐 SIGNUP
+// =====================================
+export async function signupUser(role, btn = null) {
+
+  setLoading(btn, true, "Creating...");
+
+  try {
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    if (!name || !email || !password) {
+      alert("Fill all fields ❌");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Password must be 6+ characters ❌");
+      return;
+    }
+
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+    const userData = {
+      name,
+      email,
+      role, // 🔥 IMPORTANT
+      createdAt: Date.now()
+    };
+
+    await setDoc(doc(db, "users", cred.user.uid), userData);
+
+    saveSession(userData);
+
+    redirectByRole(role);
+
+  } catch (e) {
+
+    console.error(e);
+
+    const errors = {
+      "auth/email-already-in-use": "Email already exists ❌",
+      "auth/invalid-email": "Invalid email ❌",
+      "auth/weak-password": "Weak password ❌"
+    };
+
+    alert(errors[e.code] || e.message);
+  }
+
+  setLoading(btn, false);
+}
+
+
+// =====================================
+// 🔐 LOGOUT
+// =====================================
+export async function logoutUser() {
+
+  await signOut(auth);
+
+  clearSession();
+
+  window.location.href = "index.html";
+}
+
+
+// =====================================
+// 🔐 RESET PASSWORD
+// =====================================
+export async function resetPassword(email) {
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Reset link sent ✅");
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+
+// =====================================
+// 🛡 PAGE PROTECTION
+// =====================================
+export function protectPage(role) {
+
+  const user = getSession();
+
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  if (role && user.role !== role) {
+    window.location.href = "index.html";
+  }
+}
+
+
+// =====================================
+// 🔄 AUTO SESSION
+// =====================================
 onAuthStateChanged(auth, async (firebaseUser) => {
 
   if (!firebaseUser) return;
