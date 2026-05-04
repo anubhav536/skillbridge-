@@ -279,7 +279,6 @@
 <footer class="js-login-footer footer">
   <p>© 2026 SkillBridge AI</p>
 </footer>
-
 <script type="module">
 import {
   loginUser,
@@ -287,6 +286,8 @@ import {
   checkSessionUI
 } from "./firebase.js";
 
+// 🧠 Agar already login hai to redirect
+checkSessionUI();
 
 
 // 🔐 LOGIN BUTTON
@@ -295,17 +296,9 @@ document.getElementById("loginBtn")
 
   const btn = document.getElementById("loginBtn");
 
-  const user = await loginUser(btn);
-
-  if(user){
-
-
-    // 🚀 Redirect
-    window.location.href = "jobseeker-dashboard.html";
-
-  } else {
-    alert("Login Failed ❌");
-  }
+  // ❌ NO IF/ELSE HERE
+  // firebase.js already redirect karta hai
+  await loginUser(btn);
 
 });
 
@@ -317,8 +310,7 @@ document.getElementById("forgotPassword")
   e.preventDefault();
 
   const email =
-    document.getElementById("email")
-    .value.trim();
+    document.getElementById("email").value.trim();
 
   if(!email){
     alert("Input Email First 📩");
@@ -330,9 +322,9 @@ document.getElementById("forgotPassword")
 });
 
 
-// 🔥 LOGOUT FUNCTION (GLOBAL USE)
+// 🔥 LOGOUT (global use)
 window.logout = function(){
-  localStorage.clear();   // 🧹 full clean
+  localStorage.clear();
   window.location.href = "index.html";
 };
 
