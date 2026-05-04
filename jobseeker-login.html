@@ -291,15 +291,11 @@ checkSessionUI();
 
 
 // 🔐 LOGIN BUTTON
+import { loginUser } from "./firebase.js";
+
 document.getElementById("loginBtn")
 .addEventListener("click", async () => {
-
-  const btn = document.getElementById("loginBtn");
-
-  // ❌ NO IF/ELSE HERE
-  // firebase.js already redirect karta hai
-  await loginUser(btn);
-
+  await loginUser();
 });
 
 
