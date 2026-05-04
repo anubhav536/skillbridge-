@@ -5,316 +5,99 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Job Seeker Login | SkillBridge AI</title>
-<link rel="stylesheet" href="style.css">
 
 <style>
-/* ==========================================
-   CUSTOM LOGIN PAGE STYLING
-========================================== */
-
-.js-login-body{
-  min-height:100vh;
-  background:
-  radial-gradient(circle at top right, rgba(37,99,235,.18), transparent 28%),
-  radial-gradient(circle at bottom left, rgba(14,165,233,.14), transparent 24%),
-  linear-gradient(135deg,#0f172a,#111827,#020617);
-  color:#fff;
-}
-
-/* NAVBAR */
-.js-login-navbar{
-  backdrop-filter:blur(12px);
-  background:rgba(15,23,42,.82);
-  border-bottom:1px solid rgba(255,255,255,.05);
-}
-
-.js-login-logo{
-  font-size:24px;
-  font-weight:800;
-  letter-spacing:.3px;
-}
-
-/* SECTION */
-.js-login-section{
-  min-height:calc(100vh - 145px);
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#0f172a;
+  color:white;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:40px 18px;
-  position:relative;
+  height:100vh;
 }
 
-/* GLOW ORBS */
-.js-login-section::before,
-.js-login-section::after{
-  content:"";
-  position:absolute;
-  width:220px;
-  height:220px;
-  border-radius:50%;
-  filter:blur(70px);
-  z-index:0;
-}
-
-.js-login-section::before{
-  top:8%;
-  left:8%;
-  background:rgba(59,130,246,.20);
-}
-
-.js-login-section::after{
-  bottom:10%;
-  right:8%;
-  background:rgba(124,58,237,.18);
-}
-
-/* BOX */
-.js-login-box{
-  width:100%;
-  max-width:460px;
-  background:rgba(30,41,59,.94);
-  border:1px solid rgba(255,255,255,.06);
-  border-radius:24px;
-  padding:34px;
-  box-shadow:0 25px 50px rgba(0,0,0,.35);
-  position:relative;
-  z-index:2;
-}
-
-.js-login-box::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:24px;
-  padding:1px;
-  background:linear-gradient(135deg,rgba(96,165,250,.5),transparent,rgba(124,58,237,.4));
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite:xor;
-          mask-composite:exclude;
-  pointer-events:none;
-}
-
-.js-login-box h2{
-  font-size:32px;
-  margin-bottom:8px;
-  font-weight:800;
-}
-
-.js-login-subtitle{
-  color:#cbd5e1;
-  font-size:15px;
-  margin-bottom:24px;
-  line-height:1.6;
-}
-
-/* LABEL */
-.js-login-box label{
-  display:block;
-  margin:14px 0 8px;
-  font-size:14px;
-  font-weight:700;
-  color:#e2e8f0;
-}
-
-/* INPUT */
-.js-login-input{
-  width:100%;
-  padding:14px 15px;
-  border-radius:14px;
-  border:1px solid #334155;
-  background:#0f172a;
-  color:#fff;
-  transition:.25s;
-}
-
-.js-login-input:focus{
-  border-color:#3b82f6;
-  box-shadow:0 0 0 4px rgba(59,130,246,.15);
-}
-
-/* FORGOT */
-.js-login-forgot-wrap{
-  margin-top:12px;
-  text-align:right;
-}
-
-.js-login-forgot{
-  color:#60a5fa;
-  font-size:14px;
-}
-
-.js-login-forgot:hover{
-  color:#93c5fd;
-}
-
-/* BUTTON */
-.js-login-btn{
-  width:100%;
-  margin-top:22px;
-  padding:15px;
-  border:none;
+.container{
+  background:#1e293b;
+  padding:30px;
   border-radius:16px;
-  background:linear-gradient(135deg,#2563eb,#1d4ed8);
-  color:#fff;
-  font-size:16px;
-  font-weight:800;
+  width:320px;
+}
+
+input{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  width:100%;
+  margin-top:15px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#2563eb;
+  color:white;
+  font-weight:bold;
   cursor:pointer;
-  transition:.25s;
-  box-shadow:0 14px 28px rgba(37,99,235,.28);
 }
 
-.js-login-btn:hover{
-  transform:translateY(-2px);
-  box-shadow:0 18px 35px rgba(37,99,235,.35);
-}
-
-.js-login-btn:active{
-  transform:translateY(0);
-}
-
-/* BOTTOM */
-.js-login-bottom{
-  margin-top:20px;
-  text-align:center;
-  color:#cbd5e1;
-  font-size:15px;
-}
-
-.js-login-bottom a{
+a{
   color:#60a5fa;
-  font-weight:700;
-}
-
-.js-login-bottom a:hover{
-  color:#93c5fd;
-}
-
-/* FOOTER */
-.js-login-footer{
-  background:rgba(17,24,39,.85);
-  border-top:1px solid rgba(255,255,255,.05);
-}
-
-/* MOBILE */
-@media(max-width:600px){
-
-  .js-login-box{
-    padding:24px;
-    border-radius:20px;
-  }
-
-  .js-login-box h2{
-    font-size:26px;
-  }
-
-  .js-login-navbar{
-    padding:16px;
-  }
-
+  font-size:14px;
 }
 </style>
 </head>
 
-<body class="js-login-body">
+<body>
 
-<!-- NAVBAR -->
-<nav class="js-login-navbar">
-  <h2 class="js-login-logo">🚀 SkillBridge AI</h2>
+<div class="container">
 
-  <div class="js-login-navlinks nav-links">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-  </div>
-</nav>
+<h2>👨‍🎓 Job Seeker Login</h2>
 
-<!-- LOGIN -->
-<section class="js-login-section">
+<input type="email" id="email" placeholder="Enter Email">
+<input type="password" id="password" placeholder="Enter Password">
 
-  <div class="js-login-box">
+<button id="loginBtn">Login 🚀</button>
 
-    <h2>👨‍🎓 Job Seeker Login</h2>
+<p><a href="#" id="forgotPassword">Forgot Password?</a></p>
 
-    <p class="js-login-subtitle">
-      Enter your credentials and unlock opportunities waiting for you.
-    </p>
+<p>Don't have account? <a href="jobseeker-signup.html">Signup</a></p>
 
-    <label>Email</label>
-    <input
-      type="email"
-      id="email"
-      placeholder="Enter Email"
-      class="js-login-input"
-    >
+</div>
 
-    <label>Password</label>
-    <input
-      type="password"
-      id="password"
-      placeholder="Enter Password"
-      class="js-login-input"
-    >
-
-    <p class="js-login-forgot-wrap">
-      <a href="#" id="forgotPassword" class="js-login-forgot">
-        Forgot Password?
-      </a>
-    </p>
-
-    <button id="loginBtn" class="js-login-btn">
-      Login 🚀
-    </button>
-
-    <p class="js-login-bottom">
-      Don’t have an account?
-      <a href="jobseeker-signup.html">Signup</a>
-    </p>
-
-  </div>
-
-</section>
-
-<!-- FOOTER -->
-<footer class="js-login-footer footer">
-  <p>© 2026 SkillBridge AI</p>
-</footer>
 <script type="module">
-import {
-  loginUser,
-  resetPassword,
-  checkSessionUI
-} from "./firebase.js";
+import { loginUser, resetPassword } from "./firebase.js";
 
-// 🧠 already logged-in ho to redirect
-checkSessionUI();
-
-// 🔐 LOGIN BUTTON
+// LOGIN
 document.getElementById("loginBtn")
 .addEventListener("click", async () => {
-  await loginUser();
+
+  console.log("Login clicked");
+
+  await loginUser(); // redirect inside function
 });
 
-// 🔁 FORGOT PASSWORD
+
+// FORGOT PASSWORD
 document.getElementById("forgotPassword")
 .addEventListener("click", (e) => {
+
   e.preventDefault();
 
   const email = document.getElementById("email").value.trim();
 
   if(!email){
-    alert("Input Email First 📩");
+    alert("Enter email first");
     return;
   }
 
   resetPassword(email);
 });
-
-// 🔥 LOGOUT
-window.logout = function(){
-  localStorage.clear();
-  window.location.href = "index.html";
-};
 </script>
+
 </body>
 </html>
