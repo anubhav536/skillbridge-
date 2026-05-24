@@ -56,69 +56,60 @@
 </div>
 
 <script type="module">
-import { db, logoutUser } from "./firebase.js";
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { logoutUser, getSession, observeUsersRealtime, approveAdminUser } from "./firebase.js";
 
-// LOGOUT
 document.querySelector(".btn").addEventListener("click", logoutUser);
 
-// LOAD USERS
-async function loadAllUsers(){
+const container = document.getElementById("usersList");
+const searchInput = document.getElementById("searchUser");
+let allUsers = [];
 
-  const container = document.getElementById("usersList");
-  container.innerHTML = `<p class="loading">Loading users...</p>`;
-
-  try{
-
-    const snapshot = await getDocs(collection(db,"users"));
-    container.innerHTML = "";
-
-    if(snapshot.empty){
-      container.innerHTML = `<p class="loading">No users found 🚫</p>`;
-      return;
-    }
-
-    snapshot.forEach(doc=>{
-      const u = doc.data();
-
-      const card = document.createElement("div");
-      card.className = "user-card";
-
-      card.innerHTML = `
-        <h3>👤 ${u.name || "No Name"}</h3>
-        <p>📧 ${u.email || "No Email"}</p>
-        <span class="role-badge">${u.role || "N/A"}</span>
-      `;
-
-      container.appendChild(card);
-    });
-
-  }catch(err){
-    console.error(err);
-    container.innerHTML = `<p class="loading">Error loading users ❌</p>`;
-  }
+function cardMarkup(u) {
+  const pending = u.role === "admin_pending";
+  return `
+    <div class="user-card" data-search="${`${u.name || ""} ${u.email || ""} ${u.role || ""}`.toLowerCase()}">
+      <h3>👤 ${u.name || "No Name"}</h3>
+      <p>📧 ${u.email || "No Email"}</p>
+      <span class="role-badge">${u.role || "N/A"}</span>
+      ${pending ? `<button class="btn approve-admin-btn" data-id="${u.id}" style="margin-top:10px;">Approve Admin ✅</button>` : ""}
+    </div>`;
 }
 
-// SEARCH
-document.getElementById("searchUser")
-.addEventListener("keyup",function(){
+function render(users) {
+  if (!users.length) {
+    container.innerHTML = `<p class="loading">No users found 🚫</p>`;
+    return;
+  }
+  container.innerHTML = users.map(cardMarkup).join("");
+}
 
-  const q = this.value.toLowerCase();
-  const users = document.querySelectorAll(".user-card");
-
-  users.forEach(card=>{
-    card.style.display =
-      card.innerText.toLowerCase().includes(q)
-      ? "block"
-      : "none";
-  });
-
+observeUsersRealtime((users) => {
+  allUsers = users;
+  render(allUsers);
 });
 
-// MOBILE MENU
+searchInput.addEventListener("keyup", function () {
+  const q = this.value.toLowerCase().trim();
+  const filtered = !q ? allUsers : allUsers.filter((u) => `${u.name || ""} ${u.email || ""} ${u.role || ""}`.toLowerCase().includes(q));
+  render(filtered);
+});
+
+container.addEventListener("click", async (e) => {
+  const btn = e.target.closest('.approve-admin-btn');
+  if (!btn) return;
+  const session = getSession() || {};
+  btn.disabled = true;
+  btn.textContent = "Approving...";
+  try {
+    await approveAdminUser(btn.dataset.id, session.email || session.name || "admin");
+  } catch (err) {
+    console.error(err);
+    alert("Approval failed ❌");
+    btn.disabled = false;
+    btn.textContent = "Approve Admin ✅";
+  }
+});
+
 window.toggleMenu = function(){
   document.getElementById("sidebar").classList.toggle("active");
 }
@@ -130,8 +121,6 @@ document.querySelectorAll(".sidebar a").forEach(link=>{
     }
   });
 });
-
-loadAllUsers();
 </script>
 
 <script type="module" src="./app-enhancements.js"></script>

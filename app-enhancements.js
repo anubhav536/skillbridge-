@@ -113,3 +113,26 @@ enhanceForms();
 enableDraftAutosave();
 profileCompleteness();
 enrichAnalyticsPages();
+
+
+function stabilizeButtonLayout() {
+  document.querySelectorAll(".page-top, .profile-top, .profile-head").forEach((top) => {
+    top.style.display = "flex";
+    top.style.alignItems = "center";
+    top.style.justifyContent = "space-between";
+    top.style.gap = "12px";
+    top.style.flexWrap = "wrap";
+  });
+
+  document.querySelectorAll("button, .btn").forEach((btn) => {
+    if (!btn.closest(".sidebar nav")) {
+      btn.style.minHeight = "40px";
+      btn.style.display = "inline-flex";
+      btn.style.alignItems = "center";
+      btn.style.justifyContent = "center";
+      btn.style.gap = "6px";
+    }
+  });
+}
+
+stabilizeButtonLayout();
