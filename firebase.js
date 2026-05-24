@@ -53,10 +53,12 @@ function setLoading(btn, state, text = "Please wait...") {
 // ---------- SESSION ----------
 function saveSession(user) {
   localStorage.setItem("session", JSON.stringify(user));
+  if (user?.role) localStorage.setItem("role", user.role);
 }
 
 function clearSession() {
   localStorage.removeItem("session");
+  localStorage.removeItem("role");
 }
 
 export function getSession() {
@@ -119,6 +121,8 @@ export async function loginUser(btn = null, expectedRole = null) {
     const user = snap.data();
 
     if (expectedRole && user.role !== expectedRole) {
+      await signOut(auth);
+      clearSession();
       alert("Access denied for this portal ❌");
       return null;
     }
