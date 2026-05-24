@@ -94,7 +94,7 @@
 
 <script type="module">
 import { db } from "./firebase.js";
-import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { addDoc, collection, serverTimestamp } from "./database.js";
 
 window.sendMessage = async function sendMessage(e) {
   e.preventDefault();

@@ -13,7 +13,7 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import {
-  getFirestore,
+  db,
   doc,
   getDoc,
   setDoc,
@@ -26,7 +26,7 @@ import {
   getDocs,
   orderBy,
   limit
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+} from "./database.js";
 
 // ---------- CONFIG ----------
 const firebaseConfig = {
@@ -38,7 +38,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const db = getFirestore(app);
 
 // =====================================
 // ⚙️ HELPERS

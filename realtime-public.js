@@ -1,5 +1,5 @@
 import { db } from "./firebase.js";
-import { collection, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { collection, onSnapshot, query, orderBy, limit } from "./database.js";
 
 function setText(id, value) {
   const el = document.getElementById(id);
