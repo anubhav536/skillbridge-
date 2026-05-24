@@ -19,7 +19,11 @@ import {
   setDoc,
   addDoc,
   updateDoc,
-  collection
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 // ---------- CONFIG ----------
@@ -299,4 +303,72 @@ export async function updateUserProfile(profileData) {
 
   const session = getSession() || {};
   saveSession({ ...session, ...profileData });
+}
+
+
+// =====================================
+// 📊 REALTIME ANALYTICS + ADMIN UTILITIES
+// =====================================
+export async function updatePresence(role = null) {
+  const firebaseUser = auth.currentUser;
+  if (!firebaseUser) return;
+
+  const session = getSession() || {};
+  const effectiveRole = role || session.role || localStorage.getItem("role") || "unknown";
+
+  await setDoc(doc(db, "presence", firebaseUser.uid), {
+    uid: firebaseUser.uid,
+    role: effectiveRole,
+    email: session.email || firebaseUser.email || "",
+    isOnline: true,
+    lastSeen: Date.now()
+  }, { merge: true });
+}
+
+export async function markOffline() {
+  const firebaseUser = auth.currentUser;
+  if (!firebaseUser) return;
+  await setDoc(doc(db, "presence", firebaseUser.uid), {
+    isOnline: false,
+    lastSeen: Date.now()
+  }, { merge: true });
+}
+
+export function startPresenceHeartbeat(role = null) {
+  updatePresence(role).catch(console.error);
+  const id = setInterval(() => updatePresence(role).catch(console.error), 30000);
+
+  window.addEventListener("beforeunload", () => {
+    clearInterval(id);
+    markOffline().catch(console.error);
+  });
+
+  return () => clearInterval(id);
+}
+
+export function enforceSecretAdminSignup() {
+  const unlocked = sessionStorage.getItem("admin_signup_unlocked") === "1";
+  if (!unlocked) {
+    alert("Admin signup is restricted. Use secret access from Admin Login.");
+    window.location.href = "admin-login.html";
+    return false;
+  }
+  return true;
+}
+
+export function observePlatformAnalytics(handlers = {}) {
+  const unsubs = [];
+  const bind = (key, value) => {
+    if (typeof handlers[key] === "function") handlers[key](value);
+  };
+
+  unsubs.push(onSnapshot(collection(db, "users"), (snap) => bind("totalUsers", snap.size)));
+  unsubs.push(onSnapshot(collection(db, "jobs"), (snap) => bind("totalJobs", snap.size)));
+  unsubs.push(onSnapshot(collection(db, "applications"), (snap) => bind("totalApplications", snap.size)));
+
+  unsubs.push(onSnapshot(query(collection(db, "presence"), where("isOnline", "==", true)), (snap) => {
+    bind("activeUsers", snap.size);
+  }));
+
+  return () => unsubs.forEach((u) => u && u());
 }

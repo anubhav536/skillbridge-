@@ -13,7 +13,7 @@
 <!-- NAVBAR -->
 <nav class="navbar">
 
-  <h2>🚀 SkillBridge AI</h2>
+  <h2 id="homeBrandSecret">🚀 SkillBridge AI</h2>
 
   <div class="nav-links">
     <a href="index.html" class="active">Home</a>
@@ -135,13 +135,39 @@
 
 
 <script>
-// Secret admin access: Ctrl + Shift + A
+function openAdminLogin() {
+  window.location.href = "admin-login.html";
+}
+
+// Desktop secret admin access: Ctrl + Shift + A
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-    window.location.href = "admin-login.html";
+    openAdminLogin();
+  }
+});
+
+// Mobile secret gesture: 5 taps in 3 seconds on brand title
+let homeTapCount = 0;
+let homeFirstTapAt = 0;
+const homeBrand = document.getElementById("homeBrandSecret");
+
+homeBrand.addEventListener("click", () => {
+  const now = Date.now();
+
+  if (!homeFirstTapAt || now - homeFirstTapAt > 3000) {
+    homeFirstTapAt = now;
+    homeTapCount = 1;
+    return;
+  }
+
+  homeTapCount += 1;
+
+  if (homeTapCount >= 5) {
+    openAdminLogin();
   }
 });
 </script>
 
+<script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

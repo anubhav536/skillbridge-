@@ -39,13 +39,20 @@
   <footer class="footer">© 2026 SkillBridge AI • Admin Provisioning</footer>
 
 <script type="module">
-import { signupUser } from "./firebase.js";
+import { signupUser, enforceSecretAdminSignup, startPresenceHeartbeat } from "./firebase.js";
+
+if (!enforceSecretAdminSignup()) {
+  throw new Error("Blocked restricted route");
+}
 
 document.getElementById("signupBtn").addEventListener("click", async () => {
   const btn = document.getElementById("signupBtn");
   const user = await signupUser("admin", btn);
   if (!user) return;
+  startPresenceHeartbeat("admin");
+  sessionStorage.removeItem("admin_signup_unlocked");
 });
 </script>
+<script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
