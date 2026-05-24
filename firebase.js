@@ -114,6 +114,8 @@ export async function loginUser(btn = null, expectedRole = null) {
     const snap = await getDoc(doc(db, "users", cred.user.uid));
 
     if (!snap.exists()) {
+      await signOut(auth);
+      clearSession();
       alert("User data not found ❌");
       return null;
     }
