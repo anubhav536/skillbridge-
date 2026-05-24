@@ -23,7 +23,9 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs
+  getDocs,
+  orderBy,
+  limit
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 // ---------- CONFIG ----------
@@ -80,14 +82,16 @@ export function getSession() {
 }
 
 // ---------- REDIRECT ----------
-function redirectByRole(role) {
+function redirectByRole(role, user = {}) {
   if (role === "jobseeker") {
-    window.location.href = "js-dashboard.html";
+    const profileReady = Boolean((user.skills || "").trim()) && user.exp !== undefined && user.exp !== null && `${user.exp}` !== "";
+    window.location.href = profileReady ? "js-dashboard.html" : "js-profile.html";
     return;
   }
 
   if (role === "recruiter") {
-    window.location.href = "rec-dashboard.html";
+    const profileReady = Boolean((user.company || "").trim());
+    window.location.href = profileReady ? "rec-dashboard.html" : "rec-profile.html";
     return;
   }
 
@@ -126,6 +130,13 @@ export async function loginUser(btn = null, expectedRole = null) {
 
     const user = snap.data();
 
+    if (expectedRole === "admin" && user.role === "admin_pending") {
+      await signOut(auth);
+      clearSession();
+      alert("Admin account is pending approval by existing admin ⏳");
+      return null;
+    }
+
     if (expectedRole && user.role !== expectedRole) {
       await signOut(auth);
       clearSession();
@@ -134,7 +145,7 @@ export async function loginUser(btn = null, expectedRole = null) {
     }
 
     saveSession(user);
-    redirectByRole(user.role);
+    redirectByRole(user.role, user);
     return user;
   } catch (e) {
     console.error(e);
@@ -176,17 +187,38 @@ export async function signupUser(role, btn = null) {
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
 
-    const userData = {
+    let userData = {
       name,
       email,
       role,
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      profileCompleted: false
     };
+
+    if (role === "admin") {
+      const approvedAdmins = await getDocs(query(collection(db, "users"), where("role", "==", "admin")));
+      const requiresApproval = !approvedAdmins.empty;
+      userData = {
+        ...userData,
+        role: requiresApproval ? "admin_pending" : "admin",
+        requestedRole: "admin",
+        approved: !requiresApproval,
+        approvedBy: requiresApproval ? null : "bootstrap"
+      };
+    }
 
     await setDoc(doc(db, "users", cred.user.uid), userData);
 
     saveSession(userData);
-    redirectByRole(role);
+    if (role === "admin" && userData.role === "admin_pending") {
+      alert("Admin signup request submitted. Wait for approval from an existing admin.");
+      await signOut(auth);
+      clearSession();
+      window.location.href = "admin-login.html";
+      return userData;
+    }
+
+    redirectByRole(userData.role, userData);
     return userData;
   } catch (e) {
     console.error(e);
@@ -371,4 +403,22 @@ export function observePlatformAnalytics(handlers = {}) {
   }));
 
   return () => unsubs.forEach((u) => u && u());
+}
+
+
+export function observeUsersRealtime(onChange) {
+  return onSnapshot(query(collection(db, "users"), orderBy("createdAt", "desc"), limit(500)), (snap) => {
+    const users = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    if (typeof onChange === "function") onChange(users);
+  });
+}
+
+export async function approveAdminUser(userId, approver = "") {
+  if (!userId) throw new Error("userId required");
+  await updateDoc(doc(db, "users", userId), {
+    role: "admin",
+    approved: true,
+    approvedBy: approver || "existing-admin",
+    approvedAt: Date.now()
+  });
 }
