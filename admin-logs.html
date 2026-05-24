@@ -5,64 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Logs | SkillBridge AI</title>
 
-<style>
 
-/* SAME CSS (unchanged) */
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-
-body{
-  background: linear-gradient(135deg,#0f172a,#020617);
-  color:white;
-}
-
-.dashboard{display:flex;}
-
-.sidebar{
-  width:240px;height:100vh;background:#020617;padding:20px;
-  position:fixed;left:0;top:0;transition:0.3s;z-index:1000;
-}
-
-.sidebar nav a{
-  display:block;padding:10px;border-radius:8px;margin-bottom:8px;
-  color:white;text-decoration:none;
-}
-
-.sidebar nav a:hover,.sidebar nav a.active{background:#3b82f6;}
-
-.main{margin-left:240px;padding:20px;width:100%;}
-
-.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:20px;}
-
-table{width:100%;border-collapse:collapse;}
-
-th,td{padding:12px;border-bottom:1px solid #334155;text-align:left;}
-th{color:#94a3b8;}
-
-input,select{
-  width:100%;padding:10px;margin:10px 0;border-radius:8px;
-  border:none;background:#0f172a;color:white;
-}
-
-.btn{
-  padding:10px 15px;background:#3b82f6;border:none;
-  border-radius:8px;color:white;cursor:pointer;
-}
-
-.topbar{
-  display:flex;justify-content:space-between;
-  align-items:center;margin-bottom:20px;
-}
-
-.menu-btn{display:none;font-size:22px;cursor:pointer;}
-
-@media(max-width:768px){
-  .sidebar{left:-100%;}
-  .sidebar.active{left:0;}
-  .main{margin-left:0;}
-  .menu-btn{display:block;}
-}
-
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -99,7 +43,7 @@ input,select{
 
 <div class="card">
 
-<h3 style="margin-bottom:10px;">🧾 System Activity</h3>
+<h3>🧾 System Activity</h3>
 
 <table id="logsTable">
 <tr>

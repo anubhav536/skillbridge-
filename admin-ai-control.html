@@ -5,92 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>AI Control Panel | SkillBridge AI</title>
 
-<style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
 
-body{
-  background: linear-gradient(135deg,#0f172a,#020617);
-  color:white;
-}
-
-.dashboard{display:flex;}
-
-.sidebar{
-  width:240px;
-  height:100vh;
-  background:#020617;
-  padding:20px;
-  position:fixed;
-  left:0;
-  top:0;
-  transition:0.3s;
-  z-index:1000;
-}
-
-.sidebar nav a{
-  display:block;
-  padding:10px;
-  border-radius:8px;
-  margin-bottom:8px;
-  color:white;
-  text-decoration:none;
-}
-
-.sidebar nav a:hover,
-.sidebar nav a.active{
-  background:#3b82f6;
-}
-
-.main{
-  margin-left:240px;
-  padding:20px;
-  width:100%;
-}
-
-.card{
-  background:#1e293b;
-  padding:18px;
-  border-radius:12px;
-  margin-bottom:20px;
-}
-
-input, select{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  margin-bottom:15px;
-  border-radius:8px;
-  border:none;
-}
-
-.btn{
-  padding:10px 16px;
-  background:#3b82f6;
-  border-radius:8px;
-  color:white;
-  border:none;
-  cursor:pointer;
-}
-
-.menu-btn{
-  display:none;
-  font-size:22px;
-  cursor:pointer;
-}
-
-#statusMsg{
-  margin-top:10px;
-  font-size:14px;
-  opacity:0.8;
-}
-
-@media(max-width:768px){
-  .sidebar{left:-100%;}
-  .sidebar.active{left:0;}
-  .main{margin-left:0;}
-  .menu-btn{display:block;}
-}
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -122,7 +38,7 @@ input, select{
 <!-- MAIN -->
 <main class="main">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<div>
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>🤖 AI Control Panel</h2>
 </div>

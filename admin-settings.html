@@ -5,32 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Settings | SkillBridge AI</title>
 
-<style>
 
-/* (same CSS — unchanged) */
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background: linear-gradient(135deg,#0f172a,#020617);color:white;}
-.dashboard{display:flex;}
-.sidebar{width:240px;height:100vh;background:#020617;padding:20px;position:fixed;left:0;top:0;transition:0.3s;z-index:1000;}
-.sidebar h2{margin-bottom:20px;}
-.sidebar nav a{display:block;padding:10px;border-radius:8px;margin-bottom:8px;color:white;text-decoration:none;}
-.sidebar nav a:hover,.sidebar nav a.active{background:#3b82f6;}
-.main{margin-left:240px;padding:20px;width:100%;}
-.card{background:#1e293b;padding:20px;border-radius:12px;margin-bottom:15px;transition:0.3s;}
-.card:hover{transform:translateY(-3px);}
-.btn{display:inline-block;padding:10px 16px;background:#3b82f6;border-radius:8px;text-decoration:none;color:white;margin-top:15px;border:none;cursor:pointer;}
-label{display:block;margin:10px 0;}
-select{padding:8px;border-radius:6px;border:none;}
-.menu-btn{display:none;font-size:22px;cursor:pointer;}
-
-@media(max-width:768px){
-.sidebar{left:-100%;}
-.sidebar.active{left:0;}
-.main{margin-left:0;}
-.menu-btn{display:block;}
-}
-
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -60,7 +36,7 @@ select{padding:8px;border-radius:6px;border:none;}
 
 <main class="main">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<div>
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>⚙ Platform Settings</h2>
 </div>

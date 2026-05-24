@@ -842,3 +842,59 @@ PDF / RESUME PREVIEW
   }
 
 }
+/* ========= UNIVERSAL APP SYMMETRY ========= */
+main, .main, .dashboard, .content, .wrapper{
+  width:min(1200px,92%);
+  margin:28px auto;
+}
+
+h1,h2,h3{
+  letter-spacing:.2px;
+  margin-bottom:14px;
+}
+
+p{ color:var(--muted); }
+
+form, .form-card, .panel, .box, .widget, .section, .table-wrap{
+  background:linear-gradient(180deg,rgba(30,41,59,.95),rgba(15,23,42,.96));
+  border:1px solid rgba(96,165,250,.18);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:rgba(15,23,42,.8);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+th,td{
+  padding:12px 14px;
+  border-bottom:1px solid rgba(148,163,184,.2);
+  text-align:left;
+}
+
+th{ background:rgba(37,99,235,.2); color:#dbeafe; }
+tr:hover td{ background:rgba(59,130,246,.08); }
+
+.auth-container, .login-container, .signup-container, .card-container{
+  width:min(500px,92%);
+  margin:60px auto;
+}
+
+.actions, .row, .topbar, .toolbar{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+
+@media (max-width:768px){
+  .hero h1{font-size:36px;}
+  nav,.navbar{padding:14px 16px;}
+  .btn{width:100%; text-align:center;}
+}

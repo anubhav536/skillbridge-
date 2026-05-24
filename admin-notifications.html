@@ -5,86 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Admin Notifications | SkillBridge AI</title>
 
-<style>
 
-/* SAME CSS (unchanged) */
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-
-body{
-  background: linear-gradient(135deg,#0f172a,#020617);
-  color:white;
-}
-
-.dashboard{display:flex;}
-
-.sidebar{
-  width:240px;
-  height:100vh;
-  background:#020617;
-  padding:20px;
-  position:fixed;
-  left:0;
-  top:0;
-}
-
-.sidebar nav a{
-  display:block;
-  padding:10px;
-  margin-bottom:8px;
-  border-radius:8px;
-  color:white;
-  text-decoration:none;
-}
-
-.sidebar nav a:hover,
-.sidebar nav a.active{
-  background:#3b82f6;
-}
-
-.main{
-  margin-left:240px;
-  padding:20px;
-  width:100%;
-}
-
-.card{
-  background:#1e293b;
-  padding:15px;
-  border-radius:12px;
-  margin-bottom:20px;
-}
-
-input, textarea, select{
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  margin-bottom:15px;
-  border-radius:8px;
-  border:none;
-}
-
-.btn{
-  padding:10px 15px;
-  background:#3b82f6;
-  border:none;
-  border-radius:8px;
-  color:white;
-  cursor:pointer;
-}
-
-table{width:100%;border-collapse:collapse;}
-th,td{padding:10px;border-bottom:1px solid #334155;}
-
-.menu-btn{display:none;}
-
-@media(max-width:768px){
-  .sidebar{left:-100%;transition:0.3s;}
-  .sidebar.active{left:0;}
-  .main{margin-left:0;}
-  .menu-btn{display:block;}
-}
-
-</style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -118,7 +40,7 @@ th,td{padding:10px;border-bottom:1px solid #334155;}
 <!-- MAIN -->
 <main class="main">
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+<div>
   <span class="menu-btn" onclick="toggleMenu()">☰</span>
   <h2>📩 Notifications</h2>
 </div>
