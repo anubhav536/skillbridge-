@@ -276,5 +276,23 @@ document.getElementById("signupBtn")
 
 </script>
 
+
+
+<script>
+// Secret admin access (not visible in UI)
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+    window.location.href = "admin-login.html";
+  }
+});
+
+// Secret admin signup: Ctrl + Shift + S
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
+    window.location.href = "admin-signup.html";
+  }
+});
+</script>
+
 </body>
 </html>

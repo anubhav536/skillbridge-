@@ -125,6 +125,14 @@ window.logout = function(){
   window.location.href = "index.html";
 };
 
+
+
+// Secret signup route for admins only
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
+    window.location.href = "admin-signup.html";
+  }
+});
 </script>
 </body>
 </html>
