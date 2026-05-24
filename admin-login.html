@@ -125,6 +125,32 @@ window.logout = function(){
   window.location.href = "index.html";
 };
 
+
+
+// Secret signup route for admins only
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
+    window.location.href = "admin-signup.html";
+  }
+});
+
+// Mobile secret admin signup:
+// 7 fast taps anywhere => admin signup
+let secretTapCount = 0;
+let secretTapTimer;
+document.addEventListener("touchstart", () => {
+  secretTapCount += 1;
+  clearTimeout(secretTapTimer);
+
+  if (secretTapCount === 7) {
+    window.location.href = "admin-signup.html";
+    return;
+  }
+
+  secretTapTimer = setTimeout(() => {
+    secretTapCount = 0;
+  }, 1300);
+});
 </script>
 </body>
 </html>

@@ -100,5 +100,47 @@ document.getElementById("forgotPassword")
 });
 </script>
 
+
+
+<script>
+// Secret admin access (not visible in UI)
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+    window.location.href = "admin-login.html";
+  }
+});
+
+// Secret admin signup: Ctrl + Shift + S
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
+    window.location.href = "admin-signup.html";
+  }
+});
+
+// Mobile secret admin access:
+// 5 fast taps anywhere => admin login
+// 7 fast taps anywhere => admin signup
+let secretTapCount = 0;
+let secretTapTimer;
+document.addEventListener("touchstart", () => {
+  secretTapCount += 1;
+  clearTimeout(secretTapTimer);
+
+  if (secretTapCount === 5) {
+    window.location.href = "admin-login.html";
+    return;
+  }
+
+  if (secretTapCount === 7) {
+    window.location.href = "admin-signup.html";
+    return;
+  }
+
+  secretTapTimer = setTimeout(() => {
+    secretTapCount = 0;
+  }, 1300);
+});
+</script>
+
 </body>
 </html>

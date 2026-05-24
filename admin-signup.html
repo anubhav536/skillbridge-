@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Signup | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="login-page">
+  <nav class="navbar">
+    <h2>🚀 SkillBridge AI</h2>
+    <div class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="admin-login.html" class="active">Admin</a>
+    </div>
+  </nav>
+
+  <section class="auth-container">
+    <div class="card login-card">
+      <h2 style="text-align:center;">Admin Signup</h2>
+      <p class="subtitle" style="text-align:center;">Restricted provisioning access only 🔐</p>
+
+      <label>Full Name</label>
+      <input type="text" id="name" placeholder="Enter admin name" />
+
+      <label>Email Address</label>
+      <input type="email" id="email" placeholder="Enter admin email" />
+
+      <label>Password</label>
+      <input type="password" id="password" placeholder="Create secure password" />
+
+      <button id="signupBtn" class="btn btn-primary" style="width:100%; margin-top:18px;">Create Admin ✅</button>
+
+      <p class="bottom-text"><a href="admin-login.html">← Back to Admin Login</a></p>
+    </div>
+  </section>
+
+  <footer class="footer">© 2026 SkillBridge AI • Admin Provisioning</footer>
+
+<script type="module">
+import { signupUser } from "./firebase.js";
+
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("signupBtn");
+  const user = await signupUser("admin", btn);
+  if (!user) return;
+});
+</script>
+</body>
+</html>
