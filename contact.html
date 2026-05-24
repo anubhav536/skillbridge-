@@ -50,12 +50,12 @@
       </div>
 
       <div class="stat">
-        <h3>99%</h3>
+        <h3 id="contactSupportRate">Loading...</h3>
         <span>Support Rate</span>
       </div>
 
       <div class="stat">
-        <h3>500+</h3>
+        <h3 id="contactUsersHelped">Loading...</h3>
         <span>Users Helped</span>
       </div>
     </div>
@@ -92,28 +92,49 @@
   <p>© 2026 SkillBridge AI. All rights reserved.</p>
 </footer>
 
-<script>
-function sendMessage(e){
+<script type="module">
+import { db } from "./firebase.js";
+import { addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+window.sendMessage = async function sendMessage(e) {
   e.preventDefault();
 
   const btn = document.querySelector(".contact-form button");
+  const name = document.getElementById("cname").value.trim();
+  const email = document.getElementById("cemail").value.trim();
+  const message = document.getElementById("cmsg").value.trim();
+
+  if (!name || !email || !message) {
+    alert("Please fill all fields ❌");
+    return;
+  }
 
   btn.innerText = "Sending...";
   btn.disabled = true;
 
-  setTimeout(() => {
-    alert("Message sent successfully 🚀");
+  try {
+    await addDoc(collection(db, "contacts"), {
+      name,
+      email,
+      message,
+      createdAt: serverTimestamp()
+    });
 
+    alert("Message sent successfully 🚀");
     document.getElementById("cname").value = "";
     document.getElementById("cemail").value = "";
     document.getElementById("cmsg").value = "";
-
+  } catch (error) {
+    console.error(error);
+    alert("Failed to send message. Try again ❌");
+  } finally {
     btn.innerText = "Send Message 🚀";
     btn.disabled = false;
-  },1200);
-}
+  }
+};
 </script>
 
+<script type="module" src="./realtime-public.js"></script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
