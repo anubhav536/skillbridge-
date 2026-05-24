@@ -18,7 +18,7 @@
     <a href="index.html" class="active">Home</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
-    <a href="admin-login.html" class="admin-link">Admin</a>
+    
   </div>
 
 </nav>
@@ -47,9 +47,6 @@
         🏢 I am a Recruiter
       </a>
 
-      <a href="admin-login.html" class="admin-btn">
-        🛡️ Admin Panel
-      </a>
 
     </div>
 
@@ -134,6 +131,16 @@
 <footer class="footer">
   <p>© 2026 SkillBridge AI. All rights reserved.</p>
 </footer>
+
+
+<script>
+// Secret admin access: Ctrl + Shift + A
+document.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
+    window.location.href = "admin-login.html";
+  }
+});
+</script>
 
 </body>
 </html>
