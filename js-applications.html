@@ -115,7 +115,7 @@ import {
   collection
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-protectPage("seeker");
+protectPage("jobseeker");
 
 document.getElementById("logoutBtn")
 .addEventListener("click", logoutUser);
@@ -135,7 +135,7 @@ async function loadApplications(){
 
   if(!user){
     window.location.href =
-      "js-applications.html";
+      "jobseeker-login.html";
     return;
   }
 

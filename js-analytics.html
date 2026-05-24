@@ -113,7 +113,7 @@ import {
   collection
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-protectPage("seeker");
+protectPage("jobseeker");
 
 // LOGOUT
 document.getElementById("logoutBtn")
@@ -126,7 +126,7 @@ async function loadAnalytics(){
   const user = getSession();
 
   if(!user){
-    window.location.href = "js-analytics.html";
+    window.location.href = "jobseeker-login.html";
     return;
   }
 
