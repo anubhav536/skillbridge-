@@ -107,16 +107,11 @@ document
 
     const btn = document.getElementById("loginBtn");
 
-    const user = await loginUser(btn);
+    const user = await loginUser(btn, "admin");
 
-    if (user) {
-      // ✅ ROLE SET
-      localStorage.setItem("role", "admin");
-
-      // 🚀 Redirect
-      window.location.href = "admin-dashboard.html";
-    } else {
+    if (!user) {
       alert("Invalid Admin Credentials 🚫");
+      return;
     }
 
   });

@@ -78,7 +78,8 @@ document.getElementById("loginBtn")
 
   console.log("Login clicked");
 
-  await loginUser(); // redirect inside function
+  const btn = document.getElementById("loginBtn");
+  await loginUser(btn, "jobseeker");
 });
 
 

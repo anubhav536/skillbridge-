@@ -245,8 +245,7 @@
 <script type="module">
 
 import {
-  signupUser,
-  checkSessionUI
+  signupUser
 } from "./firebase.js";
 
 
@@ -267,7 +266,7 @@ document.getElementById("signupBtn")
     localStorage.setItem("role", "recruiter");
 
     // 🚀 Direct dashboard entry
-    window.location.href = "recruiter-dashboard.html";
+    window.location.href = "rec-dashboard.html";
 
   } else {
     alert("Signup Failed ❌");

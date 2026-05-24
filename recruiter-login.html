@@ -99,8 +99,7 @@
 
 import {
   loginUser,
-  resetPassword,
-  checkSessionUI
+  resetPassword
 } from "./firebase.js";
 
 
@@ -111,16 +110,9 @@ document.getElementById("loginBtn")
 
   const btn = document.getElementById("loginBtn");
 
-  const user = await loginUser(btn);
-
-  if(user){
-
-
-    // 🚀 Redirect to recruiter dashboard
-    window.location.href = "recruiter-dashboard.html";
-
-  } else {
-    alert("Login Failed ❌");
+  const user = await loginUser(btn, "recruiter");
+  if (!user) {
+    return;
   }
 
 });

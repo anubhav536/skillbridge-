@@ -4,29 +4,6 @@
 
 // ---------- IMPORTS ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
-
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-// =====================================
-// 🔥 SkillBridge AI CLEAN firebase.js
-// =====================================
-
-// ---------- IMPORTS ----------
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-app.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -39,7 +16,10 @@ import {
   getFirestore,
   doc,
   getDoc,
-  setDoc
+  setDoc,
+  addDoc,
+  updateDoc,
+  collection
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 // ---------- CONFIG ----------
@@ -54,147 +34,9 @@ const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// ---------- SESSION ----------
-function saveSession(user) {
-  localStorage.setItem("session", JSON.stringify(user));
-}
-function clearSession() {
-  localStorage.removeItem("session");
-}
-export function getSession() {
-  return JSON.parse(localStorage.getItem("session"));
-}
-
-// ---------- REDIRECT ----------
-function redirectByRole(role) {
-  if (role === "jobseeker") {
-    window.location.href = "jobseeker-dashboard.html";
-    return;
-  }
-  if (role === "recruiter") {
-    window.location.href = "recruiter-dashboard.html";
-    return;
-  }
-  if (role === "admin") {
-    window.location.href = "admin-dashboard.html";
-    return;
-  }
-  window.location.href = "index.html";
-}
-
-// ---------- LOGIN ----------
-export async function loginUser(btn = null) {
-  try {
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-
-    const snap = await getDoc(doc(db, "users", cred.user.uid));
-
-    if (!snap.exists()) {
-      alert("User data not found ❌");
-      return;
-    }
-
-    const user = snap.data();
-    saveSession(user);
-    redirectByRole(user.role);
-
-  } catch (e) {
-    console.error(e);
-    alert(e.code);
-  }
-}
-
-// ---------- SIGNUP ----------
-export async function signupUser(role, btn = null) {
-  try {
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
-
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-
-    const userData = { name, email, role };
-
-    await setDoc(doc(db, "users", cred.user.uid), userData);
-
-    saveSession(userData);
-    redirectByRole(role);
-
-  } catch (e) {
-    console.error(e);
-    alert(e.code);
-  }
-}
-
-// =====================================
-// 🔐 LOGOUT
-// =====================================
-export async function logoutUser() {
-
-  await signOut(auth);
-
-  clearSession();
-
-  window.location.href = "index.html";
-}
-
-
-// =====================================
-// 🔐 RESET PASSWORD
-// =====================================
-export async function resetPassword(email) {
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Reset link sent ✅");
-  } catch (e) {
-    alert(e.message);
-  }
-}
-
-
-// =====================================
-// 🛡 PAGE PROTECTION
-// =====================================
-export function protectPage(role) {
-
-  const user = getSession();
-
-  if (!user) {
-    window.location.href = "index.html";
-    return;
-  }
-
-  if (role && user.role !== role) {
-    window.location.href = "index.html";
-  }
-}
-
-
-// =====================================
-// 🔄 AUTO SESSION
-// =====================================
-onAuthStateChanged(auth, async (firebaseUser) => {
-
-  if (!firebaseUser) return;
-
-  const snap = await getDoc(doc(db, "users", firebaseUser.uid));
-
-  if (snap.exists()) {
-    saveSession(snap.data());
-  }
-
-});
-
-
 // =====================================
 // ⚙️ HELPERS
 // =====================================
-
-// Loading button
 function setLoading(btn, state, text = "Please wait...") {
   if (!btn) return;
 
@@ -208,7 +50,6 @@ function setLoading(btn, state, text = "Please wait...") {
   }
 }
 
-
 // ---------- SESSION ----------
 function saveSession(user) {
   localStorage.setItem("session", JSON.stringify(user));
@@ -219,20 +60,28 @@ function clearSession() {
 }
 
 export function getSession() {
-  return JSON.parse(localStorage.getItem("session"));
-}
+  const raw = localStorage.getItem("session");
 
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error("Invalid session data in localStorage", e);
+    clearSession();
+    return null;
+  }
+}
 
 // ---------- REDIRECT ----------
 function redirectByRole(role) {
-
   if (role === "jobseeker") {
-    window.location.href = "jobseeker-dashboard.html";
+    window.location.href = "js-dashboard.html";
     return;
   }
 
   if (role === "recruiter") {
-    window.location.href = "recruiter-dashboard.html";
+    window.location.href = "rec-dashboard.html";
     return;
   }
 
@@ -244,39 +93,39 @@ function redirectByRole(role) {
   window.location.href = "index.html";
 }
 
-
 // =====================================
 // 🔐 LOGIN
 // =====================================
-export async function loginUser(btn = null) {
-
+export async function loginUser(btn = null, expectedRole = null) {
   setLoading(btn, true, "Logging in...");
 
   try {
-
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
     if (!email || !password) {
       alert("Fill all fields ❌");
-      return;
+      return null;
     }
 
     const cred = await signInWithEmailAndPassword(auth, email, password);
-
     const snap = await getDoc(doc(db, "users", cred.user.uid));
 
     if (!snap.exists()) {
       alert("User data not found ❌");
-      return;
+      return null;
     }
 
     const user = snap.data();
 
+    if (expectedRole && user.role !== expectedRole) {
+      alert("Access denied for this portal ❌");
+      return null;
+    }
+
     saveSession(user);
-
     redirectByRole(user.role);
-
+    return user;
   } catch (e) {
     console.error(e);
 
@@ -288,33 +137,31 @@ export async function loginUser(btn = null) {
     };
 
     alert(errors[e.code] || e.message);
+    return null;
+  } finally {
+    setLoading(btn, false);
   }
-
-  setLoading(btn, false);
 }
-
 
 // =====================================
 // 🔐 SIGNUP
 // =====================================
 export async function signupUser(role, btn = null) {
-
   setLoading(btn, true, "Creating...");
 
   try {
-
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const password = document.getElementById("password").value.trim();
 
     if (!name || !email || !password) {
       alert("Fill all fields ❌");
-      return;
+      return null;
     }
 
     if (password.length < 6) {
       alert("Password must be 6+ characters ❌");
-      return;
+      return null;
     }
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -322,18 +169,16 @@ export async function signupUser(role, btn = null) {
     const userData = {
       name,
       email,
-      role, // 🔥 IMPORTANT
+      role,
       createdAt: Date.now()
     };
 
     await setDoc(doc(db, "users", cred.user.uid), userData);
 
     saveSession(userData);
-
     redirectByRole(role);
-
+    return userData;
   } catch (e) {
-
     console.error(e);
 
     const errors = {
@@ -343,30 +188,25 @@ export async function signupUser(role, btn = null) {
     };
 
     alert(errors[e.code] || e.message);
+    return null;
+  } finally {
+    setLoading(btn, false);
   }
-
-  setLoading(btn, false);
 }
-
 
 // =====================================
 // 🔐 LOGOUT
 // =====================================
 export async function logoutUser() {
-
   await signOut(auth);
-
   clearSession();
-
   window.location.href = "index.html";
 }
-
 
 // =====================================
 // 🔐 RESET PASSWORD
 // =====================================
 export async function resetPassword(email) {
-
   try {
     await sendPasswordResetEmail(auth, email);
     alert("Reset link sent ✅");
@@ -375,12 +215,10 @@ export async function resetPassword(email) {
   }
 }
 
-
 // =====================================
 // 🛡 PAGE PROTECTION
 // =====================================
 export function protectPage(role) {
-
   const user = getSession();
 
   if (!user) {
@@ -393,12 +231,10 @@ export function protectPage(role) {
   }
 }
 
-
 // =====================================
 // 🔄 AUTO SESSION
 // =====================================
 onAuthStateChanged(auth, async (firebaseUser) => {
-
   if (!firebaseUser) return;
 
   const snap = await getDoc(doc(db, "users", firebaseUser.uid));
@@ -406,5 +242,55 @@ onAuthStateChanged(auth, async (firebaseUser) => {
   if (snap.exists()) {
     saveSession(snap.data());
   }
-
 });
+
+
+// =====================================
+// 💼 JOB & APPLICATION HELPERS
+// =====================================
+export async function postJob() {
+  const user = getSession();
+
+  if (!user?.email) {
+    throw new Error("Recruiter session required");
+  }
+
+  const jobData = {
+    title: document.getElementById("title")?.value?.trim() || "",
+    skills: document.getElementById("skills")?.value?.split(",").map(s => s.trim()).filter(Boolean) || [],
+    salary: document.getElementById("salary")?.value?.trim() || "",
+    location: document.getElementById("location")?.value?.trim() || "",
+    recruiter: user?.email || "",
+    createdAt: Date.now()
+  };
+
+  return addDoc(collection(db, "jobs"), jobData);
+}
+
+export async function applyJob(applicationData) {
+  if (!applicationData || !applicationData.jobId) {
+    throw new Error("Valid application data is required");
+  }
+
+  return addDoc(collection(db, "applications"), {
+    ...applicationData,
+    createdAt: applicationData?.createdAt || Date.now()
+  });
+}
+
+export async function updateApplicationStatus(applicationId, status) {
+  return updateDoc(doc(db, "applications", applicationId), { status });
+}
+
+export async function updateUserProfile(profileData) {
+  const firebaseUser = auth.currentUser;
+
+  if (!firebaseUser) {
+    throw new Error("User not logged in");
+  }
+
+  await updateDoc(doc(db, "users", firebaseUser.uid), profileData);
+
+  const session = getSession() || {};
+  saveSession({ ...session, ...profileData });
+}

@@ -130,10 +130,11 @@
 import {
   logoutUser,
   updateUserProfile,
-  protectPage
+  protectPage,
+  getSession
 } from "./firebase.js";
 
-protectPage("seeker");
+protectPage("jobseeker");
 
 document.getElementById("logoutBtn")
 .addEventListener("click", logoutUser);
@@ -143,13 +144,6 @@ document.getElementById("logoutBtn")
    SESSION
 ========================= */
 
-function getSession(){
-  try{
-    return JSON.parse(localStorage.getItem("session"));
-  }catch{
-    return null;
-  }
-}
 
 
 /* =========================

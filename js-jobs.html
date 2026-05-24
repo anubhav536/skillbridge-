@@ -107,10 +107,10 @@ import {
 const user = getSession();
 
 if(!user){
-  window.location.href = "js-jobs.html";
+  window.location.href = "jobseeker-login.html";
 }
 
-if(user && user.role !== "seeker"){
+if(user && user.role !== "jobseeker"){
   window.location.href = "index.html";
 }
 

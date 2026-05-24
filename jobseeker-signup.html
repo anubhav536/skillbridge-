@@ -249,44 +249,13 @@
   <p>© 2026 SkillBridge AI</p>
 </footer>
 <script type="module">
-
-import {
-  signupUser,
-  checkSessionUI
-} from "./firebase.js";
-
-
-
-// 🚀 SIGNUP BUTTON
-document
-.getElementById("signupBtn")
-.addEventListener("click", async () => {
-
-  const btn = document.getElementById("signupBtn");
-
-  const user = await signupUser(
-    "jobseeker",
-    btn
-  );
-
-  if(user){
-
-    // ✅ ROLE SET
 import { signupUser } from "./firebase.js";
 
-document.getElementById("signupBtn")
-.addEventListener("click", async () => {
-  await signupUser("jobseeker");
+// 🚀 SIGNUP BUTTON
+document.getElementById("signupBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("signupBtn");
+  await signupUser("jobseeker", btn);
 });
-    // 🚀 Direct entry
-    window.location.href = "jobseeker-dashboard.html";
-
-  } else {
-    alert("Signup Failed ❌");
-  }
-
-});
-
 </script>
 
 </body>
