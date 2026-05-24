@@ -83,50 +83,16 @@
 
 <!-- 🔥 FIREBASE LOGIC -->
 <script type="module">
-import { db } from "./firebase.js";
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { observePlatformAnalytics, startPresenceHeartbeat } from "./firebase.js";
 
-async function loadAnalytics(){
+startPresenceHeartbeat("admin");
 
-  try{
-
-    // USERS
-    const usersSnap = await getDocs(collection(db,"users"));
-    const totalUsers = usersSnap.size;
-
-    // JOBS
-    const jobsSnap = await getDocs(collection(db,"jobs"));
-    const totalJobs = jobsSnap.size;
-
-    // APPLICATIONS
-    const appsSnap = await getDocs(collection(db,"applications"));
-    const totalApps = appsSnap.size;
-
-    // ACTIVE USERS (simple logic)
-    let activeUsers = 0;
-    usersSnap.forEach(doc=>{
-      const u = doc.data();
-      if(u.lastActive && (Date.now() - u.lastActive < 7*24*60*60*1000)){
-        activeUsers++;
-      }
-    });
-
-    // UPDATE UI
-    document.getElementById("totalUsers").innerText = totalUsers;
-    document.getElementById("totalJobs").innerText = totalJobs;
-    document.getElementById("totalApps").innerText = totalApps;
-    document.getElementById("activeUsers").innerText = activeUsers;
-
-  }catch(err){
-    console.error(err);
-  }
-
-}
-
-loadAnalytics();
+observePlatformAnalytics({
+  totalUsers: (value) => (document.getElementById("totalUsers").innerText = value),
+  totalJobs: (value) => (document.getElementById("totalJobs").innerText = value),
+  totalApplications: (value) => (document.getElementById("totalApps").innerText = value),
+  activeUsers: (value) => (document.getElementById("activeUsers").innerText = value)
+});
 </script>
 
 <!-- UI JS -->
@@ -144,5 +110,6 @@ document.querySelectorAll(".sidebar a").forEach(link=>{
 });
 </script>
 
+<script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

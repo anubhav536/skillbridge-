@@ -57,9 +57,9 @@ if(role !== "admin"){
 </div>  
   
 <div class="grid">  
-<div class="card"><h3>Users</h3><p>Loading...</p></div>  
-<div class="card"><h3>Jobs</h3><p>Loading...</p></div>  
-<div class="card"><h3>Apps</h3><p>Loading...</p></div>  
+<div class="card"><h3>Users</h3><p id="dashUsers">Loading...</p></div>  
+<div class="card"><h3>Jobs</h3><p id="dashJobs">Loading...</p></div>  
+<div class="card"><h3>Apps</h3><p id="dashApps">Loading...</p></div>  
 </div>  
   
 <h2>Quick Actions</h2>  
@@ -78,6 +78,17 @@ if(role !== "admin"){
 </main>  
 </div>  
   
+<script type="module">
+import { observePlatformAnalytics, startPresenceHeartbeat } from "./firebase.js";
+
+startPresenceHeartbeat("admin");
+observePlatformAnalytics({
+  totalUsers: (value) => (document.getElementById("dashUsers").innerText = value),
+  totalJobs: (value) => (document.getElementById("dashJobs").innerText = value),
+  totalApplications: (value) => (document.getElementById("dashApps").innerText = value)
+});
+</script>
+
 <script>  
 
 function toggleMenu(){  
@@ -100,5 +111,6 @@ document.querySelectorAll(".sidebar a").forEach(link=>{
 });
 </script>  
   
+<script type="module" src="./app-enhancements.js"></script>
 </body>  
 </html>

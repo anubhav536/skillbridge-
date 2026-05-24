@@ -12,7 +12,7 @@
 
   <!-- NAVBAR -->
   <nav class="navbar">
-    <h2>🚀 SkillBridge AI</h2>
+    <h2 id="adminBrandSecret">🚀 SkillBridge AI</h2>
 
     <div class="nav-links">
       <a href="index.html">Home</a>
@@ -81,7 +81,7 @@
     © 2026 SkillBridge AI • Admin Portal
   </footer>
 <script type="module">
-import { loginUser } from "./firebase.js";
+import { loginUser, startPresenceHeartbeat } from "./firebase.js";
 
 // 🔐 LOGIN BUTTON
 document
@@ -98,6 +98,7 @@ document
     }
 
     localStorage.setItem("role", "admin");
+    startPresenceHeartbeat("admin");
 
   });
 
@@ -110,12 +111,39 @@ window.logout = function(){
 
 
 
-// Secret signup route for admins only
+function unlockAdminSignup() {
+  sessionStorage.setItem("admin_signup_unlocked", "1");
+  window.location.href = "admin-signup.html";
+}
+
+// Desktop secret shortcut
 document.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
-    window.location.href = "admin-signup.html";
+    unlockAdminSignup();
+  }
+});
+
+// Mobile secret gesture: 5 taps in 3 seconds on brand title
+let tapCount = 0;
+let firstTapAt = 0;
+const secretBrand = document.getElementById("adminBrandSecret");
+
+secretBrand.addEventListener("click", () => {
+  const now = Date.now();
+
+  if (!firstTapAt || now - firstTapAt > 3000) {
+    firstTapAt = now;
+    tapCount = 1;
+    return;
+  }
+
+  tapCount += 1;
+
+  if (tapCount >= 5) {
+    unlockAdminSignup();
   }
 });
 </script>
+<script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
