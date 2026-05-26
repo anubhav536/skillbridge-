@@ -898,8 +898,4 @@ tr:hover td{ background:rgba(59,130,246,.08); }
   nav,.navbar{padding:14px 16px;}
   .btn{width:100%; text-align:center;}
 }
-/* ===== REMOVE RECRUITER GHOST LABEL ===== */
-#homeBrandSecret::after{
-  content:none !important;
-  display:none !important;
-}
+
