@@ -9,11 +9,8 @@ function createNode(tag, attrs = {}, text = "") {
 }
 
 function injectRoleChip() {
-  const nav = document.querySelector('.navbar h2, .sidebar h2');
-  const role = localStorage.getItem('role');
-  if (!nav || !role) return;
-  const chip = createNode('span', { style: 'margin-left:10px;font-size:12px;padding:4px 8px;border-radius:999px;background:#111827;color:#fff;vertical-align:middle;' }, role.toUpperCase());
-  nav.appendChild(chip);
+  // Disabled intentionally: user requested removing role label (e.g., RECRUITER)
+  // shown next to the SkillBridge AI brand across pages.
 }
 
 function enhanceForms() {
