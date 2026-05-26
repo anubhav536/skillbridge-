@@ -162,11 +162,11 @@ nav a,
 
 nav a:hover,
 .nav-links a:hover,
-.active{
-  background:var(--blue);
-  color:#fff;
+nav a.active,
+.nav-links a.active {
+  background: var(--blue);
+  color: #fff;
 }
-
 /* ========= HERO ========= */
 .hero{
   padding:90px 20px;
