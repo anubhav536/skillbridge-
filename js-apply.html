@@ -255,8 +255,11 @@ document.getElementById("applyForm")
 
 
   // 🔥 DUPLICATE CHECK
+  const scopedKey =
+    `appliedJobs:${(user.email || "").toLowerCase()}`;
+
   let appliedJobs =
-    JSON.parse(localStorage.getItem("appliedJobs")) || [];
+    JSON.parse(localStorage.getItem(scopedKey)) || [];
 
   if(appliedJobs.includes(currentJobId)){
 
@@ -304,7 +307,7 @@ document.getElementById("applyForm")
     appliedJobs.push(currentJobId);
 
     localStorage.setItem(
-      "appliedJobs",
+      scopedKey,
       JSON.stringify(appliedJobs)
     );
 

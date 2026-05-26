@@ -173,11 +173,15 @@ async function loadAppliedJobs(){
       const app = docSnap.data() || {};
 
       const appEmail =
-        (app.userEmail || app.user || app.seeker || app.email || "")
-        .toLowerCase();
+        (
+          app.userEmail ||
+          app.seeker ||
+          app.email ||
+          ""
+        ).toLowerCase();
 
       const appJobId =
-        app.jobId || "";
+        (app.jobId || "").toString().trim();
 
       if(appEmail === email && appJobId){
         appliedJobIds.add(appJobId);
