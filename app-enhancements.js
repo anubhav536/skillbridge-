@@ -9,8 +9,7 @@ function createNode(tag, attrs = {}, text = "") {
 }
 
 function injectRoleChip() {
-  // Disabled intentionally: user requested removing role label (e.g., RECRUITER)
-  // shown next to the SkillBridge AI brand across pages.
+  // Intentionally disabled: role-chip injection next to the SkillBridge AI brand.
 }
 
 function enhanceForms() {
