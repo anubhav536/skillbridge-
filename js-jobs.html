@@ -123,11 +123,13 @@ document.getElementById("logoutBtn")
 
 /* GLOBAL */
 let allJobs = [];
+let appliedJobIds = new Set();
 
 
 /* START */
 window.addEventListener("DOMContentLoaded", async ()=>{
 
+  await loadAppliedJobs();
   await loadJobs();
 
   document.getElementById("search")
@@ -138,6 +140,61 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 
 });
 
+
+
+async function loadAppliedJobs(){
+
+  const currentUser = getSession();
+
+  if(!currentUser?.email){
+    appliedJobIds = new Set();
+    return;
+  }
+
+  const email =
+    currentUser.email.toLowerCase();
+
+  const scopedKey =
+    `appliedJobs:${email}`;
+
+  const savedLocal =
+    JSON.parse(localStorage.getItem(scopedKey)) || [];
+
+  appliedJobIds =
+    new Set(savedLocal);
+
+  try{
+
+    const snap =
+      await getDocs(collection(db, "applications"));
+
+    snap.forEach(docSnap=>{
+
+      const app = docSnap.data() || {};
+
+      const appEmail =
+        (app.userEmail || app.user || app.seeker || app.email || "")
+        .toLowerCase();
+
+      const appJobId =
+        app.jobId || "";
+
+      if(appEmail === email && appJobId){
+        appliedJobIds.add(appJobId);
+      }
+
+    });
+
+    localStorage.setItem(
+      scopedKey,
+      JSON.stringify(Array.from(appliedJobIds))
+    );
+
+  }catch(err){
+    console.error("Failed to load application states", err);
+  }
+
+}
 
 /* =========================
    LOAD JOBS
@@ -273,16 +330,12 @@ function renderJobs(jobs){
     return;
   }
 
-  const appliedJobs =
-    JSON.parse(
-      localStorage.getItem("appliedJobs")
-    ) || [];
 
   container.innerHTML =
     jobs.map((job,index)=>{
 
       const applied =
-        appliedJobs.includes(job.id);
+        appliedJobIds.has(job.id);
 
       const skills =
         Array.isArray(job.skills)
@@ -322,7 +375,7 @@ function renderJobs(jobs){
             data-index="${index}"
             ${applied ? "disabled" : ""}
           >
-            ${applied ? "Applied ✅" : "Apply 🚀"}
+            ${applied ? "Applied ✅" : "Apply Now"}
           </button>
 
         </div>
@@ -362,12 +415,10 @@ function attachApplyEvents(jobs){
         return;
       }
 
-      let appliedJobs =
-        JSON.parse(
-          localStorage.getItem("appliedJobs")
-        ) || [];
+      const scopedKey =
+        `appliedJobs:${(user.email || "").toLowerCase()}`;
 
-      if(appliedJobs.includes(job.id)){
+      if(appliedJobIds.has(job.id)){
         alert("Already applied ⚠️");
         return;
       }
@@ -389,22 +440,23 @@ function attachApplyEvents(jobs){
 
         });
 
-        appliedJobs.push(job.id);
+        appliedJobIds.add(job.id);
 
         localStorage.setItem(
-          "appliedJobs",
-          JSON.stringify(appliedJobs)
+          scopedKey,
+          JSON.stringify(Array.from(appliedJobIds))
         );
 
         btn.innerText = "Applied ✅";
         btn.classList.add("done-btn");
+        btn.disabled = true;
 
       }catch(err){
 
         console.error(err);
 
         btn.disabled = false;
-        btn.innerText = "Apply 🚀";
+        btn.innerText = "Apply Now";
 
         alert("Application failed ❌");
 
