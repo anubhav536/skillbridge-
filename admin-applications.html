@@ -3,177 +3,257 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillBridge AI</title>
+<title>Applications | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .filter-bar { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .filter-bar input  { flex:1; min-width:180px; margin:0; }
+  .filter-bar select { width:160px; margin:0; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
+  .mini-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:12px;
+    padding:.9rem 1rem; text-align:center;
+  }
+  .mini-card h3 { font-size:13px; color:#a78bfa; margin-bottom:.35rem; font-weight:600; }
+  .mini-card p  { font-size:28px; font-weight:800; color:#f5f3ff; margin:0; line-height:1; }
+
+  /* Table */
+  .table-wrap {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    overflow:hidden;
+  }
+  .app-table { width:100%; border-collapse:collapse; }
+  .app-table thead th {
+    padding:.85rem 1rem; text-align:left; font-size:13px; font-weight:700;
+    color:#a78bfa; background:rgba(124,58,237,.1); border-bottom:1px solid rgba(124,58,237,.2);
+  }
+  .app-table tbody tr {
+    border-bottom:1px solid rgba(124,58,237,.1); transition:background .15s;
+  }
+  .app-table tbody tr:last-child { border-bottom:none; }
+  .app-table tbody tr:hover { background:rgba(124,58,237,.06); }
+  .app-table td { padding:.85rem 1rem; font-size:13.5px; color:#c4b5fd; }
+  .app-table td:first-child { color:#f5f3ff; font-weight:600; }
+
+  .status-badge {
+    display:inline-block; padding:.22rem .7rem; border-radius:999px; font-size:12px; font-weight:700;
+  }
+  .badge-applied     { background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35); color:#c4b5fd; }
+  .badge-pending     { background:rgba(245,158,11,.12);  border:1px solid rgba(245,158,11,.3);  color:#fcd34d; }
+  .badge-shortlisted { background:rgba(74,222,128,.12);  border:1px solid rgba(74,222,128,.35); color:#4ade80; }
+  .badge-hired       { background:rgba(34,197,94,.12);   border:1px solid rgba(34,197,94,.35);  color:#4ade80; }
+  .badge-rejected    { background:rgba(248,113,113,.1);  border:1px solid rgba(248,113,113,.3); color:#f87171; }
+  .badge-approved    { background:rgba(34,197,94,.12);   border:1px solid rgba(34,197,94,.35);  color:#4ade80; }
+
+  .act-btn {
+    padding:.32rem .75rem; border-radius:7px; font-size:12.5px; font-weight:700;
+    border:none; cursor:pointer; margin-right:.35rem;
+  }
+  .accept-btn { background:rgba(74,222,128,.15); border:1px solid rgba(74,222,128,.3); color:#4ade80; }
+  .reject-btn { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+  .accept-btn:hover { background:rgba(74,222,128,.3); }
+  .reject-btn:hover { background:rgba(248,113,113,.25); }
+
+  .empty-row td { text-align:center; color:#a78bfa; padding:3rem 1rem; font-size:14px; }
+
+  @media(max-width:700px){
+    .app-table thead { display:none; }
+    .app-table td { display:block; padding:.4rem 1rem; }
+    .app-table td::before { content:attr(data-label)": "; color:#a78bfa; font-weight:600; }
+    .app-table tr { margin-bottom:.75rem; border-bottom:1px solid rgba(124,58,237,.2) !important; display:block; }
+  }
+</style>
 </head>
 
 <body>
+<script>
+  const role = localStorage.getItem("role");
+  if (role !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
-<aside class="sidebar">
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html" class="active">📄 Applications</a>
-</nav>
+<aside class="sidebar" id="sidebar">
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html" class="active">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
 <main class="main">
 
-<div class="top">
-<h2>📄 Applications Panel</h2>
-<span class="badge">Live</span>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>📄 Applications Panel</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">All platform applications</p>
+    </div>
+    <div class="badge">Live</div>
+  </div>
 
-<div class="table-container">
-<table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Email</th>
-<th>Skill</th>
-<th>Experience</th>
-<th>Status</th>
-<th>Actions</th>
-</tr>
-</thead>
+  <div class="mini-grid">
+    <div class="mini-card"><h3>Total</h3><p id="cTotal">—</p></div>
+    <div class="mini-card"><h3>Applied</h3><p id="cApplied">—</p></div>
+    <div class="mini-card"><h3>Shortlisted</h3><p id="cShort">—</p></div>
+    <div class="mini-card"><h3>Hired</h3><p id="cHired">—</p></div>
+    <div class="mini-card"><h3>Rejected</h3><p id="cRejected">—</p></div>
+  </div>
 
-<tbody id="appTable"></tbody>
+  <div class="filter-bar">
+    <input type="text" id="searchInput">
+    <select id="statusFilter">
+      <option value="all">All Status</option>
+      <option value="Applied">Applied</option>
+      <option value="pending">Pending</option>
+      <option value="Shortlisted">Shortlisted</option>
+      <option value="Hired">Hired</option>
+      <option value="Rejected">Rejected</option>
+    </select>
+  </div>
 
-</table>
-</div>
+  <div class="table-wrap">
+    <table class="app-table">
+      <thead>
+        <tr>
+          <th>Applicant</th>
+          <th>Job Title</th>
+          <th>Recruiter</th>
+          <th>Status</th>
+          <th>Applied On</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="appTable">
+        <tr><td colspan="6" class="empty-row">Loading...</td></tr>
+      </tbody>
+    </table>
+  </div>
 
 </main>
 </div>
+
 <script type="module">
-
 import { db } from "./firebase.js";
+import { collection, getDocs, doc, updateDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-import {
-  collection,
-  getDocs,
-  doc,
-  updateDoc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+let allApps = [];
 
-
-// ✅ FIXED ID
-const table = document.getElementById("appTable");
-
-
-// 🧠 SAFE PICK
-function pick(...values) {
-  for (let v of values) {
-    if (v !== undefined && v !== null && v !== "") {
-      return v;
-    }
-  }
-  return "N/A";
-}
-
-
-// 📥 LOAD
 async function loadApplications() {
+  const tbody = document.getElementById("appTable");
+  tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#a78bfa;padding:2rem">Loading...</td></tr>`;
 
   try {
-
-    table.innerHTML = `<tr><td colspan="6">Loading...</td></tr>`;
-
     const snap = await getDocs(collection(db, "applications"));
-
-    if (snap.empty) {
-      table.innerHTML = `<tr><td colspan="6">No applications found 🚫</td></tr>`;
-      return;
-    }
-
-    table.innerHTML = "";
-
-    snap.forEach(d => {
-
-      const app = d.data();
-
-      const name = pick(app.name, app.fullName);
-      const email = pick(app.email, app.userEmail);
-      const skills = pick(
-        Array.isArray(app.skills) ? app.skills.join(", ") : app.skills,
-        app.skill
-      );
-      const experience = pick(app.experience, app.exp);
-      const status = pick(app.status, "pending");
-
-      table.innerHTML += `
-      <tr>
-        <td>${name}</td>
-        <td>${email}</td>
-        <td>${skills}</td>
-        <td>${experience}</td>
-        <td>
-          <span class="status ${status}">
-            ${status}
-          </span>
-        </td>
-        <td class="actions">
-          ${(status === "pending") ? `
-            <button class="accept" onclick="accept('${d.id}')">Accept</button>
-            <button class="reject" onclick="reject('${d.id}')">Reject</button>
-          ` : ""}
-        </td>
-      </tr>
-      `;
-
-    });
-
-  } catch (e) {
+    allApps = [];
+    snap.forEach(d => allApps.push({ id: d.id, ...d.data() }));
+    allApps.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    updateStats(allApps);
+    renderTable(allApps);
+  } catch(e) {
     console.error(e);
-    table.innerHTML = `<tr><td colspan="6">Error loading data ❌</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#f87171;padding:2rem">Error loading data ❌</td></tr>`;
   }
 }
 
+function updateStats(apps) {
+  document.getElementById("cTotal").textContent   = apps.length;
+  document.getElementById("cApplied").textContent = apps.filter(a => a.status === "Applied" || a.status === "pending" || !a.status).length;
+  document.getElementById("cShort").textContent   = apps.filter(a => a.status === "Shortlisted").length;
+  document.getElementById("cHired").textContent   = apps.filter(a => a.status === "Hired").length;
+  document.getElementById("cRejected").textContent= apps.filter(a => a.status === "Rejected").length;
+}
 
-// ✅ ACCEPT
-window.accept = async function (id) {
-  try {
-    await updateDoc(doc(db, "applications", id), {
-      status: "approved"   // ⚡ CSS ke saath match
-    });
-
-    loadApplications();
-
-  } catch (e) {
-    console.error(e);
-    alert("Error ❌");
+function renderTable(apps) {
+  const tbody = document.getElementById("appTable");
+  if (apps.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#a78bfa;padding:2rem">No applications found 🚫</td></tr>`;
+    return;
   }
+
+  tbody.innerHTML = apps.map(app => {
+    const status = app.status || "Applied";
+    const cls    = status.toLowerCase().replace(" ","");
+    const badgeCls = `badge-${cls}`;
+    const date = app.createdAt ? new Date(app.createdAt).toLocaleDateString() : "—";
+    const canAct = status === "pending" || status === "Applied";
+
+    return `<tr>
+      <td data-label="Applicant">${app.seeker || app.user || app.email || "N/A"}</td>
+      <td data-label="Job">${app.jobTitle || "—"}</td>
+      <td data-label="Recruiter">${app.recruiter || "—"}</td>
+      <td data-label="Status"><span class="status-badge ${badgeCls}">${status}</span></td>
+      <td data-label="Applied On">${date}</td>
+      <td data-label="Actions">
+        ${canAct ? `
+          <button class="act-btn accept-btn" onclick="accept('${app.id}')">Accept</button>
+          <button class="act-btn reject-btn" onclick="reject('${app.id}')">Reject</button>
+        ` : "—"}
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+window.accept = async function(id) {
+  try {
+    await updateDoc(doc(db, "applications", id), { status: "Shortlisted" });
+    loadApplications();
+  } catch(e) { console.error(e); alert("Error ❌"); }
 };
 
-
-// ❌ REJECT
-window.reject = async function (id) {
+window.reject = async function(id) {
   try {
-    await updateDoc(doc(db, "applications", id), {
-      status: "rejected"
-    });
-
+    await updateDoc(doc(db, "applications", id), { status: "Rejected" });
     loadApplications();
-
-  } catch (e) {
-    console.error(e);
-    alert("Error ❌");
-  }
+  } catch(e) { console.error(e); alert("Error ❌"); }
 };
 
+document.getElementById("searchInput").addEventListener("input", applyFilters);
+document.getElementById("statusFilter").addEventListener("change", applyFilters);
 
-// 🚀 START
+function applyFilters() {
+  const q  = document.getElementById("searchInput").value.toLowerCase().trim();
+  const st = document.getElementById("statusFilter").value;
+  let filtered = [...allApps];
+  if (q) {
+    filtered = filtered.filter(a =>
+      (a.seeker || a.user || a.email || "").toLowerCase().includes(q) ||
+      (a.jobTitle || "").toLowerCase().includes(q) ||
+      (a.recruiter || "").toLowerCase().includes(q)
+    );
+  }
+  if (st !== "all") filtered = filtered.filter(a => (a.status || "Applied") === st);
+  updateStats(filtered);
+  renderTable(filtered);
+}
+
 loadApplications();
-
 </script>
 
+<script>
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+window.toggleMenu = function() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
+  });
+});
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

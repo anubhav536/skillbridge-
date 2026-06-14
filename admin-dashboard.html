@@ -1,116 +1,272 @@
-<!DOCTYPE html>  
-<html lang="en">  
-<head>  
-<meta charset="UTF-8" />  
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-<title>SkillBridge AI</title>  
-  
-  
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
-</head>  
-  
-<body>  
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .dash-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .dash-top h1 { margin:0; }
 
-<!-- 🔐 ROLE GUARD -->
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.9rem; margin-bottom:1.1rem; }
+  .stat-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.25rem; position:relative; overflow:hidden; transition:box-shadow .25s;
+  }
+  .stat-card:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+  .stat-card h3 { font-size:13.5px; color:#a78bfa; margin-bottom:.4rem; font-weight:600; }
+  .stat-card p  { font-size:38px; font-weight:800; margin:0; color:#f5f3ff; line-height:1; }
+  .stat-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+  .s-blue::before   { background:linear-gradient(90deg,#4f46e5,#818cf8); }
+  .s-green::before  { background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .s-purple::before { background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
+  .s-orange::before { background:linear-gradient(90deg,#d97706,#fcd34d); }
+  .s-red::before    { background:linear-gradient(90deg,#dc2626,#f87171); }
+
+  .section-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22);
+    border-radius:16px; padding:1.25rem; margin-bottom:1.1rem;
+    transition:box-shadow .25s;
+  }
+  .section-card:hover { box-shadow:0 0 24px rgba(124,58,237,.15); }
+  .section-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:.9rem; }
+
+  .quick-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.7rem; }
+  .q-btn {
+    background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.28);
+    border-radius:12px; padding:.9rem .75rem; text-align:center; font-size:14px; font-weight:600;
+    color:#c4b5fd; display:block; transition:all .2s;
+  }
+  .q-btn:hover { background:rgba(124,58,237,.25); color:#ede9fe; transform:translateY(-2px); }
+
+  /* Platform health bars */
+  .health-row { display:flex; flex-direction:column; gap:.65rem; }
+  .health-item { display:flex; align-items:center; gap:.75rem; font-size:13.5px; }
+  .health-label { width:130px; color:#a78bfa; flex-shrink:0; }
+  .health-bar-wrap { flex:1; height:8px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; }
+  .health-bar-fill { height:100%; border-radius:99px; transition:width .8s ease; }
+  .health-val { width:40px; text-align:right; font-weight:700; color:#c4b5fd; font-size:13px; }
+
+  /* Recent activity */
+  .activity-list { display:flex; flex-direction:column; gap:.5rem; }
+  .activity-item {
+    display:flex; align-items:center; gap:.75rem; padding:.65rem .9rem;
+    background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.18); border-radius:10px;
+  }
+  .activity-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .dot-blue   { background:#818cf8; }
+  .dot-green  { background:#4ade80; }
+  .dot-orange { background:#fcd34d; }
+  .activity-text { font-size:13.5px; color:#c4b5fd; flex:1; }
+  .activity-time { font-size:12px; color:#6b7280; white-space:nowrap; }
+
+  .live-badge {
+    display:inline-flex; align-items:center; gap:.35rem;
+    background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.3);
+    color:#4ade80; padding:.3rem .85rem; border-radius:999px; font-size:13px; font-weight:700;
+  }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+</style>
+</head>
+
+<body>
 <script>
-const role = localStorage.getItem("role");
-
-if(role !== "admin"){
-  window.location.href = "index.html";
-}
+  const role = localStorage.getItem("role");
+  if (role !== "admin") { window.location.href = "index.html"; }
 </script>
 
-<div class="dashboard">  
-  
-<!-- SIDEBAR -->  
-<aside class="sidebar" id="sidebar">  
-<h2>👑 Admin</h2>  
-  
-<nav>  
-<a href="admin-dashboard.html" class="active">📊 Dashboard</a>  
-<a href="admin-users.html">👥 Users</a>  
-<a href="admin-jobs.html">💼 Jobs</a>  
-<a href="admin-applications.html">📄 Apps</a>  
-<a href="admin-flags.html">🚨 Flags</a>  
-<a href="admin-analytics.html">📈 Analytics</a>  
-<a href="admin-ai-control.html">🤖 AI</a>  
-<a href="admin-leaderboard.html">🏆 Rank</a>  
-<a href="admin-settings.html">⚙ Settings</a>  
-<a href="admin-logs.html">📜 Logs</a>  
-<a href="admin-notifications.html">📩 Notify</a>  
-<a href="admin-moderation.html">🛠 Mod</a>  
-</nav>  
+<div class="dashboard">
 
-<!-- 🔥 LOGOUT BUTTON -->
-<button class="btn" onclick="logout()">Logout 👋</button>  
-  
-</aside>  
-  
-<!-- MAIN -->  
-<main class="main">  
-  
-<div>  
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>  
-  <h2>Dashboard</h2>  
-  <span class="badge">Live</span>  
-</div>  
-  
-<div class="grid">  
-<div class="card"><h3>Users</h3><p id="dashUsers">Loading...</p></div>  
-<div class="card"><h3>Jobs</h3><p id="dashJobs">Loading...</p></div>  
-<div class="card"><h3>Apps</h3><p id="dashApps">Loading...</p></div>  
-</div>  
-  
-<h2>Quick Actions</h2>  
-  
-<div class="grid">  
-<div class="card"><h3>Users</h3><a href="admin-users.html" class="btn">Open</a></div>  
-<div class="card"><h3>Jobs</h3><a href="admin-jobs.html" class="btn">Open</a></div>  
-<div class="card"><h3>Apps</h3><a href="admin-applications.html" class="btn">Open</a></div>  
-<div class="card"><h3>Flags</h3><a href="admin-flags.html" class="btn">Open</a></div>  
-<div class="card"><h3>Analytics</h3><a href="admin-analytics.html" class="btn">Open</a></div>  
-<div class="card"><h3>AI</h3><a href="admin-ai-control.html" class="btn">Open</a></div>  
-<div class="card"><h3>Rank</h3><a href="admin-leaderboard.html" class="btn">Open</a></div>  
-<div class="card"><h3>Settings</h3><a href="admin-settings.html" class="btn">Open</a></div>  
-</div>  
-  
-</main>  
-</div>  
-  
+<aside class="sidebar" id="sidebar">
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html" class="active">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button class="btn" onclick="logout()">Logout 👋</button>
+</aside>
+
+<main class="main">
+
+  <div class="dash-top">
+    <div>
+      <h1>📊 Platform Dashboard</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Full platform overview</p>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span> Live</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stat-grid">
+    <div class="stat-card s-blue">
+      <h3>👥 Total Users</h3>
+      <p id="dashUsers">—</p>
+    </div>
+    <div class="stat-card s-green">
+      <h3>💼 Total Jobs</h3>
+      <p id="dashJobs">—</p>
+    </div>
+    <div class="stat-card s-purple">
+      <h3>📄 Applications</h3>
+      <p id="dashApps">—</p>
+    </div>
+    <div class="stat-card s-orange">
+      <h3>⚡ Active Now</h3>
+      <p id="dashActive">—</p>
+    </div>
+  </div>
+
+  <!-- PLATFORM HEALTH -->
+  <div class="section-card">
+    <h3>🏥 Platform Health</h3>
+    <div class="health-row">
+      <div class="health-item">
+        <span class="health-label">Job Seekers</span>
+        <div class="health-bar-wrap"><div class="health-bar-fill" id="barSeekers" style="background:#818cf8;width:0%"></div></div>
+        <span class="health-val" id="cntSeekers">—</span>
+      </div>
+      <div class="health-item">
+        <span class="health-label">Recruiters</span>
+        <div class="health-bar-wrap"><div class="health-bar-fill" id="barRecruiters" style="background:#4ade80;width:0%"></div></div>
+        <span class="health-val" id="cntRecruiters">—</span>
+      </div>
+      <div class="health-item">
+        <span class="health-label">Applications</span>
+        <div class="health-bar-wrap"><div class="health-bar-fill" id="barAppHealth" style="background:#fcd34d;width:0%"></div></div>
+        <span class="health-val" id="cntAppHealth">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK ACTIONS -->
+  <div class="section-card">
+    <h3>⚡ Quick Actions</h3>
+    <div class="quick-grid">
+      <a href="admin-users.html"         class="q-btn">👥 Users</a>
+      <a href="admin-jobs.html"           class="q-btn">💼 Jobs</a>
+      <a href="admin-applications.html"   class="q-btn">📄 Apps</a>
+      <a href="admin-flags.html"          class="q-btn">🚨 Flags</a>
+      <a href="admin-analytics.html"      class="q-btn">📈 Analytics</a>
+      <a href="admin-notifications.html"  class="q-btn">📩 Notify</a>
+      <a href="admin-leaderboard.html"    class="q-btn">🏆 Rank</a>
+      <a href="admin-moderation.html"     class="q-btn">🛠 Mod</a>
+    </div>
+  </div>
+
+  <!-- RECENT ACTIVITY (dynamic) -->
+  <div class="section-card">
+    <h3>🕒 Recent Activity</h3>
+    <div id="activityList" class="activity-list">
+      <p style="color:#a78bfa;font-size:14px">Loading...</p>
+    </div>
+  </div>
+
+</main>
+</div>
+
 <script type="module">
-import { observePlatformAnalytics, startPresenceHeartbeat } from "./firebase.js";
+import { observePlatformAnalytics, startPresenceHeartbeat, db } from "./firebase.js";
+import { getDocs, collection, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 startPresenceHeartbeat("admin");
+
+let totalUsers = 0, totalJobs = 0, totalApps = 0;
+
 observePlatformAnalytics({
-  totalUsers: (value) => (document.getElementById("dashUsers").innerText = value),
-  totalJobs: (value) => (document.getElementById("dashJobs").innerText = value),
-  totalApplications: (value) => (document.getElementById("dashApps").innerText = value)
+  totalUsers: v => {
+    document.getElementById("dashUsers").textContent = v;
+    totalUsers = v;
+    updateHealth();
+  },
+  totalJobs: v => {
+    document.getElementById("dashJobs").textContent = v;
+    totalJobs = v;
+    updateHealth();
+  },
+  totalApplications: v => {
+    document.getElementById("dashApps").textContent = v;
+    totalApps = v;
+    updateHealth();
+  },
+  activeUsers: v => {
+    document.getElementById("dashActive").textContent = v;
+  }
 });
-</script>
 
-<script>  
-
-function toggleMenu(){  
-  document.getElementById("sidebar").classList.toggle("active");  
-}  
-
-// 🔥 LOGOUT FUNCTION
-function logout(){
-  localStorage.clear();  
-  window.location.href = "index.html";
+function updateHealth() {
+  const max = Math.max(totalUsers, totalJobs, totalApps, 1);
+  const pct = n => Math.round((n / max) * 100) + "%";
+  document.getElementById("barAppHealth").style.width = pct(totalApps);
+  document.getElementById("cntAppHealth").textContent = totalApps;
 }
 
-// mobile auto close
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
+// Role breakdown
+async function loadUserBreakdown() {
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    let seekers = 0, recruiters = 0;
+    snap.forEach(d => {
+      const r = d.data().role;
+      if (r === "jobseeker") seekers++;
+      else if (r === "recruiter") recruiters++;
+    });
+    const maxR = Math.max(seekers, recruiters, 1);
+    document.getElementById("barSeekers").style.width   = Math.round(seekers   / maxR * 100) + "%";
+    document.getElementById("barRecruiters").style.width = Math.round(recruiters / maxR * 100) + "%";
+    document.getElementById("cntSeekers").textContent   = seekers;
+    document.getElementById("cntRecruiters").textContent = recruiters;
+
+    // Recent activity
+    const appsSnap = await getDocs(query(collection(db, "applications"), orderBy("createdAt", "desc"), limit(5)));
+    const items = [];
+    appsSnap.forEach(d => {
+      const a = d.data();
+      items.push({
+        text: `${a.seeker || a.user || "User"} applied for ${a.jobTitle || "a job"}`,
+        time: a.createdAt ? new Date(a.createdAt).toLocaleString() : "—",
+        dot: "dot-blue"
+      });
+    });
+
+    const list = document.getElementById("activityList");
+    if (items.length === 0) {
+      list.innerHTML = `<p style="color:#a78bfa;font-size:14px">No recent activity yet.</p>`;
+    } else {
+      list.innerHTML = items.map(i => `
+        <div class="activity-item">
+          <div class="activity-dot ${i.dot}"></div>
+          <span class="activity-text">${i.text}</span>
+          <span class="activity-time">${i.time}</span>
+        </div>`).join("");
     }
+  } catch(e) { console.error(e); }
+}
+
+loadUserBreakdown();
+</script>
+
+<script>
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+window.toggleMenu = function() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
-</script>  
-  
+</script>
 <script type="module" src="./app-enhancements.js"></script>
-</body>  
+</body>
 </html>

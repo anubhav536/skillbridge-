@@ -1,32 +1,117 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recruiter Dashboard | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .hero-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .hero-row h1 { margin:0; }
+  .hero-row p  { margin:.2rem 0 0; font-size:14px; color:#a78bfa; }
 
-<title>SkillBridge AI</title>
+  .stat-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.9rem; margin-bottom:1.1rem; }
+  .stat-card {
+    background: rgba(18,12,48,.72);
+    border: 1px solid rgba(124,58,237,.22);
+    border-radius: 16px;
+    padding: 1.25rem;
+    position: relative; overflow: hidden;
+    transition: box-shadow .25s;
+  }
+  .stat-card:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+  .stat-card h3 { font-size:13.5px; color:#a78bfa; margin-bottom:.4rem; font-weight:600; }
+  .stat-card p  { font-size:38px; font-weight:800; margin:0; color:#f5f3ff; line-height:1; }
+  .stat-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+  .s-blue::before   { background:linear-gradient(90deg,#4f46e5,#818cf8); }
+  .s-green::before  { background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .s-purple::before { background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
+  .s-orange::before { background:linear-gradient(90deg,#d97706,#fcd34d); }
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+  .lower-grid { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; margin-bottom:1.1rem; }
+  @media(max-width:700px){ .lower-grid { grid-template-columns:1fr; } }
 
-<link rel="stylesheet" href="style.css?v=92">
-  <link rel="stylesheet" href="universal.css">
+  .card {
+    background: rgba(18,12,48,.72);
+    border: 1px solid rgba(124,58,237,.22);
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: box-shadow .25s;
+  }
+  .card:hover { box-shadow:0 0 24px rgba(124,58,237,.18); }
+  .card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:.9rem; }
 
+  /* Funnel */
+  .bar-box { margin-bottom:.7rem; }
+  .bar-box span { display:block; font-size:13px; color:#a78bfa; margin-bottom:.3rem; font-weight:600; }
+  .bar-box .track {
+    background: rgba(255,255,255,.07);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .bar-box .track div {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg,#7c3aed,#a78bfa);
+    transition: width .8s ease;
+    width: 0%;
+  }
+  .bar-box .count { font-size:12px; color:#c4b5fd; margin-top:.25rem; }
 
+  /* Tips */
+  .tips { list-style:none; padding:0; display:flex; flex-direction:column; gap:.55rem; }
+  .tips li {
+    padding:.75rem 1rem;
+    background: rgba(124,58,237,.1);
+    border: 1px solid rgba(124,58,237,.2);
+    border-radius: 10px;
+    font-size:13.5px; color:#ede9fe; line-height:1.5;
+  }
 
+  /* Quick actions */
+  .quick-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.7rem; }
+  .q-btn {
+    background: rgba(124,58,237,.12);
+    border: 1px solid rgba(124,58,237,.28);
+    border-radius: 12px;
+    padding: .9rem;
+    text-align:center; font-size:14px; font-weight:600;
+    color:#c4b5fd; display:block;
+    transition: all .2s;
+  }
+  .q-btn:hover { background:rgba(124,58,237,.25); color:#ede9fe; transform:translateY(-2px); }
+
+  /* Recent applicants */
+  .rec-list { display:flex; flex-direction:column; gap:.55rem; }
+  .rec-item {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:.65rem .9rem;
+    background: rgba(30,18,80,.5);
+    border: 1px solid rgba(124,58,237,.18);
+    border-radius:10px; font-size:13px;
+    flex-wrap:wrap; gap:.4rem;
+  }
+  .rec-item-left { display:flex; flex-direction:column; gap:.15rem; }
+  .rec-item-name { font-weight:700; color:#f5f3ff; }
+  .rec-item-job  { color:#a78bfa; font-size:12px; }
+  .status-chip {
+    font-size:12px; font-weight:700; padding:.2rem .65rem;
+    border-radius:999px;
+  }
+  .chip-applied     { background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35); color:#c4b5fd; }
+  .chip-shortlisted { background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.35); color:#4ade80; }
+  .chip-hired       { background:rgba(34,197,94,.12);  border:1px solid rgba(34,197,94,.35);  color:#4ade80; }
+  .chip-rejected    { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+</style>
 </head>
 
 <body class="rec-dashboard-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>🏢 Recruiter Panel</h2>
-
     <nav>
       <a href="rec-dashboard.html" class="active">📊 Dashboard</a>
       <a href="rec-post-job.html">➕ Post Job</a>
@@ -35,109 +120,195 @@
       <a href="rec-analytics.html">📈 Analytics</a>
       <a href="rec-profile.html">👤 Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- TOP -->
     <div class="hero-row">
-
       <div>
         <h1>📊 Dashboard Overview</h1>
-        <p id="welcome" class="muted">Loading...</p>
+        <p id="welcome">Loading...</p>
       </div>
-
-      <div class="pulse-pill">
-        🚀 Hiring Engine Active
-      </div>
-
+      <div class="badge">🚀 Hiring Engine Active</div>
     </div>
 
-
-
     <!-- STATS -->
-    <section class="grid stat-grid">
-
-      <div class="card stat-card">
+    <section class="stat-grid">
+      <div class="stat-card s-blue">
         <h3>📦 Jobs Posted</h3>
-        <p id="totalJobs">0</p>
+        <p id="totalJobs">—</p>
       </div>
-
-      <div class="card stat-card">
-        <h3>👥 Applicants</h3>
-        <p id="totalApps">0</p>
+      <div class="stat-card s-purple">
+        <h3>👥 Total Applicants</h3>
+        <p id="totalApps">—</p>
       </div>
-
-      <div class="card stat-card">
-        <h3>📈 Hiring Rate</h3>
-        <p id="hiringRate">0%</p>
-      </div>
-
-      <div class="card stat-card">
+      <div class="stat-card s-orange">
         <h3>🔥 Shortlisted</h3>
-        <p id="shortlisted">0</p>
+        <p id="shortlisted">—</p>
       </div>
-
+      <div class="stat-card s-green">
+        <h3>📈 Hire Rate</h3>
+        <p id="hiringRate">—</p>
+      </div>
     </section>
 
+    <!-- FUNNEL + TIPS -->
+    <section class="lower-grid">
 
-
-    <!-- LOWER SECTION -->
-    <section class="grid lower-grid">
-
-      <!-- Funnel -->
       <div class="card">
         <h3>🎯 Hiring Funnel</h3>
-
         <div class="bar-box">
-          <span>Applicants</span>
-          <div class="track">
-            <div id="barApps"></div>
-          </div>
+          <span>Applied</span>
+          <div class="track"><div id="barApps"></div></div>
+          <div class="count" id="cntApps">0 applicants</div>
         </div>
-
         <div class="bar-box">
           <span>Shortlisted</span>
-          <div class="track">
-            <div id="barShort"></div>
-          </div>
+          <div class="track"><div id="barShort"></div></div>
+          <div class="count" id="cntShort">0 shortlisted</div>
         </div>
-
         <div class="bar-box">
           <span>Hired</span>
-          <div class="track">
-            <div id="barHire"></div>
-          </div>
+          <div class="track"><div id="barHire" style="background:linear-gradient(90deg,#16a34a,#4ade80)"></div></div>
+          <div class="count" id="cntHire">0 hired</div>
         </div>
-
       </div>
 
-
-
-      <!-- AI Tips -->
       <div class="card">
-        <h3>🧠 AI Suggestions</h3>
-
-        <ul class="tips">
-          <li id="tip1">Loading...</li>
-          <li id="tip2"></li>
-          <li id="tip3"></li>
+        <h3>🧠 AI Hiring Suggestions</h3>
+        <ul class="tips" id="tipsList">
+          <li>Loading suggestions...</li>
         </ul>
-
       </div>
 
     </section>
 
-  </main>
+    <!-- RECENT APPLICANTS -->
+    <div class="card" style="margin-bottom:1.1rem">
+      <h3>🕒 Recent Applicants</h3>
+      <div id="recentList" class="rec-list">
+        <p style="color:#a78bfa;font-size:14px">Loading...</p>
+      </div>
+    </div>
 
+    <!-- QUICK ACTIONS -->
+    <div class="card" style="margin-bottom:1.1rem">
+      <h3>⚡ Quick Actions</h3>
+      <div class="quick-grid">
+        <a href="rec-post-job.html"     class="q-btn">➕ Post Job</a>
+        <a href="rec-applicants.html"   class="q-btn">👥 Applicants</a>
+        <a href="rec-manage-jobs.html"  class="q-btn">🧾 My Jobs</a>
+        <a href="rec-analytics.html"    class="q-btn">📈 Analytics</a>
+      </div>
+    </div>
+
+  </main>
 </div>
 
+<script type="module">
+import { db, logoutUser, getSession, protectPage } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+
+protectPage("recruiter");
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+async function loadDashboard() {
+  const user = getSession();
+  if (!user) { window.location.href = "recruiter-login.html"; return; }
+
+  document.getElementById("welcome").textContent =
+    `Welcome back, ${user.name || "Recruiter"} 👋 — ${user.company || "Your Company"}`;
+
+  try {
+    const jobSnap = await getDocs(collection(db, "jobs"));
+    const myJobIds = [];
+    jobSnap.forEach(d => {
+      if (d.data().recruiter === user.email) myJobIds.push(d.id);
+    });
+
+    const appSnap = await getDocs(collection(db, "applications"));
+    const apps = [];
+    appSnap.forEach(d => {
+      const a = d.data();
+      if (myJobIds.includes(a.jobId)) apps.push({ id: d.id, ...a });
+    });
+
+    const total       = apps.length;
+    const shortlisted = apps.filter(a => a.status === "Shortlisted").length;
+    const hired       = apps.filter(a => a.status === "Hired").length;
+    const hireRate    = total ? Math.round((hired / total) * 100) : 0;
+
+    document.getElementById("totalJobs").textContent    = myJobIds.length;
+    document.getElementById("totalApps").textContent    = total;
+    document.getElementById("shortlisted").textContent  = shortlisted;
+    document.getElementById("hiringRate").textContent   = hireRate + "%";
+
+    // Funnel
+    const max = total || 1;
+    document.getElementById("barApps").style.width   = "100%";
+    document.getElementById("barShort").style.width  = (shortlisted / max * 100) + "%";
+    document.getElementById("barHire").style.width   = (hired / max * 100) + "%";
+    document.getElementById("cntApps").textContent   = total + " applicants";
+    document.getElementById("cntShort").textContent  = shortlisted + " shortlisted";
+    document.getElementById("cntHire").textContent   = hired + " hired";
+
+    // AI Tips
+    const tips = [];
+    if (myJobIds.length === 0) {
+      tips.push("📢 Post your first job to start receiving candidates.");
+      tips.push("✏️ Add a salary range — it attracts 3× more applicants.");
+      tips.push("🎯 Be specific with required skills for better AI matching.");
+    } else if (total === 0) {
+      tips.push("📬 No applicants yet — your jobs are live and visible.");
+      tips.push("🔑 Use clear, common skill names for better AI matching.");
+      tips.push("💡 Add location / remote info to widen your reach.");
+    } else if (hireRate < 20) {
+      tips.push(`⚠️ Hire rate is ${hireRate}% — try shortlisting faster to reduce drop-offs.`);
+      tips.push("🔍 Review skill requirements — they may be too strict.");
+      tips.push("📞 Candidates shortlisted within 48h are 2× more likely to respond.");
+    } else {
+      tips.push("🔥 Great hiring pipeline! Scale job postings to grow faster.");
+      tips.push(`✅ ${hired} candidate${hired !== 1 ? "s" : ""} hired — strong conversion.`);
+      tips.push("📊 Check Analytics for skill trends in your applicants.");
+    }
+
+    document.getElementById("tipsList").innerHTML =
+      tips.map(t => `<li>${t}</li>`).join("");
+
+    // Recent applicants (last 5)
+    const recent = [...apps]
+      .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+      .slice(0, 5);
+
+    const recEl = document.getElementById("recentList");
+    if (recent.length === 0) {
+      recEl.innerHTML = `<p style="color:#a78bfa;font-size:14px">No applicants yet. Post a job to get started.</p>`;
+    } else {
+      recEl.innerHTML = recent.map(a => {
+        const s = (a.status || "Applied").toLowerCase();
+        const chipClass = s === "shortlisted" ? "chip-shortlisted"
+          : s === "hired" ? "chip-hired"
+          : s === "rejected" ? "chip-rejected"
+          : "chip-applied";
+        return `
+        <div class="rec-item">
+          <div class="rec-item-left">
+            <span class="rec-item-name">${a.seeker || a.user || a.email || "Applicant"}</span>
+            <span class="rec-item-job">📋 ${a.jobTitle || "Applied Job"}</span>
+          </div>
+          <span class="status-chip ${chipClass}">${a.status || "Applied"}</span>
+        </div>`;
+      }).join("");
+    }
+
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+loadDashboard();
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

@@ -1,474 +1,273 @@
-<script type="module" src="./app-enhancements.js"></script>
-</body>
-</html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Applicants | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .top-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .top-row h1 { margin:0; }
 
-<link rel="stylesheet" href="style.css?v=92">
-  <link rel="stylesheet" href="universal.css">
+  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
+  .mini-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:12px;
+    padding:.9rem 1rem; text-align:center;
+  }
+  .mini-card h3 { font-size:13px; color:#a78bfa; margin-bottom:.35rem; font-weight:600; }
+  .mini-card p  { font-size:30px; font-weight:800; color:#f5f3ff; margin:0; line-height:1; }
 
+  .filter-bar { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .filter-bar input  { flex:1; min-width:180px; margin:0; }
+  .filter-bar select { width:160px; margin:0; }
+
+  .app-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; }
+
+  .applicant-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.2rem; display:flex; flex-direction:column; gap:.55rem;
+    position:relative; overflow:hidden; transition: box-shadow .25s;
+  }
+  .applicant-card:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+  .applicant-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:linear-gradient(90deg,#7c3aed,#4f46e5); }
+
+  .head-row { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+  .head-row h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin:0; }
+  .mail { font-size:12.5px; color:#a78bfa; margin:.15rem 0 0; }
+
+  .status-chip {
+    font-size:12px; font-weight:700; padding:.25rem .65rem; border-radius:999px; white-space:nowrap;
+  }
+  .applied     { background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35); color:#c4b5fd; }
+  .shortlisted { background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.35); color:#4ade80; }
+  .hired       { background:rgba(34,197,94,.12);  border:1px solid rgba(34,197,94,.35);  color:#4ade80; }
+  .rejected    { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+
+  .info-row { font-size:13.5px; color:#c4b5fd; }
+  .info-row b { color:#a78bfa; }
+
+  /* Match score */
+  .match-row { display:flex; align-items:center; gap:.6rem; }
+  .match-bar-wrap { flex:1; height:5px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
+  .match-bar-fill { height:100%; border-radius:99px; transition:width .6s ease; }
+  .match-pct { font-size:12px; font-weight:800; min-width:34px; text-align:right; }
+
+  .tags { display:flex; flex-wrap:wrap; gap:.3rem; }
+  .tag { font-size:12px; padding:.2rem .55rem; border-radius:999px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+
+  .btn-row { display:flex; gap:.5rem; margin-top:.25rem; flex-wrap:wrap; }
+  .green-btn, .red-btn, .hire-btn {
+    flex:1; padding:.6rem; border-radius:9px; font-size:13px; font-weight:700;
+    border:none; cursor:pointer; width:auto; min-width:70px;
+  }
+  .green-btn { background:rgba(74,222,128,.15); border:1px solid rgba(74,222,128,.35); color:#4ade80; }
+  .red-btn   { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+  .hire-btn  { background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; box-shadow:0 3px 12px rgba(124,58,237,.3); }
+  .green-btn:hover:not(:disabled) { background:rgba(74,222,128,.25); }
+  .red-btn:hover:not(:disabled)   { background:rgba(248,113,113,.2); }
+  .hire-btn:hover:not(:disabled)  { filter:brightness(1.1); }
+
+  .loading-text { color:#a78bfa; text-align:center; padding:3rem 1rem; font-size:15px; grid-column:1/-1; }
+</style>
 </head>
 
 <body class="rec-applicants-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>🏢 Recruiter Panel</h2>
-
     <nav>
-      <a href="rec-dashboard.html">Dashboard</a>
-      <a href="rec-post-job.html">Post Job</a>
-      <a href="rec-manage-jobs.html">Manage Jobs</a>
-      <a href="rec-applicants.html" class="active">Applicants</a>
-      <a href="rec-analytics.html">Analytics</a>
-      <a href="rec-profile.html">Profile</a>
+      <a href="rec-dashboard.html">📊 Dashboard</a>
+      <a href="rec-post-job.html">➕ Post Job</a>
+      <a href="rec-manage-jobs.html">🧾 Manage Jobs</a>
+      <a href="rec-applicants.html" class="active">👥 Applicants</a>
+      <a href="rec-analytics.html">📈 Analytics</a>
+      <a href="rec-profile.html">👤 Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- TOP -->
     <div class="top-row">
-
       <div>
         <h1>👥 Applicants</h1>
-        <p class="muted">
-          Your talent radar is online 📡
-        </p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Your talent radar 📡</p>
       </div>
-
-      <input
-        type="text"
-        id="search"
-        class="search-box"
-        
-      >
-
     </div>
 
-
-
     <!-- STATS -->
-    <section class="grid mini-grid">
-
-      <div class="card mini-card">
-        <h3>Total</h3>
-        <p id="totalCount">0</p>
-      </div>
-
-      <div class="card mini-card">
-        <h3>Shortlisted</h3>
-        <p id="shortCount">0</p>
-      </div>
-
-      <div class="card mini-card">
-        <h3>Rejected</h3>
-        <p id="rejectCount">0</p>
-      </div>
-
+    <section class="mini-grid">
+      <div class="mini-card"><h3>Total</h3><p id="totalCount">—</p></div>
+      <div class="mini-card"><h3>Shortlisted</h3><p id="shortCount">—</p></div>
+      <div class="mini-card"><h3>Hired</h3><p id="hiredCount">—</p></div>
+      <div class="mini-card"><h3>Rejected</h3><p id="rejectCount">—</p></div>
     </section>
 
+    <!-- FILTERS -->
+    <div class="filter-bar">
+      <input type="text" id="search">
+      <select id="statusFilter">
+        <option value="all">All Status</option>
+        <option value="Applied">Applied</option>
+        <option value="Shortlisted">Shortlisted</option>
+        <option value="Hired">Hired</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <select id="sortFilter">
+        <option value="new">Most Recent</option>
+        <option value="score">Highest Match</option>
+      </select>
+    </div>
 
-
-    <!-- APPLICANTS -->
-    <section
-      id="appList"
-      class="app-grid"
-    ></section>
+    <!-- LIST -->
+    <section id="appList" class="app-grid">
+      <p class="loading-text">Loading applicants...</p>
+    </section>
 
   </main>
-
 </div>
 
-
-
 <script type="module">
-
-import {
-  db,
-  logoutUser,
-  getSession,
-  updateApplicationStatus
-} from "./firebase.js";
-
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-
-/* =========================
-   PAGE PROTECT
-========================= */
+import { db, logoutUser, getSession, updateApplicationStatus } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const user = getSession();
+if (!user) { window.location.href = "recruiter-login.html"; }
+if (user && user.role !== "recruiter") { window.location.href = "index.html"; }
 
-if(!user){
-  window.location.href =
-    "rec-applicants.html";
-}
-
-if(user && user.role !== "recruiter"){
-  window.location.href =
-    "index.html";
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
-
-
-
-/* =========================
-   DATA
-========================= */
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
 let allApps = [];
 
+async function loadApplicants() {
+  const list = document.getElementById("appList");
+  list.innerHTML = `<p class="loading-text">Loading applicants...</p>`;
 
-
-/* =========================
-   LOAD APPLICANTS
-========================= */
-
-async function loadApplicants(){
-
-  const list =
-    document.getElementById("appList");
-
-  list.innerHTML =
-    `<p class="loading-text">
-      Loading applicants...
-    </p>`;
-
-  try{
-
-    /* recruiter jobs */
-    const jobsSnap =
-      await getDocs(collection(db,"jobs"));
-
-    let myJobIds = [];
-
-    jobsSnap.forEach(item => {
-
-      const job = item.data();
-
-      if(job.recruiter === user.email){
-        myJobIds.push(item.id);
-      }
-
+  try {
+    const jobSnap = await getDocs(collection(db, "jobs"));
+    const myJobIds = [];
+    jobSnap.forEach(d => {
+      if (d.data().recruiter === user.email) myJobIds.push(d.id);
     });
 
-
-    /* applications */
-    const appsSnap =
-      await getDocs(
-        collection(db,"applications")
-      );
-
+    const appSnap = await getDocs(collection(db, "applications"));
     allApps = [];
-
-    appsSnap.forEach(item => {
-
-      const app = item.data();
-
-      if(myJobIds.includes(app.jobId)){
-
-        allApps.push({
-          id: item.id,
-          ...app
-        });
-
-      }
-
+    appSnap.forEach(d => {
+      const a = d.data();
+      if (myJobIds.includes(a.jobId)) allApps.push({ id: d.id, ...a });
     });
 
     updateStats(allApps);
-    renderApps(allApps);
-
-  }catch(err){
-
-    console.error(err);
-
-    list.innerHTML =
-      `<p class="loading-text">
-        Failed to load ❌
-      </p>`;
-
+    applyFilters();
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = `<p class="loading-text">Failed to load ❌</p>`;
   }
-
 }
 
-
-
-/* =========================
-   STATS
-========================= */
-
-function updateStats(apps){
-
-  document.getElementById("totalCount")
-  .innerText = apps.length;
-
-  document.getElementById("shortCount")
-  .innerText =
-    apps.filter(a =>
-      a.status === "Shortlisted"
-    ).length;
-
-  document.getElementById("rejectCount")
-  .innerText =
-    apps.filter(a =>
-      a.status === "Rejected"
-    ).length;
-
+function updateStats(apps) {
+  document.getElementById("totalCount").textContent  = apps.length;
+  document.getElementById("shortCount").textContent  = apps.filter(a => a.status === "Shortlisted").length;
+  document.getElementById("hiredCount").textContent  = apps.filter(a => a.status === "Hired").length;
+  document.getElementById("rejectCount").textContent = apps.filter(a => a.status === "Rejected").length;
 }
 
+function applyFilters() {
+  const search = document.getElementById("search").value.toLowerCase().trim();
+  const status = document.getElementById("statusFilter").value;
+  const sort   = document.getElementById("sortFilter").value;
 
+  let filtered = [...allApps];
 
-/* =========================
-   RENDER
-========================= */
-
-function renderApps(apps){
-
-  const list =
-    document.getElementById("appList");
-
-  if(apps.length === 0){
-
-    list.innerHTML =
-      `<p class="loading-text">
-        No applicants found 😢
-      </p>`;
-
-    return;
-  }
-
-  list.innerHTML =
-    apps.map(app => {
-
-      const skills =
-        Array.isArray(app.skills)
-        ? app.skills.join(", ")
-        : (app.skills || "N/A");
-
-      const status =
-        app.status || "Applied";
-
-      return `
-
-      <div class="card applicant-card">
-
-        <div class="head-row">
-
-          <div>
-            <h3>
-              ${app.name || app.user || "Applicant"}
-            </h3>
-
-            <p class="mail">
-              ${app.email || app.user || ""}
-            </p>
-          </div>
-
-          <span class="status-chip ${status.toLowerCase()}">
-            ${status}
-          </span>
-
-        </div>
-
-        <p>
-          <b>Job:</b>
-          ${app.jobTitle || "Applied Job"}
-        </p>
-
-        <p>
-          <b>Skills:</b>
-          ${skills}
-        </p>
-
-        <p>
-          <b>Experience:</b>
-          ${app.experience || 0} yrs
-        </p>
-
-        <div class="btn-row">
-
-          <button
-            class="green-btn actionBtn"
-            data-id="${app.id}"
-            data-status="Shortlisted"
-          >
-            Shortlist ✅
-          </button>
-
-          <button
-            class="red-btn actionBtn"
-            data-id="${app.id}"
-            data-status="Rejected"
-          >
-            Reject ❌
-          </button>
-
-        </div>
-
-      </div>
-
-      `;
-
-    }).join("");
-
-  attachActionEvents();
-
-}
-
-
-
-/* =========================
-   ACTION EVENTS
-========================= */
-
-function attachActionEvents(){
-
-  document
-  .querySelectorAll(".actionBtn")
-  .forEach(btn => {
-
-    btn.addEventListener(
-      "click",
-      async ()=>{
-
-        const id =
-          btn.dataset.id;
-
-        const status =
-          btn.dataset.status;
-
-        btn.disabled = true;
-        btn.innerText =
-          "Updating...";
-
-        try{
-
-          await updateApplicationStatus(
-            id,
-            status
-          );
-
-          loadApplicants();
-
-        }catch(err){
-
-          console.error(err);
-
-          btn.disabled = false;
-          btn.innerText =
-            "Retry";
-
-          alert(
-            "Update failed ❌"
-          );
-
-        }
-
-      }
+  if (search) {
+    filtered = filtered.filter(a =>
+      (a.seeker || a.user || "").toLowerCase().includes(search) ||
+      (a.email  || "").toLowerCase().includes(search) ||
+      (a.jobTitle || "").toLowerCase().includes(search) ||
+      (Array.isArray(a.skills) ? a.skills.join(" ") : (a.skills || "")).toLowerCase().includes(search)
     );
-
-  });
-
-}
-
-
-
-/* =========================
-   SEARCH
-========================= */
-
-document.getElementById("search")
-.addEventListener("input",(e)=>{
-
-  const val =
-    e.target.value
-    .toLowerCase()
-    .trim();
-
-  if(!val){
-    updateStats(allApps);
-    renderApps(allApps);
-    return;
   }
 
-  const filtered =
-    allApps.filter(app => {
+  if (status !== "all") filtered = filtered.filter(a => a.status === status);
 
-      const name =
-        (app.name ||
-        app.user ||
-        "").toLowerCase();
-
-      const email =
-        (app.email ||
-        app.user ||
-        "").toLowerCase();
-
-      const skills =
-        Array.isArray(app.skills)
-        ? app.skills.join(" ")
-            .toLowerCase()
-        : (app.skills || "")
-            .toLowerCase();
-
-      const status =
-        (app.status || "")
-        .toLowerCase();
-
-      const job =
-        (app.jobTitle || "")
-        .toLowerCase();
-
-      return (
-        name.includes(val) ||
-        email.includes(val) ||
-        skills.includes(val) ||
-        status.includes(val) ||
-        job.includes(val)
-      );
-
-    });
+  if (sort === "score") {
+    filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
+  } else {
+    filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  }
 
   updateStats(filtered);
   renderApps(filtered);
+}
 
-});
+function renderApps(apps) {
+  const list = document.getElementById("appList");
 
+  if (apps.length === 0) {
+    list.innerHTML = `<p class="loading-text">No applicants found 😢</p>`;
+    return;
+  }
 
-/* =========================
-   INIT
-========================= */
+  list.innerHTML = apps.map(app => {
+    const status = app.status || "Applied";
+    const statusClass = status.toLowerCase();
+    const skills = Array.isArray(app.skills) ? app.skills : (app.skills || "").split(",").filter(Boolean);
+
+    const score = app.matchScore;
+    const matchBar = (score !== undefined && score !== null) ? (() => {
+      const col = score >= 80 ? "#4ade80" : score >= 60 ? "#a78bfa" : score >= 40 ? "#f59e0b" : "#f87171";
+      return `<div class="match-row">
+        <div class="match-bar-wrap"><div class="match-bar-fill" style="width:${score}%;background:${col}"></div></div>
+        <span class="match-pct" style="color:${col}">${score}%</span>
+      </div>`;
+    })() : "";
+
+    return `
+    <div class="applicant-card">
+      <div class="head-row">
+        <div>
+          <h3>${app.seeker || app.user || app.email || "Applicant"}</h3>
+          <p class="mail">📧 ${app.seeker || app.user || app.email || ""}</p>
+        </div>
+        <span class="status-chip ${statusClass}">${status}</span>
+      </div>
+      <p class="info-row"><b>Job:</b> ${app.jobTitle || "Applied Job"}</p>
+      ${app.experience ? `<p class="info-row"><b>Experience:</b> ${app.experience} yr${app.experience > 1 ? "s" : ""}</p>` : ""}
+      ${matchBar}
+      ${skills.length ? `<div class="tags">${skills.slice(0,5).map(s=>`<span class="tag">${s.trim()}</span>`).join("")}</div>` : ""}
+      <div class="btn-row">
+        ${status !== "Shortlisted" && status !== "Hired" ? `<button class="green-btn actionBtn" data-id="${app.id}" data-status="Shortlisted">Shortlist ✅</button>` : ""}
+        ${status !== "Hired" ? `<button class="hire-btn actionBtn" data-id="${app.id}" data-status="Hired">Hire 🏆</button>` : ""}
+        ${status !== "Rejected" ? `<button class="red-btn actionBtn" data-id="${app.id}" data-status="Rejected">Reject ❌</button>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+
+  document.querySelectorAll(".actionBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const status = btn.dataset.status;
+      btn.disabled = true; btn.textContent = "Updating...";
+      try {
+        await updateApplicationStatus(id, status);
+        await loadApplicants();
+      } catch(e) {
+        console.error(e);
+        btn.disabled = false; btn.textContent = "Retry";
+        alert("Update failed ❌");
+      }
+    });
+  });
+}
+
+document.getElementById("search").addEventListener("input", applyFilters);
+document.getElementById("statusFilter").addEventListener("change", applyFilters);
+document.getElementById("sortFilter").addEventListener("change", applyFilters);
 
 loadApplicants();
-
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

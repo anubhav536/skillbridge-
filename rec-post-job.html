@@ -1,284 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Post Job | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-head { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-head h1 { margin:0; }
+  .page-head p  { margin:.2rem 0 0; font-size:14px; color:#a78bfa; }
 
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
+  .post-layout { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+  @media(max-width:720px){ .post-layout { grid-template-columns:1fr; } }
 
-<link rel="stylesheet" href="style.css?v=95">
-  <link rel="stylesheet" href="universal.css">
+  .post-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22);
+    border-radius:16px; padding:1.5rem;
+  }
+  .post-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
 
+  .job-form label { display:block; font-size:13.5px; color:#a78bfa; font-weight:600; margin-bottom:.35rem; margin-top:.85rem; }
+  .job-form label:first-child { margin-top:0; }
+  .job-form input, .job-form textarea {
+    width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px;
+    box-sizing:border-box;
+  }
+  .job-form input:focus, .job-form textarea:focus {
+    outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.2);
+  }
+  .job-form textarea { resize:vertical; min-height:90px; font-family:inherit; }
+
+  .skills-hint { font-size:12px; color:#6b7280; margin-top:.25rem; }
+
+  .primary-btn {
+    margin-top:1.2rem; width:100%; padding:.85rem; border-radius:12px;
+    font-size:15px; font-weight:700; background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:#fff; border:none; box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer;
+  }
+  .primary-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+
+  /* Preview */
+  .preview-box {
+    background:rgba(30,18,80,.6); border:1px solid rgba(124,58,237,.2);
+    border-radius:14px; padding:1.2rem;
+  }
+  .preview-box h4 { font-size:14px; color:#a78bfa; margin-bottom:.75rem; }
+  #pTitle    { font-size:18px; font-weight:800; color:#f5f3ff; margin-bottom:.35rem; }
+  .prev-meta { font-size:13.5px; color:#a78bfa; margin:.2rem 0; }
+  .prev-tags { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.5rem; }
+  .prev-tag  { font-size:12px; padding:.2rem .55rem; border-radius:999px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+
+  .success-banner {
+    background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3);
+    border-radius:12px; padding:.9rem 1.2rem; font-size:14px; color:#4ade80;
+    margin-bottom:1rem; display:none;
+  }
+</style>
 </head>
 
 <body class="rec-post-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>🏢 Recruiter Panel</h2>
-
     <nav>
-      <a href="rec-dashboard.html">Dashboard</a>
-      <a href="rec-post-job.html" class="active">Post Job</a>
-      <a href="rec-manage-jobs.html">Manage Jobs</a>
-      <a href="rec-applicants.html">Applicants</a>
-      <a href="rec-analytics.html">Analytics</a>
-      <a href="rec-profile.html">Profile</a>
+      <a href="rec-dashboard.html">📊 Dashboard</a>
+      <a href="rec-post-job.html" class="active">➕ Post Job</a>
+      <a href="rec-manage-jobs.html">🧾 Manage Jobs</a>
+      <a href="rec-applicants.html">👥 Applicants</a>
+      <a href="rec-analytics.html">📈 Analytics</a>
+      <a href="rec-profile.html">👤 Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- HEADER -->
     <div class="page-head">
-
       <div>
         <h1>📢 Post a New Job</h1>
-        <p class="muted">
-          Cast the net, catch the talent 🎯
-        </p>
+        <p>Cast the net, catch the talent 🎯</p>
+      </div>
+      <div class="badge">Recruiter Mode</div>
+    </div>
+
+    <div id="successBanner" class="success-banner">
+      ✅ Job posted successfully! <a href="rec-manage-jobs.html" style="color:#4ade80;font-weight:700">View in Manage Jobs →</a>
+    </div>
+
+    <div class="post-layout">
+
+      <!-- FORM -->
+      <div class="post-card">
+        <h3>✏️ Job Details</h3>
+        <form id="jobForm" class="job-form">
+
+          <label>Job Title *</label>
+          <input type="text" id="title" required>
+
+          <label>Skills Required *</label>
+          <input type="text" id="skills" required>
+          <div class="skills-hint">Comma separated — e.g. React, Node.js, MongoDB</div>
+
+          <label>Salary / Package</label>
+          <input type="text" id="salary">
+
+          <label>Location</label>
+          <input type="text" id="location">
+
+          <label>Job Description</label>
+          <textarea id="description"></textarea>
+
+          <button type="submit" id="postBtn" class="primary-btn">Post Job 🚀</button>
+
+        </form>
       </div>
 
-      <div class="mini-badge">
-        Recruiter Mode
+      <!-- PREVIEW -->
+      <div>
+        <div class="post-card">
+          <h3>⚡ Live Preview</h3>
+          <div class="preview-box">
+            <div id="pTitle">Job Title</div>
+            <p class="prev-meta" id="pSalary">💰 Salary —</p>
+            <p class="prev-meta" id="pLocation">📍 Location —</p>
+            <p class="prev-meta" id="pDesc" style="display:none"></p>
+            <div class="prev-tags" id="pSkills"></div>
+          </div>
+        </div>
       </div>
 
     </div>
 
-
-
-    <!-- FORM -->
-    <section class="card post-card">
-
-      <form id="jobForm" class="job-form">
-
-        <label>Job Title</label>
-        <input
-          type="text"
-          id="title"
-          
-          required
-        >
-
-        <label>Skills Required</label>
-        <input
-          type="text"
-          id="skills"
-          
-          required
-        >
-
-        <label>Salary</label>
-        <input
-          type="text"
-          id="salary"
-          
-        >
-
-        <label>Location</label>
-        <input
-          type="text"
-          id="location"
-          
-        >
-
-
-        <!-- PREVIEW -->
-        <div class="preview-box">
-
-          <h3>⚡ Quick Preview</h3>
-
-          <p id="pTitle">No title yet</p>
-          <p id="pSkills">Skills: --</p>
-          <p id="pSalary">Salary: --</p>
-          <p id="pLocation">Location: --</p>
-
-        </div>
-
-
-        <button
-          type="submit"
-          id="postBtn"
-          class="primary-btn"
-        >
-          Post Job 🚀
-        </button>
-
-      </form>
-
-    </section>
-
   </main>
-
 </div>
 
-
-
 <script type="module">
-
-import {
-  postJob,
-  logoutUser,
-  getSession
-} from "./firebase.js";
-
-
-/* =========================
-   PAGE PROTECT
-========================= */
+import { postJob, logoutUser, getSession } from "./firebase.js";
+import { db } from "./firebase.js";
+import { addDoc, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const user = getSession();
+if (!user) { window.location.href = "recruiter-login.html"; }
+if (user && user.role !== "recruiter") { window.location.href = "index.html"; }
 
-if(!user){
-  window.location.href =
-    "rec-post-job.html";
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+const titleEl    = document.getElementById("title");
+const skillsEl   = document.getElementById("skills");
+const salaryEl   = document.getElementById("salary");
+const locationEl = document.getElementById("location");
+const descEl     = document.getElementById("description");
+
+function updatePreview() {
+  document.getElementById("pTitle").textContent   = titleEl.value.trim()    || "Job Title";
+  document.getElementById("pSalary").textContent  = "💰 " + (salaryEl.value.trim()   || "Salary —");
+  document.getElementById("pLocation").textContent= "📍 " + (locationEl.value.trim() || "Location —");
+
+  const desc = descEl.value.trim();
+  const descEl2 = document.getElementById("pDesc");
+  if (desc) { descEl2.textContent = desc.slice(0, 120) + (desc.length > 120 ? "…" : ""); descEl2.style.display = "block"; }
+  else       { descEl2.style.display = "none"; }
+
+  const tags = skillsEl.value.split(",").map(s => s.trim()).filter(Boolean);
+  document.getElementById("pSkills").innerHTML = tags.map(t => `<span class="prev-tag">${t}</span>`).join("");
 }
 
-if(user && user.role !== "recruiter"){
-  window.location.href =
-    "index.html";
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
-
-
-/* =========================
-   INPUTS
-========================= */
-
-const title =
-document.getElementById("title");
-
-const skills =
-document.getElementById("skills");
-
-const salary =
-document.getElementById("salary");
-
-const location =
-document.getElementById("location");
-
-
-/* =========================
-   LIVE PREVIEW
-========================= */
-
-function updatePreview(){
-
-  document.getElementById("pTitle")
-  .innerText =
-    title.value.trim() ||
-    "No title yet";
-
-  document.getElementById("pSkills")
-  .innerText =
-    "Skills: " +
-    (
-      skills.value.trim() ||
-      "--"
-    );
-
-  document.getElementById("pSalary")
-  .innerText =
-    "Salary: " +
-    (
-      salary.value.trim() ||
-      "--"
-    );
-
-  document.getElementById("pLocation")
-  .innerText =
-    "Location: " +
-    (
-      location.value.trim() ||
-      "--"
-    );
-
-}
-
-
-/* listeners */
-[
- title,
- skills,
- salary,
- location
-].forEach(input => {
-
-  input.addEventListener(
-    "input",
-    updatePreview
-  );
-
-});
-
-
+[titleEl, skillsEl, salaryEl, locationEl, descEl].forEach(el => el.addEventListener("input", updatePreview));
 updatePreview();
 
-
-/* =========================
-   SUBMIT FORM
-========================= */
-
-document.getElementById("jobForm")
-.addEventListener("submit", async (e)=>{
-
+document.getElementById("jobForm").addEventListener("submit", async e => {
   e.preventDefault();
+  const btn = document.getElementById("postBtn");
+  btn.disabled = true; btn.textContent = "Posting...";
 
-  const btn =
-    document.getElementById("postBtn");
+  try {
+    const jobData = {
+      title:       titleEl.value.trim(),
+      skills:      skillsEl.value.split(",").map(s => s.trim()).filter(Boolean),
+      salary:      salaryEl.value.trim(),
+      location:    locationEl.value.trim(),
+      description: descEl.value.trim(),
+      recruiter:   user.email,
+      createdAt:   Date.now()
+    };
 
-  btn.disabled = true;
-  btn.innerText =
-    "Posting...";
+    if (!jobData.title || jobData.skills.length === 0) {
+      alert("Job Title and at least one Skill are required ❌");
+      btn.disabled = false; btn.textContent = "Post Job 🚀";
+      return;
+    }
 
-  try{
+    await addDoc(collection(db, "jobs"), jobData);
 
-    await postJob(btn);
-
-    alert("Job Posted Successfully ✅");
-
-    document.getElementById("jobForm")
-    .reset();
-
+    document.getElementById("successBanner").style.display = "block";
+    document.getElementById("jobForm").reset();
     updatePreview();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
-  }catch(err){
-
+  } catch(err) {
     console.error(err);
-
     alert("Failed to post job ❌");
-
   }
 
-  btn.disabled = false;
-  btn.innerText =
-    "Post Job 🚀";
-
+  btn.disabled = false; btn.textContent = "Post Job 🚀";
 });
-
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

@@ -1,24 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profile | SkillBridge AI</title>
-
-  <link rel="stylesheet" href="style.css?v=50">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="universal.css">
+  <style>
+    .profile-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+    .profile-top h1 { margin:0; }
+
+    .profile-grid { display:grid; grid-template-columns:280px 1fr; gap:1rem; }
+    @media(max-width:720px){ .profile-grid { grid-template-columns:1fr; } }
+
+    /* Left card */
+    .profile-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+      padding:1.5rem; display:flex; flex-direction:column; align-items:center; gap:.65rem;
+      text-align:center;
+    }
+    .avatar-circle {
+      width:72px; height:72px; border-radius:50%;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      display:flex; align-items:center; justify-content:center;
+      font-size:28px; font-weight:800; color:#fff;
+      box-shadow:0 4px 20px rgba(124,58,237,.45);
+    }
+    .profile-card h2 { font-size:18px; font-weight:800; color:#f5f3ff; margin:0; }
+    .profile-card p  { font-size:13.5px; color:#a78bfa; margin:0; }
+
+    .mini-info { display:flex; gap:1.25rem; }
+    .mini-info div { display:flex; flex-direction:column; align-items:center; gap:.15rem; }
+    .mini-info span { font-size:12px; color:#6b7280; }
+    .mini-info strong { font-size:20px; font-weight:800; color:#c4b5fd; }
+
+    .profile-lines { width:100%; text-align:left; display:flex; flex-direction:column; gap:.35rem; }
+    .profile-lines p { font-size:13px; color:#a78bfa; margin:0; padding:.5rem .75rem; background:rgba(124,58,237,.08); border-radius:8px; }
+
+    /* Incomplete banner */
+    .incomplete-banner {
+      background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.35);
+      border-radius:12px; padding:.9rem 1.1rem; font-size:14px; color:#fcd34d;
+      margin-bottom:1rem; display:flex; align-items:center; gap:.6rem;
+    }
+    .incomplete-banner.hidden { display:none; }
+
+    /* Right edit card */
+    .edit-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+      padding:1.5rem;
+    }
+    .edit-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+    .edit-card form label { display:block; font-size:13.5px; color:#a78bfa; font-weight:600; margin-bottom:.35rem; margin-top:.85rem; }
+    .edit-card form label:first-of-type { margin-top:0; }
+    .edit-card form input {
+      width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+      border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+    }
+    .edit-card form input:focus {
+      outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.2);
+    }
+    .hint { font-size:12px; color:#6b7280; margin-top:.25rem; }
+
+    .save-btn {
+      margin-top:1.2rem; width:100%; padding:.85rem; border-radius:12px;
+      font-size:15px; font-weight:700; background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      color:#fff; border:none; box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer;
+    }
+    .save-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+
+    .success-banner {
+      background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3);
+      border-radius:10px; padding:.75rem 1rem; font-size:14px; color:#4ade80;
+      margin-top:.75rem; display:none;
+    }
+
+    /* Completeness bar */
+    .completeness-box { margin-bottom:.85rem; }
+    .completeness-bar-wrap { background:rgba(255,255,255,.07); border-radius:99px; height:8px; overflow:hidden; margin:.45rem 0 .3rem; }
+    .completeness-bar-fill { height:100%; border-radius:99px; transition:width .5s ease; background:linear-gradient(90deg,#7c3aed,#4ade80); }
+    .completeness-label { font-size:13px; color:#a78bfa; }
+  </style>
 </head>
 
 <body class="profile-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>👨‍🎓 Job Seeker Panel</h2>
-
     <nav>
       <a href="js-dashboard.html">Dashboard</a>
       <a href="js-jobs.html">Jobs</a>
@@ -27,244 +97,153 @@
       <a href="js-analytics.html">Analytics</a>
       <a href="js-profile.html" class="active">Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- TOP -->
     <div class="profile-top">
-
       <div>
         <h1>👤 My Profile</h1>
-        <p>Polish your identity. Recruiters notice details.</p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Polish your identity — recruiters notice details.</p>
       </div>
-
-      <div class="level-badge">
-        🚀 Career Ready
-      </div>
-
+      <div class="badge">🚀 Career Ready</div>
     </div>
 
+    <!-- Inline warning (replaces annoying alert) -->
+    <div id="incompleteBanner" class="incomplete-banner hidden">
+      ⚠️ Complete your profile — add skills and experience to unlock AI job matching.
+    </div>
 
-
-    <!-- GRID -->
     <div class="profile-grid">
 
-      <!-- LEFT CARD -->
+      <!-- LEFT: Preview -->
       <section class="profile-card">
-
-        <div class="avatar-circle" id="avatarText">
-          U
-        </div>
-
+        <div class="avatar-circle" id="avatarText">U</div>
         <h2 id="name">Loading...</h2>
-
-        <p id="email">Loading...</p>
+        <p  id="email">Loading...</p>
 
         <div class="mini-info">
-          <div>
-            <span>Skills</span>
-            <strong id="skillCount">0</strong>
-          </div>
-
-          <div>
-            <span>Exp</span>
-            <strong id="expCount">0y</strong>
-          </div>
+          <div><span>Skills</span><strong id="skillCount">0</strong></div>
+          <div><span>Exp</span><strong id="expCount">0y</strong></div>
         </div>
 
         <div class="profile-lines">
           <p id="skillsText">Skills: Not added</p>
           <p id="expText">Experience: Not added</p>
         </div>
-
       </section>
 
-
-
-      <!-- RIGHT CARD -->
+      <!-- RIGHT: Edit -->
       <section class="edit-card">
-
         <h3>✏️ Edit Profile</h3>
+
+        <!-- Profile completeness bar -->
+        <div class="completeness-box">
+          <div class="completeness-bar-wrap">
+            <div class="completeness-bar-fill" id="complBar" style="width:0%"></div>
+          </div>
+          <span class="completeness-label" id="complLabel">Profile 0% complete</span>
+        </div>
 
         <form id="profileForm">
 
-          <label>Skills</label>
-          <input
-            type="text"
-            id="skills"
-            
-          >
+          <label>Skills *</label>
+          <input type="text" id="skills">
+          <div class="hint">Comma-separated — e.g. React, Python, SQL</div>
 
-          <label>Experience (Years)</label>
-          <input
-            type="number"
-            id="exp"
-            min="0"
-            
-          >
+          <label>Experience (Years) *</label>
+          <input type="number" id="exp" min="0">
 
-          <button type="submit" id="saveBtn">
-            Update Profile 🚀
-          </button>
+          <button type="submit" id="saveBtn" class="save-btn">Update Profile 🚀</button>
 
         </form>
+
+        <div id="successMsg" class="success-banner">✅ Profile updated successfully!</div>
 
       </section>
 
     </div>
 
   </main>
-
 </div>
 
-
-
 <script type="module">
-
-import {
-  logoutUser,
-  updateUserProfile,
-  protectPage,
-  getSession
-} from "./firebase.js";
+import { logoutUser, updateUserProfile, protectPage, getSession } from "./firebase.js";
 
 protectPage("jobseeker");
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
-
-
-/* =========================
-   SESSION
-========================= */
-
-
-
-/* =========================
-   CHECK PROFILE COMPLETE
-========================= */
-
-function isProfileComplete(user){
-  return (
-    user.skills &&
-    user.skills.trim().length > 0 &&
-    user.exp !== undefined &&
-    user.exp !== null &&
-    user.exp !== ""
-  );
+function isComplete(user) {
+  return (user.skills || "").trim().length > 0 &&
+    user.exp !== undefined && user.exp !== null && `${user.exp}` !== "";
 }
 
-
-/* =========================
-   LOAD PROFILE
-========================= */
-
-function loadProfile(){
-
+function loadProfile() {
   const user = getSession();
+  if (!user) { window.location.href = "jobseeker-login.html"; return; }
 
-  if(!user){
-    window.location.href = "jobseeker-login.html";
-    return;
-  }
-
-  const name = user.name || "User";
-  const email = user.email || "No Email";
+  const name   = user.name  || "User";
+  const email  = user.email || "";
   const skills = user.skills || "";
-  const exp = user.exp || "0";
+  const exp    = user.exp !== undefined ? user.exp : "";
 
-  document.getElementById("name").innerText = name;
-  document.getElementById("email").innerText = email;
+  document.getElementById("name").textContent       = name;
+  document.getElementById("email").textContent      = email;
+  document.getElementById("avatarText").textContent = name.charAt(0).toUpperCase();
+  document.getElementById("skillsText").textContent = "Skills: " + (skills || "Not added");
+  document.getElementById("expText").textContent    = "Experience: " + (exp !== "" ? exp + " year(s)" : "Not added");
 
-  document.getElementById("avatarText")
-  .innerText = name.charAt(0).toUpperCase();
-
-  document.getElementById("skillsText")
-  .innerText = "Skills: " + (skills || "Not added");
-
-  document.getElementById("expText")
-  .innerText = "Experience: " + exp + " year(s)";
-
-  const skillCount = skills
-    ? skills.split(",").filter(Boolean).length
-    : 0;
-
-  document.getElementById("skillCount").innerText = skillCount;
-  document.getElementById("expCount").innerText = exp + "y";
+  const skillArr = skills ? skills.split(",").filter(Boolean) : [];
+  document.getElementById("skillCount").textContent = skillArr.length;
+  document.getElementById("expCount").textContent   = (exp !== "" ? exp : 0) + "y";
 
   document.getElementById("skills").value = skills;
-  document.getElementById("exp").value = exp;
+  document.getElementById("exp").value    = exp;
 
+  // Completeness bar
+  const fields = [skills.trim(), `${exp}`].filter(v => v !== "");
+  const pct    = Math.round((fields.length / 2) * 100);
+  document.getElementById("complBar").style.width      = pct + "%";
+  document.getElementById("complLabel").textContent    = `Profile ${pct}% complete`;
 
-  // 🔥 AUTO WARNING IF INCOMPLETE
-  if(!isProfileComplete(user)){
-    alert("⚠️ Please complete your profile before applying for jobs");
+  // Inline warning (no alert)
+  const banner = document.getElementById("incompleteBanner");
+  if (!isComplete(user)) {
+    banner.classList.remove("hidden");
+  } else {
+    banner.classList.add("hidden");
   }
-
 }
 
-
-/* =========================
-   UPDATE PROFILE (MANDATORY)
-========================= */
-
-document.getElementById("profileForm")
-.addEventListener("submit", async (e)=>{
-
+document.getElementById("profileForm").addEventListener("submit", async e => {
   e.preventDefault();
-
-  const btn = document.getElementById("saveBtn");
-
-  btn.disabled = true;
-  btn.innerText = "Saving...";
-
+  const btn    = document.getElementById("saveBtn");
   const skills = document.getElementById("skills").value.trim();
-  const exp = document.getElementById("exp").value.trim();
+  const exp    = document.getElementById("exp").value.trim();
 
-
-  // ❗ HARD VALIDATION
-  if(!skills || !exp){
-
-    alert("⚠️ Skills and Experience are mandatory!");
-
-    btn.disabled = false;
-    btn.innerText = "Update Profile 🚀";
+  if (!skills || !exp) {
+    document.getElementById("incompleteBanner").classList.remove("hidden");
+    document.getElementById("incompleteBanner").textContent = "⚠️ Skills and Experience are both required.";
     return;
   }
 
-  try{
+  btn.disabled = true; btn.textContent = "Saving...";
 
-    await updateUserProfile({
-      skills,
-      exp: Number(exp)
-    });
-
+  try {
+    await updateUserProfile({ skills, exp: Number(exp) });
+    document.getElementById("successMsg").style.display = "block";
+    setTimeout(() => { document.getElementById("successMsg").style.display = "none"; }, 3000);
     loadProfile();
-
-    alert("Profile Updated ✅");
-
-  }catch(err){
-
+  } catch(err) {
     console.error(err);
-    alert("Failed ❌");
-
+    alert("Failed to update ❌");
   }
 
-  btn.disabled = false;
-  btn.innerText = "Update Profile 🚀";
-
+  btn.disabled = false; btn.textContent = "Update Profile 🚀";
 });
 
-
 loadProfile();
-
 </script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>

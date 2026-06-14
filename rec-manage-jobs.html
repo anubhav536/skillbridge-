@@ -1,402 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Manage Jobs | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .top-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .top-row h1 { margin:0; }
+  .top-row input { width:220px; margin:0; }
 
-<link rel="stylesheet" href="style.css?v=94">
-  <link rel="stylesheet" href="universal.css">
+  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
+  .mini-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:12px;
+    padding:.9rem 1rem; text-align:center;
+  }
+  .mini-card h3 { font-size:13px; color:#a78bfa; margin-bottom:.35rem; font-weight:600; }
+  .mini-card p  { font-size:30px; font-weight:800; color:#f5f3ff; margin:0; line-height:1; }
 
+  .jobs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(290px,1fr)); gap:1rem; }
+
+  .job-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.2rem; display:flex; flex-direction:column; gap:.55rem;
+    position:relative; overflow:hidden; transition: box-shadow .25s;
+  }
+  .job-card:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+  .job-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:linear-gradient(90deg,#7c3aed,#4f46e5); }
+
+  .job-head { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+  .job-head h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin:0; line-height:1.3; }
+  .job-chip {
+    font-size:11px; font-weight:700; padding:.25rem .6rem;
+    border-radius:999px; white-space:nowrap;
+    background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.35); color:#4ade80;
+  }
+  .job-info { font-size:13.5px; color:#c4b5fd; }
+  .job-info b { color:#a78bfa; }
+
+  .applicant-badge {
+    display:inline-flex; align-items:center; gap:.35rem;
+    background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3);
+    border-radius:999px; padding:.25rem .75rem; font-size:13px; font-weight:600; color:#c4b5fd;
+  }
+
+  .tags { display:flex; flex-wrap:wrap; gap:.3rem; }
+  .tag { font-size:12px; padding:.2rem .55rem; border-radius:999px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+
+  .btn-row { display:flex; gap:.5rem; margin-top:auto; padding-top:.35rem; }
+  .danger-btn {
+    flex:1; padding:.6rem; border-radius:9px; font-size:13px; font-weight:700;
+    background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171;
+    cursor:pointer; width:auto;
+  }
+  .view-btn {
+    flex:1; padding:.6rem; border-radius:9px; font-size:13px; font-weight:700;
+    background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+    cursor:pointer; width:auto; text-align:center;
+  }
+  .danger-btn:hover:not(:disabled) { background:rgba(248,113,113,.2); }
+  .view-btn:hover   { background:rgba(124,58,237,.25); color:#ede9fe; }
+
+  .loading-text { color:#a78bfa; text-align:center; padding:3rem 1rem; font-size:15px; grid-column:1/-1; }
+</style>
 </head>
 
 <body class="rec-manage-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>🏢 Recruiter Panel</h2>
-
     <nav>
-      <a href="rec-dashboard.html">Dashboard</a>
-      <a href="rec-post-job.html">Post Job</a>
-      <a href="rec-manage-jobs.html" class="active">Manage Jobs</a>
-      <a href="rec-applicants.html">Applicants</a>
-      <a href="rec-analytics.html">Analytics</a>
-      <a href="rec-profile.html">Profile</a>
+      <a href="rec-dashboard.html">📊 Dashboard</a>
+      <a href="rec-post-job.html">➕ Post Job</a>
+      <a href="rec-manage-jobs.html" class="active">🧾 Manage Jobs</a>
+      <a href="rec-applicants.html">👥 Applicants</a>
+      <a href="rec-analytics.html">📈 Analytics</a>
+      <a href="rec-profile.html">👤 Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- TOP -->
     <div class="top-row">
-
       <div>
         <h1>🛠 Manage Your Jobs</h1>
-        <p class="muted">
-          Your hiring inventory, polished and ready ⚙️
-        </p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Your hiring inventory ⚙️</p>
       </div>
-
-      <input
-        type="text"
-        id="search"
-        class="search-box"
-        
-      >
-
+      <input type="text" id="search">
     </div>
 
-
-
-    <!-- STATS -->
-    <section class="grid mini-grid">
-
-      <div class="card mini-card">
-        <h3>Total Jobs</h3>
-        <p id="jobCount">0</p>
-      </div>
-
-      <div class="card mini-card">
-        <h3>Visible</h3>
-        <p id="visibleCount">0</p>
-      </div>
-
+    <section class="mini-grid">
+      <div class="mini-card"><h3>Total Jobs</h3><p id="jobCount">—</p></div>
+      <div class="mini-card"><h3>Showing</h3><p id="visibleCount">—</p></div>
+      <div class="mini-card"><h3>Total Applicants</h3><p id="applicantTotal">—</p></div>
     </section>
 
-
-
-    <!-- JOB LIST -->
-    <section
-      id="jobsList"
-      class="jobs-grid"
-    ></section>
+    <section id="jobsList" class="jobs-grid">
+      <p class="loading-text">Loading jobs...</p>
+    </section>
 
   </main>
-
 </div>
 
-
-
 <script type="module">
-
-import {
-  db,
-  logoutUser,
-  getSession
-} from "./firebase.js";
-
-import {
-  getDocs,
-  collection,
-  deleteDoc,
-  doc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
-
-
-/* =========================
-   PAGE PROTECT
-========================= */
+import { db, logoutUser, getSession } from "./firebase.js";
+import { getDocs, collection, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 const user = getSession();
+if (!user) { window.location.href = "recruiter-login.html"; }
+if (user && user.role !== "recruiter") { window.location.href = "index.html"; }
 
-if(!user){
-  window.location.href =
-    "rec-manage-jobs.html";
-}
-
-if(user && user.role !== "recruiter"){
-  window.location.href =
-    "index.html";
-}
-
-
-/* =========================
-   LOGOUT
-========================= */
-
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
-
-
-/* =========================
-   DATA
-========================= */
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
 let allJobs = [];
+let appCountMap = {};  // jobId → count
 
+async function loadJobs() {
+  const list = document.getElementById("jobsList");
+  list.innerHTML = `<p class="loading-text">Loading jobs...</p>`;
 
-/* =========================
-   LOAD JOBS
-========================= */
-
-async function loadJobs(){
-
-  const list =
-    document.getElementById("jobsList");
-
-  list.innerHTML =
-    `<p class="loading-text">
-      Loading jobs...
-    </p>`;
-
-  try{
-
-    const snap =
-      await getDocs(collection(db,"jobs"));
-
-    allJobs = [];
-
-    snap.forEach(item => {
-
-      const job = item.data();
-
-      if(job.recruiter === user.email){
-
-        allJobs.push({
-          id: item.id,
-          ...job
-        });
-
+  try {
+    // Load applicant counts
+    const appSnap = await getDocs(collection(db, "applications"));
+    appCountMap = {};
+    let total = 0;
+    appSnap.forEach(d => {
+      const a = d.data();
+      if (a.jobId) {
+        appCountMap[a.jobId] = (appCountMap[a.jobId] || 0) + 1;
+        total++;
       }
-
     });
 
-    updateCounts(allJobs);
+    const snap = await getDocs(collection(db, "jobs"));
+    allJobs = [];
+    snap.forEach(d => {
+      const job = d.data();
+      if (job.recruiter === user.email) allJobs.push({ id: d.id, ...job });
+    });
+
+    const myTotal = allJobs.reduce((s, j) => s + (appCountMap[j.id] || 0), 0);
+    document.getElementById("jobCount").textContent      = allJobs.length;
+    document.getElementById("applicantTotal").textContent = myTotal;
+
     renderJobs(allJobs);
-
-  }catch(err){
-
-    console.error(err);
-
-    list.innerHTML =
-      `<p class="loading-text">
-        Failed to load ❌
-      </p>`;
-
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = `<p class="loading-text">Failed to load ❌</p>`;
   }
-
 }
 
+function renderJobs(jobs) {
+  const list = document.getElementById("jobsList");
+  document.getElementById("visibleCount").textContent = jobs.length;
 
-/* =========================
-   COUNTS
-========================= */
-
-function updateCounts(jobs){
-
-  document.getElementById("jobCount")
-  .innerText = allJobs.length;
-
-  document.getElementById("visibleCount")
-  .innerText = jobs.length;
-
-}
-
-
-/* =========================
-   RENDER
-========================= */
-
-function renderJobs(jobs){
-
-  const list =
-    document.getElementById("jobsList");
-
-  if(jobs.length === 0){
-
-    list.innerHTML =
-      `<p class="loading-text">
-        No jobs found 😢
-      </p>`;
-
+  if (jobs.length === 0) {
+    list.innerHTML = `<p class="loading-text">No jobs found 😢 — <a href="rec-post-job.html" style="color:#c4b5fd">Post one now →</a></p>`;
     return;
   }
 
-  list.innerHTML =
-    jobs.map(job => `
-
-      <div class="card job-card">
-
-        <div class="job-head">
-
-          <h3>
-            ${job.title || "Untitled Job"}
-          </h3>
-
-          <span class="job-chip">
-            🔥 Active
-          </span>
-
-        </div>
-
-        <p>
-          <b>Skills:</b>
-          ${
-            Array.isArray(job.skills)
-            ? job.skills.join(", ")
-            : (job.skills || "N/A")
-          }
-        </p>
-
-        <p>
-          <b>Salary:</b>
-          ${job.salary || "Not specified"}
-        </p>
-
-        <p>
-          <b>Location:</b>
-          ${job.location || "Remote / N/A"}
-        </p>
-
-        <div class="btn-row">
-
-          <button
-            class="danger-btn deleteBtn"
-            data-id="${job.id}"
-          >
-            Delete ❌
-          </button>
-
-        </div>
-
+  list.innerHTML = jobs.map(job => {
+    const cnt    = appCountMap[job.id] || 0;
+    const skills = Array.isArray(job.skills) ? job.skills : (job.skills || "").split(",").filter(Boolean);
+    return `
+    <div class="job-card">
+      <div class="job-head">
+        <h3>${job.title || "Untitled Job"}</h3>
+        <span class="job-chip">🔥 Active</span>
       </div>
+      <span class="applicant-badge">👥 ${cnt} applicant${cnt !== 1 ? "s" : ""}</span>
+      ${job.salary   ? `<p class="job-info"><b>Salary:</b> ${job.salary}</p>` : ""}
+      ${job.location ? `<p class="job-info"><b>Location:</b> ${job.location}</p>` : ""}
+      ${skills.length ? `<div class="tags">${skills.slice(0,5).map(s=>`<span class="tag">${s.trim()}</span>`).join("")}</div>` : ""}
+      <div class="btn-row">
+        <a href="rec-applicants.html" class="view-btn">👥 View Applicants</a>
+        <button class="danger-btn deleteBtn" data-id="${job.id}">Delete ❌</button>
+      </div>
+    </div>`;
+  }).join("");
 
-    `).join("");
-
-  attachDeleteEvents();
-
-}
-
-
-/* =========================
-   DELETE EVENTS
-========================= */
-
-function attachDeleteEvents(){
-
-  document
-  .querySelectorAll(".deleteBtn")
-  .forEach(btn => {
-
-    btn.addEventListener(
-      "click",
-      async ()=>{
-
-        const id =
-          btn.dataset.id;
-
-        const ok =
-          confirm(
-            "Delete this job?"
-          );
-
-        if(!ok) return;
-
-        btn.disabled = true;
-        btn.innerText =
-          "Deleting...";
-
-        try{
-
-          await deleteDoc(
-            doc(db,"jobs",id)
-          );
-
-          loadJobs();
-
-        }catch(err){
-
-          console.error(err);
-
-          btn.disabled = false;
-          btn.innerText =
-            "Delete ❌";
-
-          alert(
-            "Delete failed ❌"
-          );
-
-        }
-
+  document.querySelectorAll(".deleteBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      if (!confirm("Delete this job? This cannot be undone.")) return;
+      btn.disabled = true; btn.textContent = "Deleting...";
+      try {
+        await deleteDoc(doc(db, "jobs", id));
+        await loadJobs();
+      } catch(e) {
+        console.error(e);
+        btn.disabled = false; btn.textContent = "Delete ❌";
+        alert("Delete failed ❌");
       }
-    );
-
+    });
   });
-
 }
 
-
-/* =========================
-   SEARCH
-========================= */
-
-document.getElementById("search")
-.addEventListener("input",(e)=>{
-
-  const val =
-    e.target.value
-    .toLowerCase()
-    .trim();
-
-  let filtered =
-    [...allJobs];
-
-  if(val){
-
-    filtered =
-      filtered.filter(job => {
-
-        const title =
-          (job.title || "")
-          .toLowerCase();
-
-        const location =
-          (job.location || "")
-          .toLowerCase();
-
-        const skills =
-          Array.isArray(job.skills)
-          ? job.skills.join(" ")
-              .toLowerCase()
-          : (job.skills || "")
-              .toLowerCase();
-
-        return (
-          title.includes(val) ||
-          location.includes(val) ||
-          skills.includes(val)
-        );
-
-      });
-
+document.getElementById("search").addEventListener("input", e => {
+  const val = e.target.value.toLowerCase().trim();
+  let filtered = [...allJobs];
+  if (val) {
+    filtered = filtered.filter(job =>
+      (job.title || "").toLowerCase().includes(val) ||
+      (job.location || "").toLowerCase().includes(val) ||
+      (Array.isArray(job.skills) ? job.skills.join(" ") : (job.skills || "")).toLowerCase().includes(val)
+    );
   }
-
-  updateCounts(filtered);
   renderJobs(filtered);
-
 });
 
-
-/* =========================
-   INIT
-========================= */
-
 loadJobs();
-
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
