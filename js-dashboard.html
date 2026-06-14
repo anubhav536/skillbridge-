@@ -1,134 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Dashboard | SkillBridge AI</title>
-<link rel="stylesheet" href="style.css?v=12">
-  <link rel="stylesheet" href="universal.css">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  /* ── Stat cards ── */
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.9rem; margin-bottom:1.1rem; }
+  .dash-card {
+    background: rgba(18,12,48,.72);
+    border: 1px solid rgba(124,58,237,.22);
+    border-radius: 16px;
+    padding: 1.25rem;
+    transition: box-shadow .25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .dash-card:hover { box-shadow: 0 0 28px rgba(124,58,237,.2); }
+  .dash-card h3 { font-size: 14px; color: #a78bfa; margin-bottom:.5rem; font-weight:600; }
+  .dash-card p  { font-size: 36px; font-weight:800; margin:0; line-height:1; color:#f5f3ff; }
 
+  .blue-line::before   { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#4f46e5,#818cf8); }
+  .green-line::before  { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .purple-line::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
+  .orange-line::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#d97706,#fcd34d); }
 
+  /* ── Progress bar ── */
+  .progress-card { margin-bottom:1.1rem; }
+  .progress-card h3 { margin-bottom:.75rem; font-size:15px; }
+  .progress-wrap { background:rgba(255,255,255,.07); border-radius:99px; height:10px; overflow:hidden; margin-bottom:.6rem; }
+  .progress-bar  { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa); transition:width .8s ease; }
+  .progress-meta { display:flex; justify-content:space-between; font-size:13px; color:#a78bfa; }
 
+  /* ── AI Picks ── */
+  .picks-card { margin-bottom:1.1rem; }
+  .picks-card h3 { margin-bottom:.85rem; font-size:15px; }
+  .picks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.75rem; }
+
+  .pick-card {
+    background: rgba(30,18,80,.55);
+    border: 1px solid rgba(124,58,237,.25);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: .45rem;
+    transition: box-shadow .2s, transform .2s;
+  }
+  .pick-card:hover { box-shadow:0 0 20px rgba(124,58,237,.22); transform:translateY(-2px); }
+  .pick-title { font-size:15px; font-weight:700; color:#f5f3ff; }
+  .pick-company { font-size:13px; color:#a78bfa; }
+  .pick-score-row { display:flex; align-items:center; gap:.5rem; }
+  .pick-bar-wrap { flex:1; height:5px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
+  .pick-bar-fill { height:100%; border-radius:99px; }
+  .pick-pct { font-size:13px; font-weight:800; }
+  .pick-apply {
+    margin-top:.3rem;
+    padding:.55rem;
+    border-radius:8px;
+    font-size:13px; font-weight:700;
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:#fff; border:none;
+    box-shadow:0 3px 10px rgba(124,58,237,.35);
+    width:auto; cursor:pointer;
+  }
+  .pick-apply:hover { filter:brightness(1.1); }
+  .pick-apply.applied {
+    background:rgba(74,222,128,.12) !important;
+    border:1px solid rgba(74,222,128,.3) !important;
+    color:#4ade80 !important; box-shadow:none !important;
+  }
+
+  /* ── Quick actions ── */
+  .quick-card { margin-bottom:1.1rem; }
+  .quick-card h3 { margin-bottom:.85rem; font-size:15px; }
+  .quick-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; }
+  .quick-btn {
+    background: rgba(124,58,237,.12);
+    border: 1px solid rgba(124,58,237,.28);
+    border-radius: 12px;
+    padding: 1rem .9rem;
+    text-align: center;
+    font-size: 14px; font-weight:600;
+    color: #c4b5fd;
+    transition: all .2s;
+    display:block;
+  }
+  .quick-btn:hover { background:rgba(124,58,237,.25); color:#ede9fe; transform:translateY(-2px); }
+
+  /* ── Daily Quote ── */
+  .quote-card p { font-size:16px; font-style:italic; color:#c4b5fd; line-height:1.75; margin:0; }
+
+  /* ── Top ── */
+  .dash-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .dash-top h1 { margin:0; }
+  #welcome { margin:.2rem 0 0; font-size:14px; color:#a78bfa; }
+
+  /* ── Skill completion banner ── */
+  .profile-nudge {
+    background: rgba(245,158,11,.1);
+    border: 1px solid rgba(245,158,11,.35);
+    border-radius: 12px;
+    padding: .9rem 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom:1.1rem;
+    font-size:14px;
+    color:#fcd34d;
+  }
+  .profile-nudge a {
+    background:rgba(245,158,11,.25);
+    border:1px solid rgba(245,158,11,.45);
+    color:#fcd34d;
+    padding:.42rem .9rem;
+    border-radius:8px;
+    font-weight:700;
+    font-size:13px;
+    white-space:nowrap;
+  }
+
+  .picks-empty { color:#a78bfa; font-size:14px; padding:.5rem 0; }
+</style>
 </head>
 
 <body class="jsdash-page">
-
 <div class="dashboard">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-
-<h2>👨‍🎓 Job Seeker Panel</h2>
-
-<nav>
-<a href="js-dashboard.html" class="active">Dashboard</a>
-<a href="js-jobs.html">Jobs</a>
-<a href="js-applications.html">Applications</a>
-<a href="js-resume.html">Resume Builder</a>
-<a href="js-analytics.html">Analytics</a>
-<a href="js-profile.html">Profile</a>
-</nav>
-
-<button id="logoutBtn">Logout 👋</button>
-
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <nav>
+    <a href="js-dashboard.html" class="active">Dashboard</a>
+    <a href="js-jobs.html">Jobs</a>
+    <a href="js-applications.html">Applications</a>
+    <a href="js-resume.html">Resume Builder</a>
+    <a href="js-analytics.html">Analytics</a>
+    <a href="js-profile.html">Profile</a>
+  </nav>
+  <button id="logoutBtn">Logout 👋</button>
 </aside>
 
 <!-- MAIN -->
 <main class="main">
 
-<div class="dash-top">
+  <!-- TOP -->
+  <div class="dash-top">
+    <div>
+      <h1>📊 Dashboard</h1>
+      <p id="welcome">Welcome back!</p>
+    </div>
+    <div class="status-chip">🚀 Career Mode Active</div>
+  </div>
 
-<div>
-<h1>📊 Dashboard</h1>
-<p id="welcome" class="subtext">
-Welcome...
-</p>
-</div>
+  <!-- Profile nudge (hidden if complete) -->
+  <div id="profileNudge" class="profile-nudge" style="display:none">
+    ⚡ Complete your profile to unlock AI job matching
+    <a href="js-profile.html">Complete Profile →</a>
+  </div>
 
-<div class="status-chip">
-🚀 Career Mode Active
-</div>
+  <!-- STATS -->
+  <section class="stats-grid">
+    <div class="dash-card blue-line">
+      <h3>📄 Total Applications</h3>
+      <p id="totalApps">—</p>
+    </div>
+    <div class="dash-card green-line">
+      <h3>✅ Selected</h3>
+      <p id="selectedApps">—</p>
+    </div>
+    <div class="dash-card purple-line">
+      <h3>⚡ Employability Score</h3>
+      <p id="score">—</p>
+    </div>
+    <div class="dash-card orange-line">
+      <h3>🎯 AI Matched Jobs</h3>
+      <p id="matchedCount">—</p>
+    </div>
+  </section>
 
-</div>
+  <!-- PROGRESS -->
+  <section class="dash-card progress-card">
+    <h3>📈 Hiring Momentum</h3>
+    <div class="progress-wrap">
+      <div id="progressBar" class="progress-bar" style="width:0%"></div>
+    </div>
+    <div class="progress-meta">
+      <span id="progressText">Loading...</span>
+      <span id="progressPct"></span>
+    </div>
+  </section>
 
-<!-- STATS -->
-<section class="stats-grid">
+  <!-- AI TOP PICKS -->
+  <section class="dash-card picks-card">
+    <h3>🤖 AI Top Picks — Best Job Matches For You</h3>
+    <div id="picksGrid" class="picks-grid">
+      <p class="picks-empty">Loading AI picks...</p>
+    </div>
+  </section>
 
-<div class="dash-card blue-line">
-<h3>📄 Total Applications</h3>
-<p id="totalApps">0</p>
-</div>
+  <!-- QUICK ACTIONS -->
+  <section class="dash-card quick-card">
+    <h3>⚡ Quick Actions</h3>
+    <div class="quick-grid">
+      <a href="js-jobs.html"         class="quick-btn">💼 Find Jobs</a>
+      <a href="js-resume.html"       class="quick-btn">📄 Build Resume</a>
+      <a href="js-analytics.html"    class="quick-btn">📊 Analytics</a>
+      <a href="js-profile.html"      class="quick-btn">👤 Update Profile</a>
+    </div>
+  </section>
 
-<div class="dash-card green-line">
-<h3>✅ Selected</h3>
-<p id="selectedApps">0</p>
-</div>
-
-<div class="dash-card purple-line">
-<h3>⚡ Employability Score</h3>
-<p id="score">0%</p>
-</div>
-
-</section>
-
-<!-- PROGRESS -->
-<section class="dash-card progress-card">
-
-<h3>📈 Hiring Momentum</h3>
-
-<div class="progress-wrap">
-<div id="progressBar" class="progress-bar"></div>
-</div>
-
-<p id="progressText">
-Loading...
-</p>
-
-</section>
-
-<!-- QUICK ACTIONS -->
-<section class="dash-card quick-card">
-
-<h3>⚡ Quick Actions</h3>
-
-<div class="quick-grid">
-
-<a href="js-jobs.html" class="quick-btn">
-💼 Find Jobs
-</a>
-
-<a href="js-resume.html" class="quick-btn">
-📄 Build Resume
-</a>
-
-<a href="js-analytics.html" class="quick-btn">
-📊 View Analytics
-</a>
-
-<a href="js-profile.html" class="quick-btn">
-👤 Update Profile
-</a>
-
-</div>
-
-</section>
-
-<!-- QUOTE -->
-<section class="dash-card quote-card">
-
-<h3>🔥 Daily Push</h3>
-
-<p id="quoteText">
-Every application is a knock on opportunity’s door.
-</p>
-
-</section>
+  <!-- DAILY QUOTE -->
+  <section class="dash-card quote-card">
+    <h3>🔥 Daily Push</h3>
+    <p id="quoteText">Every application is a knock on opportunity's door.</p>
+  </section>
 
 </main>
 </div>
 
+<script type="module">
+import { db, logoutUser, getSession, protectPage } from "./firebase.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { rankJobs, calcEmployabilityScore, parseSkills, matchLabel } from "./ai-match.js";
+
+protectPage("jobseeker");
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+const quotes = [
+  "Every application is a knock on opportunity's door. 🚪",
+  "Skills open doors. Your effort keeps them open. 🔑",
+  "Consistency beats talent when talent doesn't show up. 💪",
+  "Your next job is one application away. 🚀",
+  "Dream big. Apply smart. Land strong. 🎯",
+  "Every rejection is a redirect to something better. ↗️",
+  "The job isn't going to apply for itself. 😉"
+];
+document.getElementById("quoteText").textContent =
+  quotes[new Date().getDay() % quotes.length];
+
+async function loadDashboard() {
+  const user = getSession();
+  if (!user) { window.location.href = "jobseeker-login.html"; return; }
+
+  document.getElementById("welcome").textContent =
+    `Welcome back, ${user.name || "Job Seeker"} 👋`;
+
+  const userSkills = user.skills || "";
+  const parsed     = parseSkills(userSkills);
+
+  if (parsed.length === 0) {
+    document.getElementById("profileNudge").style.display = "flex";
+  }
+
+  // Load applications
+  let apps = [];
+  try {
+    const snap = await getDocs(collection(db, "applications"));
+    snap.forEach(d => {
+      const a = d.data();
+      if (a.seeker === user.email || a.user === user.email || a.email === user.email) {
+        apps.push(a);
+      }
+    });
+  } catch(e) { console.error(e); }
+
+  const total   = apps.length;
+  const success = apps.filter(a => a.status === "Hired" || a.status === "Shortlisted").length;
+
+  document.getElementById("totalApps").textContent    = total;
+  document.getElementById("selectedApps").textContent = success;
+
+  // Employability score
+  const empScore = calcEmployabilityScore({
+    skills:      userSkills,
+    exp:         user.exp || 0,
+    totalApps:   total,
+    successApps: success
+  });
+
+  document.getElementById("score").textContent = empScore + "%";
+
+  // Progress bar
+  document.getElementById("progressBar").style.width = empScore + "%";
+  let level = "Starter 🌱";
+  if (empScore >= 40) level = "Growing 🚀";
+  if (empScore >= 65) level = "Strong Candidate 💼";
+  if (empScore >= 85) level = "Elite Talent 👑";
+  document.getElementById("progressText").textContent = "Level: " + level;
+  document.getElementById("progressPct").textContent  = empScore + "%";
+
+  // AI Top Picks
+  try {
+    const jobSnap = await getDocs(collection(db, "jobs"));
+    const rawJobs = [];
+    jobSnap.forEach(d => rawJobs.push({ id: d.id, ...d.data() }));
+
+    const ranked = rankJobs(rawJobs, userSkills);
+    document.getElementById("matchedCount").textContent =
+      ranked.filter(j => j.matchScore >= 40).length;
+
+    const topPicks = ranked.filter(j => j.matchScore >= 40).slice(0, 6);
+
+    const scopedKey = `appliedJobs:${(user.email||"").toLowerCase()}`;
+    const applied   = new Set(JSON.parse(localStorage.getItem(scopedKey)) || []);
+
+    const grid = document.getElementById("picksGrid");
+
+    if (topPicks.length === 0) {
+      grid.innerHTML = parsed.length === 0
+        ? `<p class="picks-empty">👆 Add your skills in Profile to get AI job picks</p>`
+        : `<p class="picks-empty">No high-match jobs right now. Check back when new jobs are posted.</p>`;
+      return;
+    }
+
+    grid.innerHTML = topPicks.map(job => {
+      const ml  = matchLabel(job.matchScore);
+      const app = applied.has(job.id);
+      return `
+      <div class="pick-card">
+        <div class="pick-title">${job.title || "Untitled"}</div>
+        <div class="pick-company">🏢 ${job.recruiter || "Company"}${job.location ? ` · 📍 ${job.location}` : ""}</div>
+        <div class="pick-score-row">
+          <div class="pick-bar-wrap">
+            <div class="pick-bar-fill" style="width:${job.matchScore}%;background:${ml.color}"></div>
+          </div>
+          <span class="pick-pct" style="color:${ml.color}">${job.matchScore}% match</span>
+        </div>
+        <button class="pick-apply ${app ? 'applied' : ''}"
+          data-jobid="${job.id}"
+          data-title="${(job.title||'').replace(/"/g,'')}"
+          data-rec="${(job.recruiter||'').replace(/"/g,'')}"
+          ${app ? 'disabled' : ''}>
+          ${app ? '✅ Applied' : '🎯 Quick Apply'}
+        </button>
+      </div>`;
+    }).join("");
+
+    // Quick apply from dashboard
+    grid.querySelectorAll(".pick-apply:not(.applied)").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const { applyJob } = await import("./firebase.js");
+        const jobId  = btn.dataset.jobid;
+        const jobTitle = btn.dataset.title;
+        const recruiter = btn.dataset.rec;
+        btn.disabled = true; btn.textContent = "Applying...";
+        try {
+          await applyJob({ jobId, jobTitle, recruiter, seeker: user.email, user: user.email, skills: [], status: "Applied" });
+          applied.add(jobId);
+          localStorage.setItem(scopedKey, JSON.stringify([...applied]));
+          btn.textContent = "✅ Applied"; btn.classList.add("applied");
+        } catch(e) {
+          console.error(e); btn.disabled = false; btn.textContent = "🎯 Quick Apply";
+          alert("Failed ❌");
+        }
+      });
+    });
+
+  } catch(e) { console.error(e); }
+}
+
+loadDashboard();
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
