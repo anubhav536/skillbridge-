@@ -10,29 +10,45 @@
   .top-row { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
   .top-row h1 { margin:0; }
 
-  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
+  .mini-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
   .mini-card {
     background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:12px;
-    padding:.9rem 1rem; text-align:center;
+    padding:.9rem 1rem; text-align:center; transition:box-shadow .25s, transform .25s; position:relative; overflow:hidden;
   }
-  .mini-card h3 { font-size:13px; color:#a78bfa; margin-bottom:.35rem; font-weight:600; }
+  .mini-card:hover { box-shadow:0 0 22px rgba(124,58,237,.2); transform:translateY(-2px); }
+  .mini-card::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; }
+  .mc-total::before   { background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
+  .mc-short::before   { background:linear-gradient(90deg,#16a34a,#4ade80); }
+  .mc-hired::before   { background:linear-gradient(90deg,#4f46e5,#818cf8); }
+  .mc-reject::before  { background:linear-gradient(90deg,#dc2626,#f87171); }
+  .mini-card h3 { font-size:12px; color:#a78bfa; margin-bottom:.35rem; font-weight:600; letter-spacing:.4px; text-transform:uppercase; }
   .mini-card p  { font-size:30px; font-weight:800; color:#f5f3ff; margin:0; line-height:1; }
 
-  .filter-bar { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .filter-bar { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; align-items:center; }
   .filter-bar input  { flex:1; min-width:180px; margin:0; }
   .filter-bar select { width:160px; margin:0; }
+  .sort-label { font-size:12px; color:#a78bfa; font-weight:600; white-space:nowrap; }
 
   .app-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:1rem; }
 
   .applicant-card {
     background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
     padding:1.2rem; display:flex; flex-direction:column; gap:.55rem;
-    position:relative; overflow:hidden; transition: box-shadow .25s;
+    position:relative; overflow:hidden; transition:box-shadow .28s, transform .28s;
   }
-  .applicant-card:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+  .applicant-card:hover { box-shadow:0 0 32px rgba(124,58,237,.22); transform:translateY(-2px); }
   .applicant-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; background:linear-gradient(90deg,#7c3aed,#4f46e5); }
 
-  .head-row { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+  /* AI rank badge */
+  .rank-badge {
+    position:absolute; top:.9rem; right:.9rem;
+    font-size:11px; font-weight:800; padding:.18rem .55rem; border-radius:999px;
+    background:rgba(124,58,237,.2); border:1px solid rgba(124,58,237,.4); color:#c4b5fd;
+  }
+  .rank-badge.top { background:rgba(245,158,11,.15); border-color:rgba(245,158,11,.4); color:#fcd34d; }
+  .rank-badge.best { background:rgba(74,222,128,.12); border-color:rgba(74,222,128,.4); color:#4ade80; }
+
+  .head-row { display:flex; align-items:flex-start; gap:.5rem; padding-right:4.5rem; }
   .head-row h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin:0; }
   .mail { font-size:12.5px; color:#a78bfa; margin:.15rem 0 0; }
 
@@ -40,35 +56,43 @@
     font-size:12px; font-weight:700; padding:.25rem .65rem; border-radius:999px; white-space:nowrap;
   }
   .applied     { background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35); color:#c4b5fd; }
-  .shortlisted { background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.35); color:#4ade80; }
-  .hired       { background:rgba(34,197,94,.12);  border:1px solid rgba(34,197,94,.35);  color:#4ade80; }
-  .rejected    { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
+  .shortlisted { background:rgba(74,222,128,.12);  border:1px solid rgba(74,222,128,.35);  color:#4ade80; }
+  .hired       { background:rgba(34,197,94,.12);   border:1px solid rgba(34,197,94,.35);   color:#4ade80; }
+  .rejected    { background:rgba(248,113,113,.1);  border:1px solid rgba(248,113,113,.3);  color:#f87171; }
 
   .info-row { font-size:13.5px; color:#c4b5fd; }
   .info-row b { color:#a78bfa; }
 
-  /* Match score */
+  /* Match score bar */
   .match-row { display:flex; align-items:center; gap:.6rem; }
-  .match-bar-wrap { flex:1; height:5px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
-  .match-bar-fill { height:100%; border-radius:99px; transition:width .6s ease; }
-  .match-pct { font-size:12px; font-weight:800; min-width:34px; text-align:right; }
+  .match-label-txt { font-size:11.5px; color:#6b7280; flex-shrink:0; }
+  .match-bar-wrap  { flex:1; height:6px; background:rgba(255,255,255,.08); border-radius:99px; overflow:hidden; }
+  .match-bar-fill  { height:100%; border-radius:99px; transition:width .7s ease; }
+  .match-pct { font-size:13px; font-weight:800; min-width:38px; text-align:right; }
+
+  /* Reason tooltip */
+  .match-reason { font-size:12px; color:#6b7280; font-style:italic; }
 
   .tags { display:flex; flex-wrap:wrap; gap:.3rem; }
-  .tag { font-size:12px; padding:.2rem .55rem; border-radius:999px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+  .tag  { font-size:12px; padding:.2rem .55rem; border-radius:999px; background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+  .tag.matched { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.3); color:#4ade80; }
 
   .btn-row { display:flex; gap:.5rem; margin-top:.25rem; flex-wrap:wrap; }
   .green-btn, .red-btn, .hire-btn {
     flex:1; padding:.6rem; border-radius:9px; font-size:13px; font-weight:700;
-    border:none; cursor:pointer; width:auto; min-width:70px;
+    border:none; cursor:pointer; width:auto; min-width:70px; transition:all .18s;
   }
   .green-btn { background:rgba(74,222,128,.15); border:1px solid rgba(74,222,128,.35); color:#4ade80; }
   .red-btn   { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.3); color:#f87171; }
   .hire-btn  { background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; box-shadow:0 3px 12px rgba(124,58,237,.3); }
-  .green-btn:hover:not(:disabled) { background:rgba(74,222,128,.25); }
-  .red-btn:hover:not(:disabled)   { background:rgba(248,113,113,.2); }
-  .hire-btn:hover:not(:disabled)  { filter:brightness(1.1); }
+  .green-btn:hover:not(:disabled) { background:rgba(74,222,128,.28); transform:translateY(-1px); }
+  .red-btn:hover:not(:disabled)   { background:rgba(248,113,113,.22); transform:translateY(-1px); }
+  .hire-btn:hover:not(:disabled)  { filter:brightness(1.1); transform:translateY(-1px); }
 
   .loading-text { color:#a78bfa; text-align:center; padding:3rem 1rem; font-size:15px; grid-column:1/-1; }
+
+  /* Suggestion row */
+  .suggestion-row { font-size:12px; color:#6b7280; font-style:italic; padding:.2rem 0; }
 </style>
 </head>
 
@@ -93,21 +117,22 @@
     <div class="top-row">
       <div>
         <h1>👥 Applicants</h1>
-        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Your talent radar 📡</p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">AI-ranked talent radar 📡</p>
       </div>
+      <div class="badge">🤖 AI Ranked</div>
     </div>
 
     <!-- STATS -->
     <section class="mini-grid">
-      <div class="mini-card"><h3>Total</h3><p id="totalCount">—</p></div>
-      <div class="mini-card"><h3>Shortlisted</h3><p id="shortCount">—</p></div>
-      <div class="mini-card"><h3>Hired</h3><p id="hiredCount">—</p></div>
-      <div class="mini-card"><h3>Rejected</h3><p id="rejectCount">—</p></div>
+      <div class="mini-card mc-total"><h3>Total</h3><p id="totalCount">—</p></div>
+      <div class="mini-card mc-short"><h3>Shortlisted</h3><p id="shortCount">—</p></div>
+      <div class="mini-card mc-hired"><h3>Hired</h3><p id="hiredCount">—</p></div>
+      <div class="mini-card mc-reject"><h3>Rejected</h3><p id="rejectCount">—</p></div>
     </section>
 
     <!-- FILTERS -->
     <div class="filter-bar">
-      <input type="text" id="search">
+      <input type="text" id="search" placeholder="Search by name, email, job or skill...">
       <select id="statusFilter">
         <option value="all">All Status</option>
         <option value="Applied">Applied</option>
@@ -116,8 +141,8 @@
         <option value="Rejected">Rejected</option>
       </select>
       <select id="sortFilter">
-        <option value="new">Most Recent</option>
-        <option value="score">Highest Match</option>
+        <option value="score">🤖 Highest AI Match</option>
+        <option value="new">📅 Most Recent</option>
       </select>
     </div>
 
@@ -132,6 +157,7 @@
 <script type="module">
 import { db, logoutUser, getSession, updateApplicationStatus } from "./firebase.js";
 import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { calcWeightedScore, parseSkills } from "./ai-match.js";
 
 const user = getSession();
 if (!user) { window.location.href = "recruiter-login.html"; }
@@ -143,20 +169,42 @@ let allApps = [];
 
 async function loadApplicants() {
   const list = document.getElementById("appList");
-  list.innerHTML = `<p class="loading-text">Loading applicants...</p>`;
+  list.innerHTML = `<p class="loading-text">⚙️ Running AI ranking...</p>`;
 
   try {
-    const jobSnap = await getDocs(collection(db, "jobs"));
-    const myJobIds = [];
+    const [jobSnap, appSnap] = await Promise.all([
+      getDocs(collection(db, "jobs")),
+      getDocs(collection(db, "applications"))
+    ]);
+
+    const myJobs = {};
     jobSnap.forEach(d => {
-      if (d.data().recruiter === user.email) myJobIds.push(d.id);
+      if (d.data().recruiter === user.email) myJobs[d.id] = d.data();
     });
 
-    const appSnap = await getDocs(collection(db, "applications"));
     allApps = [];
     appSnap.forEach(d => {
       const a = d.data();
-      if (myJobIds.includes(a.jobId)) allApps.push({ id: d.id, ...a });
+      if (myJobs[a.jobId]) {
+        const job = myJobs[a.jobId];
+        const appUser = {
+          skills: Array.isArray(a.skills) ? a.skills.join(",") : (a.skills || ""),
+          exp: a.experience || 0,
+          education: a.education || "",
+          bio: a.bio || "",
+          name: a.seeker || a.user || "",
+          email: a.seeker || a.user || a.email || ""
+        };
+        const result = calcWeightedScore(appUser, job);
+        allApps.push({
+          id: d.id, ...a,
+          matchScore:    result.score,
+          matchReason:   result.reason,
+          matchSuggestions: result.suggestions,
+          missingSkills: result.missingSkills,
+          matchedCount:  result.matchedSkills
+        });
+      }
     });
 
     updateStats(allApps);
@@ -192,10 +240,10 @@ function applyFilters() {
 
   if (status !== "all") filtered = filtered.filter(a => a.status === status);
 
-  if (sort === "score") {
-    filtered.sort((a, b) => (b.matchScore || 0) - (a.matchScore || 0));
-  } else {
+  if (sort === "new") {
     filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  } else {
+    filtered.sort((a, b) => b.matchScore - a.matchScore);
   }
 
   updateStats(filtered);
@@ -210,52 +258,80 @@ function renderApps(apps) {
     return;
   }
 
-  list.innerHTML = apps.map(app => {
-    const status = app.status || "Applied";
+  list.innerHTML = apps.map((app, i) => {
+    const status      = app.status || "Applied";
     const statusClass = status.toLowerCase();
-    const skills = Array.isArray(app.skills) ? app.skills : (app.skills || "").split(",").filter(Boolean);
+    const skills      = Array.isArray(app.skills) ? app.skills : (app.skills || "").split(",").filter(Boolean);
+    const score       = app.matchScore || 0;
 
-    const score = app.matchScore;
-    const matchBar = (score !== undefined && score !== null) ? (() => {
-      const col = score >= 80 ? "#4ade80" : score >= 60 ? "#a78bfa" : score >= 40 ? "#f59e0b" : "#f87171";
-      return `<div class="match-row">
-        <div class="match-bar-wrap"><div class="match-bar-fill" style="width:${score}%;background:${col}"></div></div>
-        <span class="match-pct" style="color:${col}">${score}%</span>
-      </div>`;
-    })() : "";
+    const col = score >= 80 ? "#4ade80" : score >= 60 ? "#a78bfa" : score >= 40 ? "#f59e0b" : "#f87171";
+    const rankLabel = i === 0 ? "best" : i < 3 ? "top" : "";
+    const rankText  = i === 0 ? "🏆 Best Match" : i < 3 ? `#${i + 1} Ranked` : `#${i + 1}`;
+
+    const missingTags = (app.missingSkills || []).slice(0, 2)
+      .map(s => `<span class="tag">${s}</span>`).join("");
+
+    const skillTags = skills.slice(0, 5).map(s => {
+      const isJobSkill = true; // simplified — render all as neutral
+      return `<span class="tag">${s.trim()}</span>`;
+    }).join("");
 
     return `
     <div class="applicant-card">
+      <span class="rank-badge ${rankLabel}">${rankText}</span>
+
       <div class="head-row">
         <div>
           <h3>${app.seeker || app.user || app.email || "Applicant"}</h3>
           <p class="mail">📧 ${app.seeker || app.user || app.email || ""}</p>
         </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.4rem">
+        <p class="info-row" style="margin:0"><b>Job:</b> ${app.jobTitle || "Applied Job"}</p>
         <span class="status-chip ${statusClass}">${status}</span>
       </div>
-      <p class="info-row"><b>Job:</b> ${app.jobTitle || "Applied Job"}</p>
+
       ${app.experience ? `<p class="info-row"><b>Experience:</b> ${app.experience} yr${app.experience > 1 ? "s" : ""}</p>` : ""}
-      ${matchBar}
-      ${skills.length ? `<div class="tags">${skills.slice(0,5).map(s=>`<span class="tag">${s.trim()}</span>`).join("")}</div>` : ""}
+
+      <div class="match-row">
+        <span class="match-label-txt">AI Match</span>
+        <div class="match-bar-wrap">
+          <div class="match-bar-fill" style="width:${score}%;background:${col}"></div>
+        </div>
+        <span class="match-pct" style="color:${col}">${score}%</span>
+      </div>
+
+      ${app.matchReason ? `<div class="match-reason">💡 ${app.matchReason}</div>` : ""}
+
+      ${skillTags ? `<div class="tags">${skillTags}</div>` : ""}
+
+      ${missingTags ? `<div style="font-size:12px;color:#6b7280;margin-top:.1rem">Missing: ${missingTags}</div>` : ""}
+
       <div class="btn-row">
-        ${status !== "Shortlisted" && status !== "Hired" ? `<button class="green-btn actionBtn" data-id="${app.id}" data-status="Shortlisted">Shortlist ✅</button>` : ""}
-        ${status !== "Hired" ? `<button class="hire-btn actionBtn" data-id="${app.id}" data-status="Hired">Hire 🏆</button>` : ""}
-        ${status !== "Rejected" ? `<button class="red-btn actionBtn" data-id="${app.id}" data-status="Rejected">Reject ❌</button>` : ""}
+        ${status !== "Shortlisted" && status !== "Hired" ?
+          `<button class="green-btn actionBtn" data-id="${app.id}" data-status="Shortlisted">Shortlist ✅</button>` : ""}
+        ${status !== "Hired" ?
+          `<button class="hire-btn actionBtn" data-id="${app.id}" data-status="Hired">Hire 🏆</button>` : ""}
+        ${status !== "Rejected" ?
+          `<button class="red-btn actionBtn" data-id="${app.id}" data-status="Rejected">Reject ❌</button>` : ""}
       </div>
     </div>`;
   }).join("");
 
   document.querySelectorAll(".actionBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
-      const id = btn.dataset.id;
+      const id     = btn.dataset.id;
       const status = btn.dataset.status;
-      btn.disabled = true; btn.textContent = "Updating...";
+      btn.disabled    = true;
+      btn.textContent = "Updating...";
       try {
         await updateApplicationStatus(id, status);
         await loadApplicants();
       } catch(e) {
         console.error(e);
-        btn.disabled = false; btn.textContent = "Retry";
+        btn.disabled    = false;
+        btn.textContent = "Retry";
         alert("Update failed ❌");
       }
     });

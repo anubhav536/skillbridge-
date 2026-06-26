@@ -8,37 +8,55 @@
 <link rel="stylesheet" href="universal.css">
 <style>
   /* ── Stat cards ── */
-  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:.9rem; margin-bottom:1.1rem; }
+  .stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(175px,1fr)); gap:.9rem; margin-bottom:1.1rem; }
   .dash-card {
     background: rgba(18,12,48,.72);
     border: 1px solid rgba(124,58,237,.22);
     border-radius: 16px;
     padding: 1.25rem;
-    transition: box-shadow .25s;
+    transition: box-shadow .28s, transform .28s;
     position: relative;
     overflow: hidden;
   }
-  .dash-card:hover { box-shadow: 0 0 28px rgba(124,58,237,.2); }
-  .dash-card h3 { font-size: 14px; color: #a78bfa; margin-bottom:.5rem; font-weight:600; }
+  .dash-card:hover { box-shadow:0 0 32px rgba(124,58,237,.22); transform:translateY(-2px); }
+  .dash-card h3 { font-size: 13px; color: #a78bfa; margin-bottom:.5rem; font-weight:600; letter-spacing:.3px; text-transform:uppercase; }
   .dash-card p  { font-size: 36px; font-weight:800; margin:0; line-height:1; color:#f5f3ff; }
+  .dash-card .trend { font-size:12px; color:#6b7280; margin-top:.35rem; }
+  .trend-up { color:#4ade80 !important; }
 
   .blue-line::before   { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#4f46e5,#818cf8); }
   .green-line::before  { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#16a34a,#4ade80); }
   .purple-line::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
   .orange-line::before { content:''; position:absolute; top:0;left:0;right:0;height:3px; background:linear-gradient(90deg,#d97706,#fcd34d); }
 
-  /* ── Progress bar ── */
-  .progress-card { margin-bottom:1.1rem; }
-  .progress-card h3 { margin-bottom:.75rem; font-size:15px; }
+  /* ── Section card base ── */
+  .section-card {
+    background: rgba(18,12,48,.72);
+    border: 1px solid rgba(124,58,237,.22);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.1rem;
+    transition: box-shadow .28s;
+  }
+  .section-card:hover { box-shadow:0 0 28px rgba(124,58,237,.16); }
+  .section-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:.9rem; }
+  .sec-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:.9rem; flex-wrap:wrap; gap:.5rem; }
+  .sec-header h3 { margin:0; font-size:15px; font-weight:700; color:#f5f3ff; }
+
+  /* ── Progress card ── */
   .progress-wrap { background:rgba(255,255,255,.07); border-radius:99px; height:10px; overflow:hidden; margin-bottom:.6rem; }
-  .progress-bar  { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa); transition:width .8s ease; }
+  .progress-bar  { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa); transition:width 1s ease; }
   .progress-meta { display:flex; justify-content:space-between; font-size:13px; color:#a78bfa; }
 
-  /* ── AI Picks ── */
-  .picks-card { margin-bottom:1.1rem; }
-  .picks-card h3 { margin-bottom:.85rem; font-size:15px; }
-  .picks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.75rem; }
+  /* ── Resume completion mini ── */
+  .resume-row { display:flex; align-items:center; gap:.85rem; margin-top:.5rem; }
+  .resume-prog-wrap { flex:1; background:rgba(255,255,255,.07); border-radius:99px; height:8px; overflow:hidden; }
+  .resume-prog-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#4f46e5,#a78bfa); transition:width .8s ease; }
+  .resume-pct { font-size:13px; font-weight:800; color:#c4b5fd; min-width:36px; text-align:right; }
+  .resume-hint { font-size:12.5px; color:#6b7280; margin-top:.4rem; }
 
+  /* ── AI Picks ── */
+  .picks-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.75rem; }
   .pick-card {
     background: rgba(30,18,80,.55);
     border: 1px solid rgba(124,58,237,.25);
@@ -49,7 +67,7 @@
     gap: .45rem;
     transition: box-shadow .2s, transform .2s;
   }
-  .pick-card:hover { box-shadow:0 0 20px rgba(124,58,237,.22); transform:translateY(-2px); }
+  .pick-card:hover { box-shadow:0 0 22px rgba(124,58,237,.22); transform:translateY(-2px); }
   .pick-title { font-size:15px; font-weight:700; color:#f5f3ff; }
   .pick-company { font-size:13px; color:#a78bfa; }
   .pick-score-row { display:flex; align-items:center; gap:.5rem; }
@@ -57,14 +75,11 @@
   .pick-bar-fill { height:100%; border-radius:99px; }
   .pick-pct { font-size:13px; font-weight:800; }
   .pick-apply {
-    margin-top:.3rem;
-    padding:.55rem;
-    border-radius:8px;
+    margin-top:.3rem; padding:.55rem; border-radius:8px;
     font-size:13px; font-weight:700;
     background: linear-gradient(135deg,#7c3aed,#4f46e5);
-    color:#fff; border:none;
-    box-shadow:0 3px 10px rgba(124,58,237,.35);
-    width:auto; cursor:pointer;
+    color:#fff; border:none; box-shadow:0 3px 10px rgba(124,58,237,.35);
+    width:auto; cursor:pointer; transition: filter .2s;
   }
   .pick-apply:hover { filter:brightness(1.1); }
   .pick-apply.applied {
@@ -72,11 +87,10 @@
     border:1px solid rgba(74,222,128,.3) !important;
     color:#4ade80 !important; box-shadow:none !important;
   }
+  .picks-empty { color:#a78bfa; font-size:14px; padding:.5rem 0; }
 
   /* ── Quick actions ── */
-  .quick-card { margin-bottom:1.1rem; }
-  .quick-card h3 { margin-bottom:.85rem; font-size:15px; }
-  .quick-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:.75rem; }
+  .quick-grid  { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:.75rem; }
   .quick-btn {
     background: rgba(124,58,237,.12);
     border: 1px solid rgba(124,58,237,.28);
@@ -90,6 +104,64 @@
   }
   .quick-btn:hover { background:rgba(124,58,237,.25); color:#ede9fe; transform:translateY(-2px); }
 
+  /* ── Career Intelligence CTA ── */
+  .career-intel-card {
+    background: linear-gradient(135deg, rgba(124,58,237,.22), rgba(79,70,229,.15));
+    border: 1px solid rgba(124,58,237,.38);
+    border-radius: 18px;
+    padding: 1.5rem;
+    margin-bottom: 1.1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .career-intel-card::before {
+    content:''; position:absolute; top:-50px; right:-30px;
+    width:180px; height:180px;
+    background:radial-gradient(circle, rgba(124,58,237,.2), transparent 70%);
+    pointer-events:none;
+  }
+  .ci-left h3 { font-size:17px; font-weight:800; color:#f5f3ff; margin-bottom:.35rem; }
+  .ci-left p  { font-size:13.5px; color:#a78bfa; margin:0; }
+  .ci-tags { display:flex; flex-wrap:wrap; gap:.3rem; margin-top:.6rem; }
+  .ci-tag {
+    font-size:11.5px; font-weight:600; padding:.2rem .6rem; border-radius:999px;
+    background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+  }
+  .ci-btn {
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:#fff; border:none; padding:.88rem 1.75rem;
+    border-radius:12px; font-size:14.5px; font-weight:700;
+    cursor:pointer; box-shadow:0 6px 22px rgba(124,58,237,.45);
+    transition: all .22s ease; text-decoration:none; display:inline-block; white-space:nowrap;
+  }
+  .ci-btn:hover { filter:brightness(1.1); transform:translateY(-2px); box-shadow:0 10px 30px rgba(124,58,237,.55); }
+
+  /* ── Application timeline ── */
+  .timeline { display:flex; flex-direction:column; gap:.55rem; }
+  .tl-item {
+    display:flex; align-items:center; gap:.85rem;
+    padding:.65rem .9rem;
+    background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.18); border-radius:10px;
+  }
+  .tl-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .tl-dot-applied     { background:#818cf8; }
+  .tl-dot-shortlisted { background:#4ade80; }
+  .tl-dot-hired       { background:#4ade80; box-shadow:0 0 8px rgba(74,222,128,.6); }
+  .tl-dot-rejected    { background:#f87171; }
+  .tl-text { font-size:13.5px; color:#c4b5fd; flex:1; }
+  .tl-status {
+    font-size:11.5px; font-weight:700; padding:.18rem .6rem; border-radius:999px; white-space:nowrap;
+  }
+  .s-applied     { background:rgba(129,140,248,.12); border:1px solid rgba(129,140,248,.3); color:#818cf8; }
+  .s-shortlisted { background:rgba(74,222,128,.12);  border:1px solid rgba(74,222,128,.3);  color:#4ade80; }
+  .s-hired       { background:rgba(124,58,237,.18);  border:1px solid rgba(124,58,237,.4);  color:#c4b5fd; }
+  .s-rejected    { background:rgba(248,113,113,.1);  border:1px solid rgba(248,113,113,.3); color:#f87171; }
+
   /* ── Daily Quote ── */
   .quote-card p { font-size:16px; font-style:italic; color:#c4b5fd; line-height:1.75; margin:0; }
 
@@ -98,7 +170,7 @@
   .dash-top h1 { margin:0; }
   #welcome { margin:.2rem 0 0; font-size:14px; color:#a78bfa; }
 
-  /* ── Skill completion banner ── */
+  /* ── Profile nudge ── */
   .profile-nudge {
     background: rgba(245,158,11,.1);
     border: 1px solid rgba(245,158,11,.35);
@@ -124,7 +196,9 @@
     white-space:nowrap;
   }
 
-  .picks-empty { color:#a78bfa; font-size:14px; padding:.5rem 0; }
+  /* ── Lower two-col ── */
+  .lower-two { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; margin-bottom:1.1rem; }
+  @media(max-width:700px){ .lower-two { grid-template-columns:1fr; } }
 </style>
 </head>
 
@@ -140,6 +214,7 @@
     <a href="js-applications.html">Applications</a>
     <a href="js-resume.html">Resume Builder</a>
     <a href="js-analytics.html">Analytics</a>
+    <a href="career-gap.html">🧠 AI Career Gap</a>
     <a href="js-profile.html">Profile</a>
   </nav>
   <button id="logoutBtn">Logout 👋</button>
@@ -157,7 +232,7 @@
     <div class="status-chip">🚀 Career Mode Active</div>
   </div>
 
-  <!-- Profile nudge (hidden if complete) -->
+  <!-- Profile nudge -->
   <div id="profileNudge" class="profile-nudge" style="display:none">
     ⚡ Complete your profile to unlock AI job matching
     <a href="js-profile.html">Complete Profile →</a>
@@ -168,54 +243,110 @@
     <div class="dash-card blue-line">
       <h3>📄 Total Applications</h3>
       <p id="totalApps">—</p>
+      <div class="trend" id="appTrend"></div>
     </div>
     <div class="dash-card green-line">
       <h3>✅ Selected</h3>
       <p id="selectedApps">—</p>
+      <div class="trend" id="selTrend"></div>
     </div>
     <div class="dash-card purple-line">
       <h3>⚡ Employability Score</h3>
       <p id="score">—</p>
+      <div class="trend" id="scoreTrend"></div>
     </div>
     <div class="dash-card orange-line">
       <h3>🎯 AI Matched Jobs</h3>
       <p id="matchedCount">—</p>
+      <div class="trend" id="matchTrend"></div>
     </div>
   </section>
 
-  <!-- PROGRESS -->
-  <section class="dash-card progress-card">
-    <h3>📈 Hiring Momentum</h3>
-    <div class="progress-wrap">
-      <div id="progressBar" class="progress-bar" style="width:0%"></div>
+  <!-- PROGRESS + RESUME COMPLETION -->
+  <div class="lower-two">
+
+    <section class="section-card">
+      <div class="sec-header">
+        <h3>📈 Hiring Momentum</h3>
+        <span id="progressPct" style="font-size:13px;font-weight:800;color:#c4b5fd"></span>
+      </div>
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="progress-meta">
+        <span id="progressText">Loading...</span>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="sec-header">
+        <h3>📄 Resume Completion</h3>
+        <a href="js-resume.html" style="font-size:12px;color:#a78bfa;font-weight:600">Build →</a>
+      </div>
+      <div class="resume-row">
+        <div class="resume-prog-wrap">
+          <div class="resume-prog-fill" id="resumeBar" style="width:0%"></div>
+        </div>
+        <span class="resume-pct" id="resumePct">0%</span>
+      </div>
+      <div class="resume-hint" id="resumeHint">Complete your resume to stand out to recruiters</div>
+    </section>
+
+  </div>
+
+  <!-- 🧠 CAREER INTELLIGENCE CTA -->
+  <div class="career-intel-card">
+    <div class="ci-left">
+      <h3>🧠 Career Intelligence</h3>
+      <p>Get your Career Readiness Score, Skill Gap Report, Learning Roadmap & Top Job Matches — all AI-powered.</p>
+      <div class="ci-tags">
+        <span class="ci-tag">Career Readiness Score</span>
+        <span class="ci-tag">Missing Skills</span>
+        <span class="ci-tag">Learning Roadmap</span>
+        <span class="ci-tag">Top Job Matches</span>
+      </div>
     </div>
-    <div class="progress-meta">
-      <span id="progressText">Loading...</span>
-      <span id="progressPct"></span>
-    </div>
-  </section>
+    <a href="career-gap.html" class="ci-btn">🚀 Analyze My Career</a>
+  </div>
 
   <!-- AI TOP PICKS -->
-  <section class="dash-card picks-card">
-    <h3>🤖 AI Top Picks — Best Job Matches For You</h3>
+  <section class="section-card">
+    <div class="sec-header">
+      <h3>🤖 AI Top Picks</h3>
+      <span id="picksCount" style="font-size:12px;color:#a78bfa"></span>
+    </div>
     <div id="picksGrid" class="picks-grid">
       <p class="picks-empty">Loading AI picks...</p>
     </div>
   </section>
 
-  <!-- QUICK ACTIONS -->
-  <section class="dash-card quick-card">
-    <h3>⚡ Quick Actions</h3>
-    <div class="quick-grid">
-      <a href="js-jobs.html"         class="quick-btn">💼 Find Jobs</a>
-      <a href="js-resume.html"       class="quick-btn">📄 Build Resume</a>
-      <a href="js-analytics.html"    class="quick-btn">📊 Analytics</a>
-      <a href="js-profile.html"      class="quick-btn">👤 Update Profile</a>
-    </div>
-  </section>
+  <!-- APPLICATION TIMELINE + QUICK ACTIONS -->
+  <div class="lower-two">
+
+    <section class="section-card">
+      <div class="sec-header">
+        <h3>🕒 Recent Applications</h3>
+        <a href="js-applications.html" style="font-size:12px;color:#a78bfa;font-weight:600">View All →</a>
+      </div>
+      <div id="timeline" class="timeline">
+        <p style="color:#a78bfa;font-size:14px">Loading...</p>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <h3>⚡ Quick Actions</h3>
+      <div class="quick-grid">
+        <a href="js-jobs.html"      class="quick-btn">💼 Find Jobs</a>
+        <a href="js-resume.html"    class="quick-btn">📄 Resume</a>
+        <a href="career-gap.html"   class="quick-btn">🧠 AI Gap</a>
+        <a href="js-profile.html"   class="quick-btn">👤 Profile</a>
+      </div>
+    </section>
+
+  </div>
 
   <!-- DAILY QUOTE -->
-  <section class="dash-card quote-card">
+  <section class="section-card quote-card">
     <h3>🔥 Daily Push</h3>
     <p id="quoteText">Every application is a knock on opportunity's door.</p>
   </section>
@@ -243,6 +374,21 @@ const quotes = [
 document.getElementById("quoteText").textContent =
   quotes[new Date().getDay() % quotes.length];
 
+// Resume completion logic based on localStorage data
+function calcResumeCompletion(user) {
+  const fields = [
+    localStorage.getItem("rb_name") || user.name,
+    localStorage.getItem("rb_email") || user.email,
+    localStorage.getItem("rb_phone"),
+    localStorage.getItem("rb_summary"),
+    localStorage.getItem("rb_exp") || user.exp,
+    localStorage.getItem("rb_skills") || user.skills,
+    localStorage.getItem("rb_education")
+  ];
+  const filled = fields.filter(f => f && String(f).trim()).length;
+  return Math.round((filled / fields.length) * 100);
+}
+
 async function loadDashboard() {
   const user = getSession();
   if (!user) { window.location.href = "jobseeker-login.html"; return; }
@@ -257,6 +403,15 @@ async function loadDashboard() {
     document.getElementById("profileNudge").style.display = "flex";
   }
 
+  // Resume completion
+  const resPct = calcResumeCompletion(user);
+  document.getElementById("resumeBar").style.width = resPct + "%";
+  document.getElementById("resumePct").textContent = resPct + "%";
+  document.getElementById("resumeHint").textContent =
+    resPct >= 80 ? "✅ Great resume! Recruiters will notice." :
+    resPct >= 50 ? "⚡ Almost there — fill remaining sections." :
+    "📝 Complete your resume to stand out to recruiters";
+
   // Load applications
   let apps = [];
   try {
@@ -264,7 +419,7 @@ async function loadDashboard() {
     snap.forEach(d => {
       const a = d.data();
       if (a.seeker === user.email || a.user === user.email || a.email === user.email) {
-        apps.push(a);
+        apps.push({ ...a, id: d.id });
       }
     });
   } catch(e) { console.error(e); }
@@ -275,6 +430,17 @@ async function loadDashboard() {
   document.getElementById("totalApps").textContent    = total;
   document.getElementById("selectedApps").textContent = success;
 
+  // Trends
+  if (total > 0) {
+    document.getElementById("appTrend").textContent = total + " total sent";
+  }
+  if (success > 0) {
+    const rate = Math.round((success / total) * 100);
+    const el = document.getElementById("selTrend");
+    el.textContent = rate + "% success rate";
+    el.classList.add("trend-up");
+  }
+
   // Employability score
   const empScore = calcEmployabilityScore({
     skills:      userSkills,
@@ -284,6 +450,8 @@ async function loadDashboard() {
   });
 
   document.getElementById("score").textContent = empScore + "%";
+  document.getElementById("scoreTrend").textContent =
+    empScore >= 70 ? "🔥 Top tier" : empScore >= 50 ? "📈 Growing" : "🌱 Build up";
 
   // Progress bar
   document.getElementById("progressBar").style.width = empScore + "%";
@@ -294,6 +462,25 @@ async function loadDashboard() {
   document.getElementById("progressText").textContent = "Level: " + level;
   document.getElementById("progressPct").textContent  = empScore + "%";
 
+  // Application timeline (last 4)
+  const tlEl = document.getElementById("timeline");
+  const recent = [...apps].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, 4);
+  if (recent.length === 0) {
+    tlEl.innerHTML = `<p style="color:#a78bfa;font-size:14px">No applications yet — start applying to track them here.</p>`;
+  } else {
+    tlEl.innerHTML = recent.map(a => {
+      const s = (a.status || "Applied").toLowerCase();
+      const dotClass = `tl-dot-${s}`;
+      const chipClass = `s-${s}`;
+      const time = a.createdAt ? new Date(a.createdAt).toLocaleDateString() : "—";
+      return `<div class="tl-item">
+        <div class="tl-dot ${dotClass}"></div>
+        <span class="tl-text">${a.jobTitle || "Job"} · ${time}</span>
+        <span class="tl-status ${chipClass}">${a.status || "Applied"}</span>
+      </div>`;
+    }).join("");
+  }
+
   // AI Top Picks
   try {
     const jobSnap = await getDocs(collection(db, "jobs"));
@@ -301,66 +488,66 @@ async function loadDashboard() {
     jobSnap.forEach(d => rawJobs.push({ id: d.id, ...d.data() }));
 
     const ranked = rankJobs(rawJobs, userSkills);
-    document.getElementById("matchedCount").textContent =
-      ranked.filter(j => j.matchScore >= 40).length;
+    const matched = ranked.filter(j => j.matchScore >= 40);
+    document.getElementById("matchedCount").textContent = matched.length;
+    document.getElementById("matchTrend").textContent =
+      matched.length > 0 ? matched.length + " jobs ≥40% match" : "Add skills for matches";
 
-    const topPicks = ranked.filter(j => j.matchScore >= 40).slice(0, 6);
+    const topPicks = matched.slice(0, 6);
+    document.getElementById("picksCount").textContent =
+      topPicks.length ? `Showing top ${topPicks.length}` : "";
 
-    const scopedKey = `appliedJobs:${(user.email||"").toLowerCase()}`;
+    const scopedKey = `appliedJobs:${(user.email || "").toLowerCase()}`;
     const applied   = new Set(JSON.parse(localStorage.getItem(scopedKey)) || []);
-
-    const grid = document.getElementById("picksGrid");
+    const grid      = document.getElementById("picksGrid");
 
     if (topPicks.length === 0) {
       grid.innerHTML = parsed.length === 0
         ? `<p class="picks-empty">👆 Add your skills in Profile to get AI job picks</p>`
         : `<p class="picks-empty">No high-match jobs right now. Check back when new jobs are posted.</p>`;
-      return;
-    }
-
-    grid.innerHTML = topPicks.map(job => {
-      const ml  = matchLabel(job.matchScore);
-      const app = applied.has(job.id);
-      return `
-      <div class="pick-card">
-        <div class="pick-title">${job.title || "Untitled"}</div>
-        <div class="pick-company">🏢 ${job.recruiter || "Company"}${job.location ? ` · 📍 ${job.location}` : ""}</div>
-        <div class="pick-score-row">
-          <div class="pick-bar-wrap">
-            <div class="pick-bar-fill" style="width:${job.matchScore}%;background:${ml.color}"></div>
+    } else {
+      grid.innerHTML = topPicks.map(job => {
+        const ml  = matchLabel(job.matchScore);
+        const app = applied.has(job.id);
+        return `
+        <div class="pick-card">
+          <div class="pick-title">${job.title || "Untitled"}</div>
+          <div class="pick-company">🏢 ${job.recruiter || "Company"}${job.location ? ` · 📍 ${job.location}` : ""}</div>
+          <div class="pick-score-row">
+            <div class="pick-bar-wrap">
+              <div class="pick-bar-fill" style="width:${job.matchScore}%;background:${ml.color}"></div>
+            </div>
+            <span class="pick-pct" style="color:${ml.color}">${job.matchScore}%</span>
           </div>
-          <span class="pick-pct" style="color:${ml.color}">${job.matchScore}% match</span>
-        </div>
-        <button class="pick-apply ${app ? 'applied' : ''}"
-          data-jobid="${job.id}"
-          data-title="${(job.title||'').replace(/"/g,'')}"
-          data-rec="${(job.recruiter||'').replace(/"/g,'')}"
-          ${app ? 'disabled' : ''}>
-          ${app ? '✅ Applied' : '🎯 Quick Apply'}
-        </button>
-      </div>`;
-    }).join("");
+          <button class="pick-apply ${app ? 'applied' : ''}"
+            data-jobid="${job.id}"
+            data-title="${(job.title||'').replace(/"/g,'')}"
+            data-rec="${(job.recruiter||'').replace(/"/g,'')}"
+            ${app ? 'disabled' : ''}>
+            ${app ? '✅ Applied' : '🎯 Quick Apply'}
+          </button>
+        </div>`;
+      }).join("");
 
-    // Quick apply from dashboard
-    grid.querySelectorAll(".pick-apply:not(.applied)").forEach(btn => {
-      btn.addEventListener("click", async () => {
-        const { applyJob } = await import("./firebase.js");
-        const jobId  = btn.dataset.jobid;
-        const jobTitle = btn.dataset.title;
-        const recruiter = btn.dataset.rec;
-        btn.disabled = true; btn.textContent = "Applying...";
-        try {
-          await applyJob({ jobId, jobTitle, recruiter, seeker: user.email, user: user.email, skills: [], status: "Applied" });
-          applied.add(jobId);
-          localStorage.setItem(scopedKey, JSON.stringify([...applied]));
-          btn.textContent = "✅ Applied"; btn.classList.add("applied");
-        } catch(e) {
-          console.error(e); btn.disabled = false; btn.textContent = "🎯 Quick Apply";
-          alert("Failed ❌");
-        }
+      grid.querySelectorAll(".pick-apply:not(.applied)").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          const { applyJob } = await import("./firebase.js");
+          const jobId    = btn.dataset.jobid;
+          const jobTitle = btn.dataset.title;
+          const recruiter = btn.dataset.rec;
+          btn.disabled = true; btn.textContent = "Applying...";
+          try {
+            await applyJob({ jobId, jobTitle, recruiter, seeker: user.email, user: user.email, skills: [], status: "Applied" });
+            applied.add(jobId);
+            localStorage.setItem(scopedKey, JSON.stringify([...applied]));
+            btn.textContent = "✅ Applied"; btn.classList.add("applied");
+          } catch(e) {
+            console.error(e); btn.disabled = false; btn.textContent = "🎯 Quick Apply";
+            alert("Failed ❌");
+          }
+        });
       });
-    });
-
+    }
   } catch(e) { console.error(e); }
 }
 

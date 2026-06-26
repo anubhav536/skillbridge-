@@ -1,0 +1,2 @@
+- [SkillBridge AI architecture](skillbridge-arch.md) — Vanilla JS ES modules + Firebase CDN v12.11.0, no bundler; protectPage() guards all dashboards; all shared logic in firebase.js and ai-match.js.
+- [SkillBridge AI matching engine](skillbridge-matching.md) — ai-match.js exports must stay backward compatible; calcWeightedScore() is the new 6-factor engine (skills 40, exp 20, edu 20, resume 15, projects 10, activity 5); analyzeCareerGap() returns career readiness score, roadmap, and skill classification.

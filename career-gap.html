@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Career Gap Analyzer | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+/* ── Page layout ── */
+.cg-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.5rem; }
+.cg-top h1 { margin:0; }
+
+/* ── Hero banner ── */
+.cg-hero {
+  background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(79,70,229,.12));
+  border: 1px solid rgba(124,58,237,.3);
+  border-radius: 18px;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+.cg-hero::before {
+  content:'';
+  position:absolute; top:-60px; right:-40px;
+  width:220px; height:220px;
+  background:radial-gradient(circle, rgba(124,58,237,.18), transparent 70%);
+  pointer-events:none;
+}
+.cg-hero-text h2 { font-size:20px; margin-bottom:.35rem; }
+.cg-hero-text p  { margin:0; font-size:14px; color:#a78bfa; }
+.cg-hero-user { font-size:13px; color:#c4b5fd; margin-top:.5rem; }
+.analyze-btn {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: #fff;
+  border: none;
+  padding: .9rem 2rem;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(124,58,237,.45);
+  transition: all .22s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-shrink: 0;
+}
+.analyze-btn:hover:not(:disabled) { filter:brightness(1.12); transform:translateY(-2px); box-shadow:0 10px 32px rgba(124,58,237,.55); }
+.analyze-btn:disabled { opacity:.7; cursor:not-allowed; transform:none; }
+.spin-icon { display:inline-block; animation:spinY 1s linear infinite; }
+@keyframes spinY { to { transform:rotate(360deg); } }
+
+/* ── Skeleton loader ── */
+.skeleton-wrap { display:none; }
+.sk-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:1rem; margin-bottom:1rem; }
+.sk-block {
+  background: rgba(124,58,237,.08);
+  border-radius: 16px;
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+}
+.sk-block::after {
+  content:'';
+  position:absolute; inset:0;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.08), transparent);
+  animation: skShimmer 1.4s infinite;
+}
+@keyframes skShimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+.sk-line { background:rgba(124,58,237,.1); border-radius:8px; height:14px; margin:.45rem 0; }
+.sk-line.short { width:55%; }
+
+/* ── Empty state ── */
+.empty-state { display:none; text-align:center; padding:3rem 1rem; color:#a78bfa; }
+.empty-state .big-emoji { font-size:48px; margin-bottom:1rem; }
+.empty-state p { font-size:15px; }
+
+/* ── Results container ── */
+.analysis-results { display:none; }
+
+/* ── Score rings grid ── */
+.scores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+.score-card {
+  background: rgba(18,12,48,.72);
+  border: 1px solid rgba(124,58,237,.22);
+  border-radius: 18px;
+  padding: 1.5rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .75rem;
+  text-align: center;
+  transition: box-shadow .25s, transform .25s;
+  position: relative;
+  overflow: hidden;
+}
+.score-card::before { content:''; position:absolute; top:0;left:0;right:0; height:3px; }
+.sc-readiness::before { background:linear-gradient(90deg,#7c3aed,#a78bfa); }
+.sc-match::before     { background:linear-gradient(90deg,#4f46e5,#818cf8); }
+.sc-interview::before { background:linear-gradient(90deg,#16a34a,#4ade80); }
+.score-card:hover { box-shadow:0 0 30px rgba(124,58,237,.2); transform:translateY(-3px); }
+.score-card h4 { font-size:13px; color:#a78bfa; font-weight:600; letter-spacing:.4px; text-transform:uppercase; margin:0; }
+
+/* SVG ring */
+.ring-svg { width:120px; height:120px; transform:rotate(-90deg); }
+.ring-bg   { fill:none; stroke:rgba(255,255,255,.07); stroke-width:8; }
+.ring-fill { fill:none; stroke-width:8; stroke-linecap:round; transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke .4s; }
+.ring-label-wrap { position:relative; }
+.ring-num {
+  font-size:32px; font-weight:900; color:#f5f3ff;
+  background: linear-gradient(135deg,#c4b5fd,#7c3aed);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+}
+.ring-sub { font-size:12px; color:#a78bfa; margin-top:.1rem; }
+
+/* ── Content sections ── */
+.cg-section {
+  background: rgba(18,12,48,.72);
+  border: 1px solid rgba(124,58,237,.22);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.1rem;
+  transition: box-shadow .25s;
+}
+.cg-section:hover { box-shadow:0 0 26px rgba(124,58,237,.16); }
+.cg-section-header {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 1rem;
+  padding-bottom: .75rem;
+  border-bottom: 1px solid rgba(124,58,237,.15);
+}
+.cg-section-header h3 { font-size:16px; font-weight:700; margin:0; color:#f5f3ff; }
+.cg-section-header .cg-count {
+  margin-left:auto;
+  font-size:12px; font-weight:700; padding:.2rem .65rem;
+  border-radius:999px;
+  background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+}
+
+/* ── Skill tags container ── */
+.skill-tags-wrap { display:flex; flex-wrap:wrap; gap:.3rem; min-height:28px; }
+
+/* ── Top jobs grid ── */
+.cg-jobs-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.85rem; }
+.cg-job-card {
+  background:rgba(30,18,80,.55); border:1px solid rgba(124,58,237,.25);
+  border-radius:14px; padding:1.1rem; display:flex; flex-direction:column; gap:.5rem;
+  transition: box-shadow .2s, transform .2s;
+}
+.cg-job-card:hover { box-shadow:0 0 22px rgba(124,58,237,.22); transform:translateY(-2px); }
+.cg-job-header { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; }
+.cg-job-title  { font-size:15px; font-weight:700; color:#f5f3ff; }
+.cg-job-meta   { font-size:12.5px; color:#a78bfa; margin-top:.2rem; }
+.cg-score-pill {
+  font-size:13px; font-weight:800; padding:.2rem .65rem; border-radius:999px; white-space:nowrap; border:1px solid;
+}
+.cg-match-bar-wrap { background:rgba(255,255,255,.07); border-radius:99px; height:4px; overflow:hidden; }
+.cg-match-bar { height:100%; border-radius:99px; transition:width .8s ease; }
+.cg-job-label { font-size:12px; font-weight:600; }
+.cg-apply-btn {
+  margin-top:.3rem; padding:.55rem 1rem; border-radius:9px;
+  background:linear-gradient(135deg,#7c3aed,#4f46e5);
+  color:#fff; font-size:13px; font-weight:700;
+  border:none; cursor:pointer; text-align:center; text-decoration:none;
+  display:block; box-shadow:0 3px 12px rgba(124,58,237,.3);
+  transition: filter .2s, transform .2s;
+}
+.cg-apply-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+
+/* ── Roadmap ── */
+.cg-roadmap-cat { margin-bottom:1rem; }
+.cg-roadmap-cat-title { font-size:13px; font-weight:700; color:#a78bfa; letter-spacing:.4px; text-transform:uppercase; margin-bottom:.55rem; }
+.cg-roadmap-item {
+  background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.18);
+  border-radius:10px; padding:.75rem 1rem; margin-bottom:.45rem;
+}
+.cg-roadmap-skill { display:flex; align-items:center; gap:.4rem; flex-wrap:wrap; margin-bottom:.35rem; }
+.cg-roadmap-meta  { display:flex; gap:1.25rem; flex-wrap:wrap; font-size:12.5px; color:#6b7280; }
+
+/* ── Suggestions ── */
+.cg-suggestion {
+  background:rgba(124,58,237,.1); border:1px solid rgba(124,58,237,.22);
+  border-radius:12px; padding:.9rem 1.1rem; margin-bottom:.55rem;
+  font-size:14px; color:#c4b5fd; line-height:1.6;
+  display:flex; align-items:flex-start; gap:.5rem;
+}
+
+/* ── Stats footer ── */
+.cg-footer-stats {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:.75rem; margin-top:1.25rem;
+}
+.cg-footer-stat {
+  background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.18);
+  border-radius:12px; padding:.85rem 1rem; text-align:center;
+}
+.cg-footer-stat .big { font-size:26px; font-weight:800; color:#c4b5fd; display:block; line-height:1; }
+.cg-footer-stat .lbl { font-size:12px; color:#6b7280; margin-top:.25rem; }
+
+/* ── Two-column sections ── */
+.skills-two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+@media(max-width:600px){ .skills-two-col { grid-template-columns:1fr; } }
+
+/* ── Mobile responsive ── */
+@media(max-width:600px){
+  .cg-hero { flex-direction:column; }
+  .analyze-btn { width:100%; justify-content:center; }
+  .scores-grid { grid-template-columns:1fr; }
+  .cg-jobs-grid { grid-template-columns:1fr; }
+}
+</style>
+</head>
+
+<body class="cg-page">
+<div class="dashboard">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <h2>👨‍🎓 Job Seeker Panel</h2>
+  <nav>
+    <a href="js-dashboard.html">Dashboard</a>
+    <a href="js-jobs.html">Jobs</a>
+    <a href="js-applications.html">Applications</a>
+    <a href="js-resume.html">Resume Builder</a>
+    <a href="js-analytics.html">Analytics</a>
+    <a href="career-gap.html" class="active">🧠 AI Career Gap</a>
+    <a href="js-profile.html">Profile</a>
+  </nav>
+  <button id="logoutBtn">Logout 👋</button>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- TOP -->
+  <div class="cg-top">
+    <div>
+      <h1>🧠 AI Career Gap Analyzer</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Deep intelligence for your career path</p>
+    </div>
+    <div class="badge">⚡ AI Powered</div>
+  </div>
+
+  <!-- HERO BANNER -->
+  <div class="cg-hero">
+    <div class="cg-hero-text">
+      <h2>Career Intelligence Report</h2>
+      <p>Analyzes your profile against all live jobs to give you a complete career gap report.</p>
+      <div class="cg-hero-user">
+        👤 <strong id="userName">Loading...</strong> &nbsp;·&nbsp;
+        <span id="userSkillsPreview" style="color:#7c3aed"></span>
+      </div>
+    </div>
+    <button class="analyze-btn" id="analyzeBtn">
+      🚀 Analyze My Profile
+    </button>
+  </div>
+
+  <!-- SKELETON LOADER -->
+  <div class="skeleton-wrap" id="skeletonLoader">
+    <div class="sk-row">
+      <div class="sk-block"></div>
+      <div class="sk-block"></div>
+      <div class="sk-block"></div>
+    </div>
+    <div class="sk-block" style="height:200px;margin-bottom:1rem"></div>
+    <div class="sk-row">
+      <div class="sk-block" style="height:120px"></div>
+      <div class="sk-block" style="height:120px"></div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" id="emptyState" style="display:block">
+    <div class="big-emoji">🚀</div>
+    <p id="emptyMsg">Click "Analyze My Profile" above to generate your personalized Career Intelligence Report.</p>
+    <p style="font-size:13px;margin-top:.5rem">
+      For best results, <a href="js-profile.html" style="color:#a78bfa">complete your profile</a> with skills and experience first.
+    </p>
+  </div>
+
+  <!-- ── RESULTS ─────────────────────────────────────────── -->
+  <div class="analysis-results" id="analysisResults">
+
+    <!-- Score Rings -->
+    <div class="scores-grid">
+
+      <div class="score-card sc-readiness">
+        <h4>Career Readiness Score</h4>
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
+          <svg class="ring-svg" viewBox="0 0 120 120">
+            <circle class="ring-bg"   cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" cx="60" cy="60" r="52" id="readinessRing" stroke="#7c3aed" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div style="position:absolute;text-align:center">
+            <div class="ring-num" id="readinessNum">0</div>
+            <div class="ring-sub">/100</div>
+          </div>
+        </div>
+        <div class="ring-sub" id="readinessLabel">Calculating...</div>
+      </div>
+
+      <div class="score-card sc-match">
+        <h4>Skill Market Match %</h4>
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
+          <svg class="ring-svg" viewBox="0 0 120 120">
+            <circle class="ring-bg"   cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" cx="60" cy="60" r="52" id="skillMatchRing" stroke="#4f46e5" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div style="position:absolute;text-align:center">
+            <div class="ring-num" id="skillMatchNum">0</div>
+            <div class="ring-sub">%</div>
+          </div>
+        </div>
+        <div class="ring-sub" id="skillMatchLabel">Calculating...</div>
+      </div>
+
+      <div class="score-card sc-interview">
+        <h4>Interview Readiness</h4>
+        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center">
+          <svg class="ring-svg" viewBox="0 0 120 120">
+            <circle class="ring-bg"   cx="60" cy="60" r="52"/>
+            <circle class="ring-fill" cx="60" cy="60" r="52" id="interviewRing" stroke="#22c55e" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div style="position:absolute;text-align:center">
+            <div class="ring-num" id="interviewNum">0</div>
+            <div class="ring-sub">/100</div>
+          </div>
+        </div>
+        <div class="ring-sub" id="interviewLabel">Calculating...</div>
+      </div>
+
+    </div>
+
+    <!-- Skills Analysis -->
+    <div class="skills-two-col">
+
+      <div class="cg-section">
+        <div class="cg-section-header">
+          <span>💪</span>
+          <h3>Strong Skills</h3>
+          <span class="cg-count" id="strongCountBadge" style="background:rgba(74,222,128,.12);border-color:rgba(74,222,128,.35);color:#4ade80">0</span>
+        </div>
+        <div class="skill-tags-wrap" id="strongSkillsWrap">Loading...</div>
+      </div>
+
+      <div class="cg-section">
+        <div class="cg-section-header">
+          <span>⚠️</span>
+          <h3>Weak Skills</h3>
+          <span class="cg-count" id="weakCountBadge" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.35);color:#fcd34d">0</span>
+        </div>
+        <div class="skill-tags-wrap" id="weakSkillsWrap">Loading...</div>
+      </div>
+
+    </div>
+
+    <!-- Missing Skills -->
+    <div class="cg-section">
+      <div class="cg-section-header">
+        <span>🚨</span>
+        <h3>Missing High-Demand Skills</h3>
+        <span class="cg-count" id="missingCountBadge" style="background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.35);color:#f87171">0</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:.85rem">These skills appear most frequently in available jobs but are absent from your profile.</p>
+      <div class="skill-tags-wrap" id="missingSkillsWrap">Loading...</div>
+    </div>
+
+    <!-- Top Recommended Jobs -->
+    <div class="cg-section">
+      <div class="cg-section-header">
+        <span>🎯</span>
+        <h3>Top Recommended Jobs</h3>
+        <span class="cg-count">AI Ranked</span>
+      </div>
+      <div class="cg-jobs-grid" id="topJobsList">Loading...</div>
+    </div>
+
+    <!-- Learning Roadmap -->
+    <div class="cg-section">
+      <div class="cg-section-header">
+        <span>🗺️</span>
+        <h3>Personalized Learning Roadmap</h3>
+        <span class="cg-count">Priority Ordered</span>
+      </div>
+      <p style="font-size:13px;color:#6b7280;margin-bottom:1rem">Skills sorted by market demand. Focus on High priority items first.</p>
+      <div id="roadmapList">Loading...</div>
+    </div>
+
+    <!-- Personalized Suggestions -->
+    <div class="cg-section">
+      <div class="cg-section-header">
+        <span>💡</span>
+        <h3>Personalized AI Suggestions</h3>
+      </div>
+      <div id="suggestionsList">Loading...</div>
+    </div>
+
+    <!-- Footer Stats -->
+    <div class="cg-footer-stats">
+      <div class="cg-footer-stat">
+        <span class="big" id="totalJobsAnalyzed">—</span>
+        <div class="lbl">Jobs Analyzed</div>
+      </div>
+      <div class="cg-footer-stat">
+        <span class="big" id="marketSkillsCount">—</span>
+        <div class="lbl">Market Skills Mapped</div>
+      </div>
+      <div class="cg-footer-stat">
+        <span class="big" id="strongCount">—</span>
+        <div class="lbl">Your Strong Skills</div>
+      </div>
+      <div class="cg-footer-stat">
+        <span class="big" id="missingCount">—</span>
+        <div class="lbl">Skills to Learn</div>
+      </div>
+    </div>
+
+  </div>
+  <!-- ── END RESULTS ── -->
+
+
+</main>
+</div>
+
+<script type="module" src="./career-gap.js"></script>
+<script type="module" src="./app-enhancements.js"></script>
+</body>
+</html>
