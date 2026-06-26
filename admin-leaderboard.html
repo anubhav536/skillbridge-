@@ -4,176 +4,211 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leaderboard | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .lb-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1rem; margin-bottom:1rem; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .lb-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .lb-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+  .rank-list { display:flex; flex-direction:column; gap:.55rem; }
+  .rank-item {
+    display:flex; align-items:center; gap:.85rem; padding:.75rem 1rem;
+    background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.18); border-radius:10px;
+    transition:border-color .2s;
+  }
+  .rank-item:hover { border-color:rgba(124,58,237,.35); }
+  .rank-item.top1 { border-color:rgba(250,204,21,.3); background:rgba(250,204,21,.05); }
+  .rank-item.top2 { border-color:rgba(148,163,184,.3); background:rgba(148,163,184,.04); }
+  .rank-item.top3 { border-color:rgba(180,83,9,.3); background:rgba(180,83,9,.04); }
+
+  .rank-pos { width:28px; font-size:16px; font-weight:800; color:#c4b5fd; text-align:center; flex-shrink:0; }
+  .rank-avatar {
+    width:36px; height:36px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    display:flex; align-items:center; justify-content:center;
+    font-size:14px; font-weight:800; color:#fff;
+  }
+  .rank-info { flex:1; min-width:0; }
+  .rank-name { font-size:14px; font-weight:700; color:#f5f3ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rank-sub  { font-size:12px; color:#6b7280; margin-top:.1rem; }
+  .rank-score { font-size:18px; font-weight:800; color:#c4b5fd; flex-shrink:0; }
+  .rank-score span { font-size:11px; color:#6b7280; font-weight:400; margin-left:.15rem; }
+
+  .empty-state { text-align:center; padding:2rem 1rem; color:#6b7280; font-size:14px; }
+  .empty-state .icon { font-size:32px; display:block; margin-bottom:.65rem; }
+
+  .live-badge {
+    display:inline-flex; align-items:center; gap:.35rem;
+    background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.3);
+    color:#4ade80; padding:.3rem .85rem; border-radius:999px; font-size:13px; font-weight:700;
+  }
+  .live-dot { width:7px; height:7px; border-radius:50%; background:#4ade80; animation:blink 1.5s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html" class="active">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html">Logout 👋</a>
-
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html" class="active">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<div class="top">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>🏆 Leaderboard</h2>
-  <span class="badge">Live</span>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>🏆 Platform Leaderboard</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Top performers ranked by platform activity</p>
+    </div>
+    <div class="live-badge"><span class="live-dot"></span> Live Rankings</div>
+  </div>
 
-<!-- JOB SEEKERS -->
-<div class="card">
-  <h2>🔥 Top Job Seekers</h2>
-  <table id="jobseekersTable">
-    <tr>
-      <th>Rank</th>
-      <th>Name</th>
-      <th>Score</th>
-    </tr>
-  </table>
-</div>
+  <div class="lb-grid">
 
-<!-- RECRUITERS -->
-<div class="card">
-  <h2>🏢 Top Recruiters</h2>
-  <table id="recruitersTable">
-    <tr>
-      <th>Rank</th>
-      <th>Company</th>
-      <th>Hires</th>
-    </tr>
-  </table>
-</div>
+    <div class="lb-card">
+      <h3>🔥 Top Job Seekers</h3>
+      <div class="rank-list" id="seekerList">
+        <div class="empty-state"><span class="icon">⏳</span>Loading...</div>
+      </div>
+    </div>
 
-<!-- ACTIVE USERS -->
-<div class="card">
-  <h2>⚡ Most Active Users</h2>
-  <table id="activeTable">
-    <tr>
-      <th>User</th>
-      <th>Activity</th>
-    </tr>
-  </table>
-</div>
+    <div class="lb-card">
+      <h3>🏢 Top Recruiters by Hires</h3>
+      <div class="rank-list" id="recruiterList">
+        <div class="empty-state"><span class="icon">⏳</span>Loading...</div>
+      </div>
+    </div>
+
+    <div class="lb-card">
+      <h3>⚡ Most Active Users</h3>
+      <div class="rank-list" id="activeList">
+        <div class="empty-state"><span class="icon">⏳</span>Loading...</div>
+      </div>
+    </div>
+
+  </div>
 
 </main>
 </div>
 
-<!-- 🔥 FIREBASE SCRIPT -->
 <script type="module">
 import { db } from "./firebase.js";
-import {
-  getDocs,
-  collection
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-async function loadLeaderboard(){
+const medals = ["🥇","🥈","🥉","4️⃣","5️⃣","6️⃣","7️⃣"];
 
-  const snap = await getDocs(collection(db,"leaderboard"));
+function renderList(containerId, items, scoreLabel) {
+  const el = document.getElementById(containerId);
+  if (items.length === 0) {
+    el.innerHTML = `<div class="empty-state"><span class="icon">📭</span>No data yet</div>`;
+    return;
+  }
+  el.innerHTML = items.slice(0, 7).map((item, i) => `
+    <div class="rank-item ${i === 0 ? "top1" : i === 1 ? "top2" : i === 2 ? "top3" : ""}">
+      <div class="rank-pos">${medals[i] || i + 1}</div>
+      <div class="rank-avatar">${(item.name || item.email || "?").charAt(0).toUpperCase()}</div>
+      <div class="rank-info">
+        <div class="rank-name">${item.name || item.email || "Anonymous"}</div>
+        <div class="rank-sub">${item.email || ""}</div>
+      </div>
+      <div class="rank-score">${item.score}<span>${scoreLabel}</span></div>
+    </div>`).join("");
+}
 
-  let jobseekers = [];
-  let recruiters = [];
-  let activeUsers = [];
+async function loadLeaderboard() {
+  try {
+    const [appSnap, userSnap] = await Promise.all([
+      getDocs(collection(db, "applications")),
+      getDocs(collection(db, "users"))
+    ]);
 
-  snap.forEach(doc=>{
-    const data = doc.data();
+    const apps = [];
+    appSnap.forEach(d => apps.push(d.data()));
 
-    if(data.role === "jobseeker"){
-      jobseekers.push(data);
-    }
-    else if(data.role === "recruiter"){
-      recruiters.push(data);
-    }
-    else if(data.role === "active"){
-      activeUsers.push(data);
-    }
-  });
+    const users = [];
+    userSnap.forEach(d => users.push(d.data()));
 
-  // 🔥 SORT BY SCORE
-  jobseekers.sort((a,b)=>b.score - a.score);
-  recruiters.sort((a,b)=>b.score - a.score);
+    // Top Job Seekers: by number of applications submitted
+    const seekerMap = {};
+    apps.forEach(a => {
+      const email = a.email || a.user || a.seeker;
+      if (!email) return;
+      if (!seekerMap[email]) seekerMap[email] = { email, name: a.name || email, score: 0 };
+      seekerMap[email].score++;
+    });
+    const topSeekers = Object.values(seekerMap).sort((a, b) => b.score - a.score);
+    renderList("seekerList", topSeekers, "apps");
 
-  // 🎯 RENDER JOB SEEKERS
-  const jsTable = document.getElementById("jobseekersTable");
-  jobseekers.forEach((u,i)=>{
-    jsTable.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${u.name}</td>
-        <td>${u.score}</td>
-      </tr>
-    `;
-  });
+    // Top Recruiters: by hired count
+    const recruiterMap = {};
+    apps.forEach(a => {
+      if (!a.recruiter && !a.recruiterEmail) return;
+      const email = a.recruiter || a.recruiterEmail;
+      if (!recruiterMap[email]) recruiterMap[email] = { email, name: email, score: 0 };
+      if ((a.status || "").toLowerCase() === "hired") recruiterMap[email].score++;
+    });
+    const topRecruiters = Object.values(recruiterMap).sort((a, b) => b.score - a.score);
+    renderList("recruiterList", topRecruiters, "hires");
 
-  // 🎯 RENDER RECRUITERS
-  const rTable = document.getElementById("recruitersTable");
-  recruiters.forEach((u,i)=>{
-    rTable.innerHTML += `
-      <tr>
-        <td>${i+1}</td>
-        <td>${u.name}</td>
-        <td>${u.score}</td>
-      </tr>
-    `;
-  });
+    // Most Active: combine job seekers + recruiters by total app activity
+    // Use full user list with applications count as proxy
+    const allActive = Object.values(seekerMap).map(s => ({ ...s }));
+    Object.values(recruiterMap).forEach(r => {
+      const existing = allActive.find(u => u.email === r.email);
+      if (existing) existing.score += r.score;
+      else allActive.push({ ...r });
+    });
+    allActive.sort((a, b) => b.score - a.score);
+    renderList("activeList", allActive.slice(0, 7), "actions");
 
-  // 🎯 ACTIVE USERS
-  const aTable = document.getElementById("activeTable");
-  activeUsers.forEach(u=>{
-    aTable.innerHTML += `
-      <tr>
-        <td>${u.name}</td>
-        <td>${u.score} actions</td>
-      </tr>
-    `;
-  });
-
+  } catch(e) {
+    console.error(e);
+    ["seekerList","recruiterList","activeList"].forEach(id => {
+      document.getElementById(id).innerHTML = `<div class="empty-state"><span class="icon">❌</span>Failed to load</div>`;
+    });
+  }
 }
 
 loadLeaderboard();
 </script>
 
-<!-- MENU SCRIPT -->
 <script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

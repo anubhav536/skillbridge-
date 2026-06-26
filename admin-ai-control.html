@@ -1,156 +1,279 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Control Panel | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .ai-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:1rem; margin-bottom:1rem; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .ai-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .ai-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1.1rem; }
+  .ai-card p.desc { font-size:13px; color:#6b7280; margin-bottom:1rem; line-height:1.5; }
+
+  .slider-group { margin-bottom:1.1rem; }
+  .slider-group:last-of-type { margin-bottom:0; }
+  .slider-label { display:flex; justify-content:space-between; align-items:center; margin-bottom:.4rem; }
+  .slider-label span { font-size:13px; color:#a78bfa; font-weight:600; }
+  .slider-label .slider-val {
+    background:rgba(124,58,237,.18); border:1px solid rgba(124,58,237,.35);
+    border-radius:999px; padding:.2rem .65rem; font-size:13px; font-weight:700; color:#c4b5fd;
+    min-width:40px; text-align:center;
+  }
+
+  input[type="range"] {
+    -webkit-appearance:none; appearance:none; width:100%; height:6px;
+    background:rgba(255,255,255,.1); border-radius:99px; outline:none; cursor:pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    box-shadow:0 2px 8px rgba(124,58,237,.5); cursor:pointer;
+  }
+
+  .field-group { margin-bottom:1rem; }
+  .field-group label { display:block; font-size:13px; color:#a78bfa; font-weight:600; margin-bottom:.4rem; }
+  .field-group select,
+  .field-group input[type="number"] {
+    width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+    font-family:inherit;
+  }
+  .field-group select option { background:#1e124f; color:#f5f3ff; }
+
+  .info-pill {
+    display:inline-flex; align-items:center; gap:.35rem;
+    background:rgba(79,70,229,.1); border:1px solid rgba(79,70,229,.25);
+    color:#818cf8; padding:.3rem .85rem; border-radius:999px; font-size:12.5px; font-weight:600;
+    margin-bottom:1rem;
+  }
+
+  .save-section {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  }
+  .save-section p { font-size:14px; color:#a78bfa; margin:0; }
+  .save-btn {
+    padding:.8rem 2rem; border-radius:12px; font-size:14px; font-weight:700;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+    box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer; transition:filter .2s, transform .2s;
+  }
+  .save-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+    padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+  .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html" class="active">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn">Logout 👋</a>
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html" class="active">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<div>
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>🤖 AI Control Panel</h2>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>🤖 AI Control Panel</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Tune the matching engine and platform intelligence</p>
+    </div>
+    <span class="info-pill">⚡ Live AI Config</span>
+  </div>
 
-<!-- CARD 1 -->
-<div class="card">
-  <h3>📄 Resume Ranking</h3>
+  <div class="ai-grid">
 
-  <label>Experience Weight (%)</label>
-  <input id="exp" type="range" min="0" max="100">
+    <!-- Card 1: Resume Ranking Weights -->
+    <div class="ai-card">
+      <h3>📄 Resume Ranking Weights</h3>
+      <p class="desc">Control how the AI scores candidates. Total weights don't need to sum to 100 — they're relative.</p>
 
-  <label>Skills Weight (%)</label>
-  <input id="skills" type="range" min="0" max="100">
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🔧 Skills Match</span>
+          <div class="slider-val" id="valSkills">70</div>
+        </div>
+        <input type="range" id="skills" min="0" max="100" value="70"
+          oninput="document.getElementById('valSkills').textContent = this.value">
+      </div>
 
-  <label>Education Weight (%)</label>
-  <input id="edu" type="range" min="0" max="100">
-</div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>💼 Experience</span>
+          <div class="slider-val" id="valExp">50</div>
+        </div>
+        <input type="range" id="exp" min="0" max="100" value="50"
+          oninput="document.getElementById('valExp').textContent = this.value">
+      </div>
 
-<!-- CARD 2 -->
-<div class="card">
-  <h3>🎯 Job Recommendation</h3>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🎓 Education</span>
+          <div class="slider-val" id="valEdu">40</div>
+        </div>
+        <input type="range" id="edu" min="0" max="100" value="40"
+          oninput="document.getElementById('valEdu').textContent = this.value">
+      </div>
+    </div>
 
-  <select id="recommend">
-    <option>Skill Based</option>
-    <option>Location Based</option>
-    <option>Hybrid AI</option>
-  </select>
-</div>
+    <!-- Card 2: Job Recommendations -->
+    <div class="ai-card">
+      <h3>🎯 Job Recommendation Engine</h3>
+      <p class="desc">Choose how the AI recommends jobs to job seekers. Hybrid AI uses all signals combined.</p>
 
-<!-- CARD 3 -->
-<div class="card">
-  <h3>🚨 Fraud Sensitivity</h3>
+      <div class="field-group">
+        <label>Recommendation Strategy</label>
+        <select id="recommend">
+          <option value="Skill Based">Skill Based — match skills to job requirements</option>
+          <option value="Location Based">Location Based — prioritise nearby openings</option>
+          <option value="Hybrid AI">Hybrid AI — skills + location + activity signals</option>
+        </select>
+      </div>
 
-  <input id="fraud" type="range" min="0" max="100">
-</div>
+      <div class="field-group">
+        <label>⚡ Auto-Shortlist Minimum Match %</label>
+        <input type="number" id="match" min="0" max="100" value="70" style="border-radius:10px">
+        <div style="font-size:12px;color:#6b7280;margin-top:.3rem">Candidates above this score get auto-shortlisted</div>
+      </div>
+    </div>
 
-<!-- CARD 4 -->
-<div class="card">
-  <h3>⚡ Auto Shortlist</h3>
+    <!-- Card 3: Fraud Detection -->
+    <div class="ai-card">
+      <h3>🚨 Fraud Detection Sensitivity</h3>
+      <p class="desc">Higher sensitivity = more flags raised. Lower = only obvious violations flagged.</p>
 
-  <label>Minimum Match %</label>
-  <input id="match" type="number">
-</div>
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>🛡️ Detection Level</span>
+          <div class="slider-val" id="valFraud">60</div>
+        </div>
+        <input type="range" id="fraud" min="0" max="100" value="60"
+          oninput="document.getElementById('valFraud').textContent = this.value">
+      </div>
 
-<button class="btn" id="saveBtn">💾 Save Settings</button>
-<p id="statusMsg"></p>
+      <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap">
+        <span style="font-size:12px;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.25);color:#4ade80;padding:.3rem .7rem;border-radius:8px">0–40: Lenient</span>
+        <span style="font-size:12px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#fcd34d;padding:.3rem .7rem;border-radius:8px">41–70: Balanced</span>
+        <span style="font-size:12px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25);color:#f87171;padding:.3rem .7rem;border-radius:8px">71–100: Strict</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Save -->
+  <div class="save-section">
+    <p>Changes apply to all AI decisions platform-wide. Saved to Firestore instantly.</p>
+    <button class="save-btn" id="saveBtn">💾 Save AI Settings</button>
+  </div>
 
 </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
-
 import { db } from "./firebase.js";
-import {
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔹 LOAD DATA
-async function loadConfig(){
-  const ref = doc(db, "aiConfig", "config");
-  const snap = await getDoc(ref);
-
-  if(snap.exists()){
-    const d = snap.data();
-
-    document.getElementById("exp").value = d.experienceWeight || 50;
-    document.getElementById("skills").value = d.skillsWeight || 70;
-    document.getElementById("edu").value = d.educationWeight || 40;
-    document.getElementById("fraud").value = d.fraudSensitivity || 60;
-    document.getElementById("match").value = d.minMatch || 70;
-    document.getElementById("recommend").value = d.recommendationType || "Hybrid AI";
-  }
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
 }
 
-// 🔹 SAVE DATA
-document.getElementById("saveBtn").addEventListener("click", async ()=>{
-
-  const data = {
-    experienceWeight: +document.getElementById("exp").value,
-    skillsWeight: +document.getElementById("skills").value,
-    educationWeight: +document.getElementById("edu").value,
-    fraudSensitivity: +document.getElementById("fraud").value,
-    minMatch: +document.getElementById("match").value,
-    recommendationType: document.getElementById("recommend").value
-  };
-
-  await setDoc(doc(db, "aiConfig", "config"), data);
-
-  document.getElementById("statusMsg").innerText = "✅ Settings saved successfully!";
-});
-
-// 🔹 MOBILE MENU
-window.toggleMenu = function(){
-  document.getElementById("sidebar").classList.toggle("active");
-};
-
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
+async function loadConfig() {
+  try {
+    const snap = await getDoc(doc(db, "aiConfig", "config"));
+    if (snap.exists()) {
+      const d = snap.data();
+      const set = (id, val, displayId) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val;
+        if (displayId) document.getElementById(displayId).textContent = val;
+      };
+      set("skills", d.skillsWeight   || 70,  "valSkills");
+      set("exp",    d.experienceWeight|| 50,  "valExp");
+      set("edu",    d.educationWeight || 40,  "valEdu");
+      set("fraud",  d.fraudSensitivity|| 60,  "valFraud");
+      set("match",  d.minMatch        || 70);
+      if (d.recommendationType) document.getElementById("recommend").value = d.recommendationType;
     }
-  });
+  } catch(e) { console.error(e); }
+}
+
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true; btn.textContent = "Saving...";
+
+  try {
+    await setDoc(doc(db, "aiConfig", "config"), {
+      skillsWeight:      +document.getElementById("skills").value,
+      experienceWeight:  +document.getElementById("exp").value,
+      educationWeight:   +document.getElementById("edu").value,
+      fraudSensitivity:  +document.getElementById("fraud").value,
+      minMatch:          +document.getElementById("match").value,
+      recommendationType: document.getElementById("recommend").value,
+      updatedAt: Date.now()
+    });
+    showToast("✅ AI settings saved successfully!", "success");
+  } catch(e) {
+    console.error(e);
+    showToast("❌ Failed to save settings.", "error");
+  }
+
+  btn.disabled = false; btn.textContent = "💾 Save AI Settings";
 });
 
-// INIT
 loadConfig();
-
 </script>
 
+<script>
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
+  });
+});
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

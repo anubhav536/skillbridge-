@@ -1,167 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .notif-grid { display:grid; grid-template-columns:1fr 1.4fr; gap:1rem; }
+  @media(max-width:800px){ .notif-grid { grid-template-columns:1fr; } }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .notif-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .notif-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+  .notif-card label { display:block; font-size:13px; color:#a78bfa; font-weight:600; margin-bottom:.35rem; margin-top:.9rem; }
+  .notif-card label:first-of-type { margin-top:0; }
+  .notif-card input,
+  .notif-card textarea,
+  .notif-card select {
+    width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+    font-family:inherit; resize:vertical;
+  }
+  .notif-card input:focus, .notif-card textarea:focus, .notif-card select:focus {
+    outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.2);
+  }
+  .notif-card select option { background:#1e124f; color:#f5f3ff; }
+  .char-count { font-size:12px; color:#6b7280; text-align:right; margin-top:.25rem; }
+
+  .audience-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.5rem; }
+  .aud-chip {
+    padding:.4rem .9rem; border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+    border:1px solid rgba(124,58,237,.3); color:#c4b5fd; background:rgba(124,58,237,.1);
+    transition:all .2s;
+  }
+  .aud-chip.active { background:rgba(124,58,237,.35); border-color:#7c3aed; color:#f5f3ff; }
+
+  .send-btn {
+    margin-top:1.1rem; width:100%; padding:.85rem; border-radius:12px; font-size:15px; font-weight:700;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+    box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer; transition:filter .2s, transform .2s;
+  }
+  .send-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+  .send-btn:disabled { opacity:.6; cursor:not-allowed; }
+
+  /* History */
+  .history-item {
+    padding:.85rem 1rem; background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.15);
+    border-radius:10px; margin-bottom:.6rem;
+  }
+  .history-item:last-child { margin-bottom:0; }
+  .history-header { display:flex; align-items:flex-start; justify-content:space-between; gap:.75rem; }
+  .history-title { font-size:14px; font-weight:700; color:#f5f3ff; }
+  .history-time  { font-size:12px; color:#6b7280; white-space:nowrap; }
+  .history-msg   { font-size:13px; color:#a78bfa; margin:.35rem 0 .5rem; line-height:1.5; }
+  .history-footer { display:flex; align-items:center; gap:.6rem; }
+  .aud-badge {
+    font-size:12px; font-weight:600; padding:.2rem .6rem; border-radius:6px;
+    background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+  }
+  .sent-badge {
+    font-size:12px; font-weight:600; padding:.2rem .6rem; border-radius:6px;
+    background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.25); color:#4ade80;
+  }
+
+  .empty-state { text-align:center; padding:2rem 1rem; color:#6b7280; font-size:14px; }
+  .empty-state .icon { font-size:32px; display:block; margin-bottom:.65rem; }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+    padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+  .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+  .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html" class="active">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn">Logout 👋</a>
-
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html" class="active">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<div>
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>📩 Notifications</h2>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>📩 Notifications</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Send platform-wide announcements to users</p>
+    </div>
+  </div>
 
-<!-- SEND -->
-<div class="card">
+  <div class="notif-grid">
 
-<h3>📢 Send Announcement</h3>
+    <!-- Compose -->
+    <div class="notif-card">
+      <h3>📢 New Announcement</h3>
 
-<label>Title</label>
-<input type="text" id="title">
+      <label>Title</label>
+      <input type="text" id="notifTitle" placeholder="e.g. Platform Update v2.0 Live!">
 
-<label>Message</label>
-<textarea id="message" rows="4"></textarea>
+      <label>Message</label>
+      <textarea id="notifMessage" rows="5" maxlength="500" placeholder="Write a clear, concise message. Users will see this in their notification feed..." oninput="updateCharCount()"></textarea>
+      <div class="char-count"><span id="charCount">0</span>/500</div>
 
-<label>Audience</label>
-<select id="audience">
-<option value="all">All Users</option>
-<option value="jobseekers">Job Seekers</option>
-<option value="recruiters">Recruiters</option>
-</select>
+      <label>Audience</label>
+      <div class="audience-row">
+        <div class="aud-chip active" data-val="all" onclick="selectAud(this)">🌐 All Users</div>
+        <div class="aud-chip" data-val="jobseekers" onclick="selectAud(this)">👨‍🎓 Job Seekers</div>
+        <div class="aud-chip" data-val="recruiters" onclick="selectAud(this)">🏢 Recruiters</div>
+      </div>
+      <input type="hidden" id="audience" value="all">
 
-<button class="btn" id="sendBtn">🚀 Send Notification</button>
+      <button class="send-btn" id="sendBtn" onclick="sendNotification()">🚀 Send Notification</button>
+    </div>
 
-</div>
+    <!-- History -->
+    <div class="notif-card">
+      <h3>📜 Sent Notifications <span style="font-size:13px;color:#6b7280;font-weight:400" id="historyCount"></span></h3>
+      <div id="historyList"><div class="empty-state"><span class="icon">⏳</span>Loading...</div></div>
+    </div>
 
-<!-- HISTORY -->
-<div class="card">
-
-<h3>📜 Recent Notifications</h3>
-
-<table>
-<thead>
-<tr>
-<th>Title</th>
-<th>Audience</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody id="tableBody"></tbody>
-</table>
-
-</div>
+  </div>
 
 </main>
 </div>
 
-<!-- FIREBASE SCRIPT -->
-<script type="module">
+<div class="toast" id="toast"></div>
 
+<script type="module">
 import { db } from "./firebase.js";
 import {
-  collection,
-  addDoc,
-  getDocs
+  collection, addDoc, getDocs, query, orderBy, limit
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// SEND NOTIFICATION
-document.getElementById("sendBtn").addEventListener("click", async ()=>{
-
-  const title = document.getElementById("title").value;
-  const message = document.getElementById("message").value;
-  const audience = document.getElementById("audience").value;
-
-  if(!title || !message){
-    alert("Fill all fields ⚠️");
-    return;
-  }
-
-  await addDoc(collection(db,"notifications"),{
-    title,
-    message,
-    audience,
-    status:"sent",
-    createdAt: Date.now()
-  });
-
-  alert("Notification sent 🚀");
-
-  loadNotifications();
-});
-
-// LOAD DATA
-async function loadNotifications(){
-
-  const snap = await getDocs(collection(db,"notifications"));
-  const table = document.getElementById("tableBody");
-  table.innerHTML = "";
-
-  snap.forEach(doc=>{
-    const n = doc.data();
-
-    table.innerHTML += `
-      <tr>
-        <td>${n.title}</td>
-        <td>${n.audience}</td>
-        <td>✅ ${n.status}</td>
-      </tr>
-    `;
-  });
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
 }
 
-loadNotifications();
+function formatTime(ts) {
+  if (!ts) return "";
+  const d = new Date(ts);
+  return d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" }) +
+    " " + d.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit" });
+}
 
+window.updateCharCount = function() {
+  const len = document.getElementById("notifMessage").value.length;
+  document.getElementById("charCount").textContent = len;
+};
+
+window.selectAud = function(el) {
+  document.querySelectorAll(".aud-chip").forEach(c => c.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("audience").value = el.dataset.val;
+};
+
+window.sendNotification = async function() {
+  const title   = document.getElementById("notifTitle").value.trim();
+  const message = document.getElementById("notifMessage").value.trim();
+  const audience= document.getElementById("audience").value;
+  const btn     = document.getElementById("sendBtn");
+
+  if (!title)   { showToast("⚠️ Enter a notification title.", "warn"); return; }
+  if (!message) { showToast("⚠️ Write a message before sending.", "warn"); return; }
+
+  btn.disabled = true; btn.textContent = "Sending...";
+
+  try {
+    await addDoc(collection(db, "notifications"), {
+      title, message, audience, status: "sent", createdAt: Date.now()
+    });
+    showToast("🚀 Notification sent successfully!", "success");
+    document.getElementById("notifTitle").value   = "";
+    document.getElementById("notifMessage").value = "";
+    document.getElementById("charCount").textContent = "0";
+    loadHistory();
+  } catch(e) {
+    console.error(e);
+    showToast("❌ Failed to send. Try again.", "error");
+  }
+
+  btn.disabled = false; btn.textContent = "🚀 Send Notification";
+};
+
+async function loadHistory() {
+  const list = document.getElementById("historyList");
+  try {
+    const snap = await getDocs(collection(db, "notifications"));
+    const notifs = [];
+    snap.forEach(d => notifs.push(d.data()));
+    notifs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+    document.getElementById("historyCount").textContent = `(${notifs.length})`;
+
+    if (notifs.length === 0) {
+      list.innerHTML = `<div class="empty-state"><span class="icon">📭</span>No notifications sent yet</div>`;
+      return;
+    }
+
+    const audLabel = { all:"All Users", jobseekers:"Job Seekers", recruiters:"Recruiters" };
+
+    list.innerHTML = notifs.slice(0, 20).map(n => `
+      <div class="history-item">
+        <div class="history-header">
+          <div class="history-title">${n.title}</div>
+          <div class="history-time">${formatTime(n.createdAt)}</div>
+        </div>
+        <div class="history-msg">${n.message}</div>
+        <div class="history-footer">
+          <span class="aud-badge">🎯 ${audLabel[n.audience] || n.audience}</span>
+          <span class="sent-badge">✅ ${n.status || "sent"}</span>
+        </div>
+      </div>`).join("");
+
+  } catch(e) {
+    console.error(e);
+    list.innerHTML = `<div class="empty-state"><span class="icon">❌</span>Failed to load history</div>`;
+  }
+}
+
+loadHistory();
 </script>
 
 <script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

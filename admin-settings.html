@@ -1,146 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Platform Settings | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .settings-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1rem; margin-bottom:1rem; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .settings-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .settings-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+
+  .toggle-row {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:.8rem 0; border-bottom:1px solid rgba(124,58,237,.1);
+  }
+  .toggle-row:last-of-type { border-bottom:none; padding-bottom:0; }
+  .toggle-info { flex:1; }
+  .toggle-info .t-label { font-size:14px; color:#f5f3ff; font-weight:600; }
+  .toggle-info .t-desc  { font-size:12.5px; color:#6b7280; margin-top:.15rem; }
+
+  /* Toggle switch */
+  .switch { position:relative; display:inline-block; width:44px; height:24px; flex-shrink:0; margin-left:1rem; }
+  .switch input { opacity:0; width:0; height:0; }
+  .slider-sw {
+    position:absolute; cursor:pointer; inset:0; border-radius:99px;
+    background:rgba(255,255,255,.1); transition:.3s;
+    border:1px solid rgba(255,255,255,.15);
+  }
+  .slider-sw:before {
+    content:""; position:absolute; height:18px; width:18px; left:2px; bottom:2px;
+    background:#6b7280; border-radius:50%; transition:.3s;
+  }
+  input:checked + .slider-sw { background:rgba(124,58,237,.4); border-color:rgba(124,58,237,.6); }
+  input:checked + .slider-sw:before { transform:translateX(20px); background:#a78bfa; }
+
+  .field-group { margin-top:1rem; }
+  .field-group label { display:block; font-size:13px; color:#a78bfa; font-weight:600; margin-bottom:.4rem; }
+  .field-group select {
+    width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+    font-family:inherit;
+  }
+  .field-group select option { background:#1e124f; color:#f5f3ff; }
+
+  .maintenance-warn {
+    background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25);
+    border-radius:10px; padding:.75rem 1rem; font-size:13px; color:#f87171;
+    margin-top:.75rem; display:none;
+  }
+
+  .save-row {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  }
+  .save-row p { font-size:14px; color:#a78bfa; margin:0; }
+  .save-btn {
+    padding:.8rem 2rem; border-radius:12px; font-size:14px; font-weight:700;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+    box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer; transition:filter .2s, transform .2s;
+  }
+  .save-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+    padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+  .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
 <aside class="sidebar" id="sidebar">
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html" class="active">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn">Logout 👋</a>
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html" class="active">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
 <main class="main">
 
-<div>
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>⚙ Platform Settings</h2>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>⚙ Platform Settings</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Control platform behaviour, access, and security</p>
+    </div>
+  </div>
 
-<!-- SETTINGS -->
+  <div class="settings-grid">
 
-<div class="card">
-<h3>👤 User Settings</h3>
-<label><input type="checkbox" id="allowSignup"> Allow New User Signup</label>
-<label><input type="checkbox" id="adminApproval"> Require Admin Approval</label>
-</div>
+    <!-- User Settings -->
+    <div class="settings-card">
+      <h3>👤 User Settings</h3>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Allow New Signups</div>
+          <div class="t-desc">New users can create accounts</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="allowSignup" checked><span class="slider-sw"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Require Admin Approval</div>
+          <div class="t-desc">New accounts need manual activation</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="adminApproval"><span class="slider-sw"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Email Verification</div>
+          <div class="t-desc">Users must verify email before access</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="emailVerify"><span class="slider-sw"></span></label>
+      </div>
+    </div>
 
-<div class="card">
-<h3>💼 Job Settings</h3>
-<label><input type="checkbox" id="jobPosting"> Allow Job Posting</label>
-<label><input type="checkbox" id="manualJob"> Manual Job Approval</label>
-</div>
+    <!-- Job Settings -->
+    <div class="settings-card">
+      <h3>💼 Job Settings</h3>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Allow Job Posting</div>
+          <div class="t-desc">Recruiters can post new jobs</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="jobPosting" checked><span class="slider-sw"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Manual Job Approval</div>
+          <div class="t-desc">Jobs require admin review before going live</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="manualJob"><span class="slider-sw"></span></label>
+      </div>
+    </div>
 
-<div class="card">
-<h3>🔒 Security Settings</h3>
-<label><input type="checkbox" id="fraudDetection"> Enable Fraud Detection</label>
-<label><input type="checkbox" id="emailVerify"> Email Verification</label>
-</div>
+    <!-- Security Settings -->
+    <div class="settings-card">
+      <h3>🔒 Security</h3>
+      <div class="toggle-row">
+        <div class="toggle-info">
+          <div class="t-label">Fraud Detection</div>
+          <div class="t-desc">AI monitors for suspicious behaviour</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="fraudDetection" checked><span class="slider-sw"></span></label>
+      </div>
+    </div>
 
-<div class="card">
-<h3>🛠 Platform Mode</h3>
-<select id="platformMode">
-<option value="live">Live Mode</option>
-<option value="maintenance">Maintenance Mode</option>
-</select>
-</div>
+    <!-- Platform Mode -->
+    <div class="settings-card">
+      <h3>🛠 Platform Mode</h3>
+      <div class="field-group">
+        <label>Current Mode</label>
+        <select id="platformMode" onchange="toggleMaintenanceWarn()">
+          <option value="live">🟢 Live Mode — platform fully operational</option>
+          <option value="maintenance">🔴 Maintenance Mode — show downtime page</option>
+        </select>
+      </div>
+      <div class="maintenance-warn" id="maintenanceWarn">
+        ⚠️ Enabling maintenance mode will make the platform inaccessible to all users. Only admins can access settings.
+      </div>
+    </div>
 
-<button class="btn" id="saveBtn">💾 Save Settings</button>
+  </div>
+
+  <div class="save-row">
+    <p>Settings are saved to Firestore and apply immediately across the platform.</p>
+    <button class="save-btn" id="saveBtn">💾 Save Settings</button>
+  </div>
 
 </main>
 </div>
 
-<!-- 🔥 FIREBASE CONNECT -->
+<div class="toast" id="toast"></div>
+
 <script type="module">
-
 import { db } from "./firebase.js";
-import {
-  doc,
-  getDoc,
-  setDoc
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-// 🔹 LOAD SETTINGS
-async function loadSettings(){
-
-  const ref = doc(db, "settings", "main");
-  const snap = await getDoc(ref);
-
-  if(snap.exists()){
-    const s = snap.data();
-
-    document.getElementById("allowSignup").checked = s.allowSignup ?? true;
-    document.getElementById("adminApproval").checked = s.adminApproval ?? false;
-    document.getElementById("jobPosting").checked = s.jobPosting ?? true;
-    document.getElementById("manualJob").checked = s.manualJob ?? false;
-    document.getElementById("fraudDetection").checked = s.fraudDetection ?? true;
-    document.getElementById("emailVerify").checked = s.emailVerify ?? false;
-    document.getElementById("platformMode").value = s.maintenanceMode ? "maintenance" : "live";
-  }
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
 }
 
-// 🔹 SAVE SETTINGS
-document.getElementById("saveBtn").addEventListener("click", async ()=>{
+window.toggleMaintenanceWarn = function() {
+  const warn = document.getElementById("maintenanceWarn");
+  warn.style.display = document.getElementById("platformMode").value === "maintenance" ? "block" : "none";
+};
 
-  const data = {
-    allowSignup: document.getElementById("allowSignup").checked,
-    adminApproval: document.getElementById("adminApproval").checked,
-    jobPosting: document.getElementById("jobPosting").checked,
-    manualJob: document.getElementById("manualJob").checked,
-    fraudDetection: document.getElementById("fraudDetection").checked,
-    emailVerify: document.getElementById("emailVerify").checked,
-    maintenanceMode: document.getElementById("platformMode").value === "maintenance"
-  };
+async function loadSettings() {
+  try {
+    const snap = await getDoc(doc(db, "settings", "main"));
+    if (snap.exists()) {
+      const s = snap.data();
+      document.getElementById("allowSignup").checked    = s.allowSignup    ?? true;
+      document.getElementById("adminApproval").checked  = s.adminApproval  ?? false;
+      document.getElementById("jobPosting").checked     = s.jobPosting     ?? true;
+      document.getElementById("manualJob").checked      = s.manualJob      ?? false;
+      document.getElementById("fraudDetection").checked = s.fraudDetection ?? true;
+      document.getElementById("emailVerify").checked    = s.emailVerify    ?? false;
+      document.getElementById("platformMode").value     = s.maintenanceMode ? "maintenance" : "live";
+    }
+  } catch(e) { console.error(e); }
+}
 
-  await setDoc(doc(db, "settings", "main"), data);
+document.getElementById("saveBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("saveBtn");
+  btn.disabled = true; btn.textContent = "Saving...";
 
-  alert("✅ Settings Saved!");
+  try {
+    await setDoc(doc(db, "settings", "main"), {
+      allowSignup:    document.getElementById("allowSignup").checked,
+      adminApproval:  document.getElementById("adminApproval").checked,
+      jobPosting:     document.getElementById("jobPosting").checked,
+      manualJob:      document.getElementById("manualJob").checked,
+      fraudDetection: document.getElementById("fraudDetection").checked,
+      emailVerify:    document.getElementById("emailVerify").checked,
+      maintenanceMode: document.getElementById("platformMode").value === "maintenance",
+      updatedAt: Date.now()
+    });
+    showToast("✅ Platform settings saved!", "success");
+  } catch(e) {
+    console.error(e);
+    showToast("❌ Failed to save settings.", "error");
+  }
+
+  btn.disabled = false; btn.textContent = "💾 Save Settings";
 });
 
-// LOAD ON START
 loadSettings();
-
 </script>
 
 <script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

@@ -13,11 +13,10 @@
     .profile-grid { display:grid; grid-template-columns:280px 1fr; gap:1rem; }
     @media(max-width:720px){ .profile-grid { grid-template-columns:1fr; } }
 
-    /* Left card */
     .profile-card {
       background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
       padding:1.5rem; display:flex; flex-direction:column; align-items:center; gap:.65rem;
-      text-align:center;
+      text-align:center; position:sticky; top:1rem; align-self:start;
     }
     .avatar-circle {
       width:72px; height:72px; border-radius:50%;
@@ -27,7 +26,8 @@
       box-shadow:0 4px 20px rgba(124,58,237,.45);
     }
     .profile-card h2 { font-size:18px; font-weight:800; color:#f5f3ff; margin:0; }
-    .profile-card p  { font-size:13.5px; color:#a78bfa; margin:0; }
+    .profile-card .card-email  { font-size:13.5px; color:#a78bfa; margin:0; }
+    .profile-card .card-loc  { font-size:13px; color:#6b7280; margin:0; }
 
     .mini-info { display:flex; gap:1.25rem; }
     .mini-info div { display:flex; flex-direction:column; align-items:center; gap:.15rem; }
@@ -35,9 +35,8 @@
     .mini-info strong { font-size:20px; font-weight:800; color:#c4b5fd; }
 
     .profile-lines { width:100%; text-align:left; display:flex; flex-direction:column; gap:.35rem; }
-    .profile-lines p { font-size:13px; color:#a78bfa; margin:0; padding:.5rem .75rem; background:rgba(124,58,237,.08); border-radius:8px; }
+    .profile-lines p { font-size:13px; color:#a78bfa; margin:0; padding:.5rem .75rem; background:rgba(124,58,237,.08); border-radius:8px; word-break:break-word; }
 
-    /* Incomplete banner */
     .incomplete-banner {
       background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.35);
       border-radius:12px; padding:.9rem 1.1rem; font-size:14px; color:#fcd34d;
@@ -45,30 +44,46 @@
     }
     .incomplete-banner.hidden { display:none; }
 
-    /* Right edit card */
     .edit-card {
       background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
       padding:1.5rem;
     }
     .edit-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
 
-    .edit-card form label { display:block; font-size:13.5px; color:#a78bfa; font-weight:600; margin-bottom:.35rem; margin-top:.85rem; }
+    .form-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+    @media(max-width:540px){ .form-row { grid-template-columns:1fr; } }
+
+    .edit-card form label { display:block; font-size:13px; color:#a78bfa; font-weight:600; margin-bottom:.3rem; margin-top:.9rem; }
     .edit-card form label:first-of-type { margin-top:0; }
-    .edit-card form input {
+    .edit-card form input,
+    .edit-card form textarea,
+    .edit-card form select {
       width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
       border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+      font-family:inherit; resize:vertical;
     }
-    .edit-card form input:focus {
+    .edit-card form input:focus,
+    .edit-card form textarea:focus,
+    .edit-card form select:focus {
       outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.2);
     }
+    .edit-card form select option { background:#1e124f; color:#f5f3ff; }
     .hint { font-size:12px; color:#6b7280; margin-top:.25rem; }
+
+    .section-divider {
+      font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase;
+      letter-spacing:.05em; margin:1.25rem 0 .25rem; border-top:1px solid rgba(124,58,237,.15);
+      padding-top:.9rem;
+    }
 
     .save-btn {
       margin-top:1.2rem; width:100%; padding:.85rem; border-radius:12px;
       font-size:15px; font-weight:700; background:linear-gradient(135deg,#7c3aed,#4f46e5);
       color:#fff; border:none; box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer;
+      transition:filter .2s, transform .2s;
     }
     .save-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+    .save-btn:disabled { opacity:.6; cursor:not-allowed; }
 
     .success-banner {
       background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.3);
@@ -76,11 +91,12 @@
       margin-top:.75rem; display:none;
     }
 
-    /* Completeness bar */
     .completeness-box { margin-bottom:.85rem; }
     .completeness-bar-wrap { background:rgba(255,255,255,.07); border-radius:99px; height:8px; overflow:hidden; margin:.45rem 0 .3rem; }
     .completeness-bar-fill { height:100%; border-radius:99px; transition:width .5s ease; background:linear-gradient(90deg,#7c3aed,#4ade80); }
     .completeness-label { font-size:13px; color:#a78bfa; }
+
+    .field-req { color:#f87171; font-size:11px; margin-left:.25rem; }
   </style>
 </head>
 
@@ -106,12 +122,11 @@
     <div class="profile-top">
       <div>
         <h1>👤 My Profile</h1>
-        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Polish your identity — recruiters notice details.</p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">A complete profile gets 3× more recruiter attention.</p>
       </div>
-      <div class="badge">🚀 Career Ready</div>
+      <div class="badge" id="readinessBadge">🚀 Career Ready</div>
     </div>
 
-    <!-- Inline warning (replaces annoying alert) -->
     <div id="incompleteBanner" class="incomplete-banner hidden">
       ⚠️ Complete your profile — add skills and experience to unlock AI job matching.
     </div>
@@ -121,17 +136,21 @@
       <!-- LEFT: Preview -->
       <section class="profile-card">
         <div class="avatar-circle" id="avatarText">U</div>
-        <h2 id="name">Loading...</h2>
-        <p  id="email">Loading...</p>
+        <h2 id="previewName">Loading...</h2>
+        <p class="card-email" id="previewEmail">Loading...</p>
+        <p class="card-loc" id="previewLoc"></p>
 
         <div class="mini-info">
           <div><span>Skills</span><strong id="skillCount">0</strong></div>
           <div><span>Exp</span><strong id="expCount">0y</strong></div>
+          <div><span>Profile</span><strong id="complPct">0%</strong></div>
         </div>
 
         <div class="profile-lines">
           <p id="skillsText">Skills: Not added</p>
           <p id="expText">Experience: Not added</p>
+          <p id="eduText">Education: Not added</p>
+          <p id="bioText" style="font-style:italic">Bio: Not added</p>
         </div>
       </section>
 
@@ -139,7 +158,6 @@
       <section class="edit-card">
         <h3>✏️ Edit Profile</h3>
 
-        <!-- Profile completeness bar -->
         <div class="completeness-box">
           <div class="completeness-bar-wrap">
             <div class="completeness-bar-fill" id="complBar" style="width:0%"></div>
@@ -149,12 +167,64 @@
 
         <form id="profileForm">
 
-          <label>Skills *</label>
-          <input type="text" id="skills">
-          <div class="hint">Comma-separated — e.g. React, Python, SQL</div>
+          <div class="section-divider">Personal Information</div>
 
-          <label>Experience (Years) *</label>
-          <input type="number" id="exp" min="0">
+          <div class="form-row">
+            <div>
+              <label>Full Name <span class="field-req">*</span></label>
+              <input type="text" id="fullName" placeholder="e.g. Alex Johnson">
+            </div>
+            <div>
+              <label>Phone Number</label>
+              <input type="tel" id="phone" placeholder="e.g. +1 555 000 1234">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div>
+              <label>Location / City</label>
+              <input type="text" id="location" placeholder="e.g. New York, NY">
+            </div>
+            <div>
+              <label>LinkedIn URL</label>
+              <input type="url" id="linkedin" placeholder="https://linkedin.com/in/...">
+            </div>
+          </div>
+
+          <div class="section-divider">Career Details</div>
+
+          <label>Skills <span class="field-req">*</span></label>
+          <input type="text" id="skills" placeholder="React, Python, SQL, Communication...">
+          <div class="hint">Comma-separated. Add both technical and soft skills.</div>
+
+          <div class="form-row" style="margin-top:.9rem">
+            <div>
+              <label>Experience (Years) <span class="field-req">*</span></label>
+              <input type="number" id="exp" min="0" max="50" placeholder="0">
+            </div>
+            <div>
+              <label>Highest Education</label>
+              <select id="education">
+                <option value="">Select...</option>
+                <option value="High School">High School</option>
+                <option value="Associate Degree">Associate Degree</option>
+                <option value="Bachelor's Degree">Bachelor's Degree</option>
+                <option value="Master's Degree">Master's Degree</option>
+                <option value="PhD / Doctorate">PhD / Doctorate</option>
+                <option value="Bootcamp / Self-taught">Bootcamp / Self-taught</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <label>Current / Desired Job Title</label>
+          <input type="text" id="jobTitle" placeholder="e.g. Frontend Developer, Data Analyst">
+
+          <div class="section-divider">About You</div>
+
+          <label>Bio / Professional Summary</label>
+          <textarea id="bio" rows="4" placeholder="Write 2–3 sentences about your background, what you do, and what you're looking for..."></textarea>
+          <div class="hint">Recruiters read this first. Keep it punchy and specific.</div>
 
           <button type="submit" id="saveBtn" class="save-btn">Update Profile 🚀</button>
 
@@ -175,70 +245,129 @@ import { logoutUser, updateUserProfile, protectPage, getSession } from "./fireba
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
-function isComplete(user) {
-  return (user.skills || "").trim().length > 0 &&
-    user.exp !== undefined && user.exp !== null && `${user.exp}` !== "";
+const FIELDS = ["skills", "exp", "fullName", "phone", "location", "education", "bio", "jobTitle", "linkedin"];
+
+function calcCompleteness(user) {
+  const checks = [
+    (user.skills || "").trim().length > 0,
+    user.exp !== undefined && user.exp !== null && `${user.exp}` !== "",
+    (user.fullName || user.name || "").trim().length > 0,
+    (user.phone || "").trim().length > 0,
+    (user.location || "").trim().length > 0,
+    (user.education || "").trim().length > 0,
+    (user.bio || "").trim().length > 0,
+    (user.jobTitle || "").trim().length > 0,
+  ];
+  const filled = checks.filter(Boolean).length;
+  return Math.round((filled / checks.length) * 100);
 }
 
 function loadProfile() {
   const user = getSession();
   if (!user) { window.location.href = "jobseeker-login.html"; return; }
 
-  const name   = user.name  || "User";
-  const email  = user.email || "";
-  const skills = user.skills || "";
-  const exp    = user.exp !== undefined ? user.exp : "";
+  const name     = user.fullName || user.name || "";
+  const email    = user.email || "";
+  const skills   = user.skills || "";
+  const exp      = user.exp !== undefined ? user.exp : "";
+  const phone    = user.phone || "";
+  const location = user.location || "";
+  const linkedin = user.linkedin || "";
+  const education= user.education || "";
+  const jobTitle = user.jobTitle || "";
+  const bio      = user.bio || "";
 
-  document.getElementById("name").textContent       = name;
-  document.getElementById("email").textContent      = email;
-  document.getElementById("avatarText").textContent = name.charAt(0).toUpperCase();
-  document.getElementById("skillsText").textContent = "Skills: " + (skills || "Not added");
-  document.getElementById("expText").textContent    = "Experience: " + (exp !== "" ? exp + " year(s)" : "Not added");
+  // Preview panel
+  const displayName = name || "Your Name";
+  document.getElementById("previewName").textContent    = displayName;
+  document.getElementById("previewEmail").textContent   = email;
+  document.getElementById("avatarText").textContent     = displayName.charAt(0).toUpperCase();
+  document.getElementById("previewLoc").textContent     = location || "";
 
-  const skillArr = skills ? skills.split(",").filter(Boolean) : [];
+  const skillArr = skills ? skills.split(",").filter(s => s.trim()) : [];
   document.getElementById("skillCount").textContent = skillArr.length;
   document.getElementById("expCount").textContent   = (exp !== "" ? exp : 0) + "y";
+  document.getElementById("skillsText").textContent = "Skills: " + (skills || "Not added");
+  document.getElementById("expText").textContent    = "Experience: " + (exp !== "" ? exp + " year(s)" : "Not added");
+  document.getElementById("eduText").textContent    = "Education: " + (education || "Not added");
+  document.getElementById("bioText").textContent    = bio ? `"${bio.slice(0, 80)}${bio.length > 80 ? "…" : ""}"` : "Bio: Not added";
 
-  document.getElementById("skills").value = skills;
-  document.getElementById("exp").value    = exp;
+  // Completeness
+  const pct = calcCompleteness(user);
+  document.getElementById("complPct").textContent       = pct + "%";
+  document.getElementById("complBar").style.width       = pct + "%";
+  document.getElementById("complLabel").textContent     = `Profile ${pct}% complete`;
 
-  // Completeness bar
-  const fields = [skills.trim(), `${exp}`].filter(v => v !== "");
-  const pct    = Math.round((fields.length / 2) * 100);
-  document.getElementById("complBar").style.width      = pct + "%";
-  document.getElementById("complLabel").textContent    = `Profile ${pct}% complete`;
+  // Badge
+  const badge = document.getElementById("readinessBadge");
+  if (pct >= 80) { badge.textContent = "👑 Elite Profile"; }
+  else if (pct >= 50) { badge.textContent = "✅ Good Standing"; }
+  else { badge.textContent = "⚠️ Needs Work"; }
 
-  // Inline warning (no alert)
+  // Incomplete banner
   const banner = document.getElementById("incompleteBanner");
-  if (!isComplete(user)) {
+  if (pct < 60) {
+    banner.textContent = `⚠️ Your profile is ${pct}% complete. Recruiters prefer profiles with skills, bio, and education filled in.`;
     banner.classList.remove("hidden");
   } else {
     banner.classList.add("hidden");
   }
+
+  // Form fill
+  document.getElementById("fullName").value  = name;
+  document.getElementById("phone").value     = phone;
+  document.getElementById("location").value  = location;
+  document.getElementById("linkedin").value  = linkedin;
+  document.getElementById("skills").value    = skills;
+  document.getElementById("exp").value       = exp;
+  document.getElementById("education").value = education;
+  document.getElementById("jobTitle").value  = jobTitle;
+  document.getElementById("bio").value       = bio;
 }
 
 document.getElementById("profileForm").addEventListener("submit", async e => {
   e.preventDefault();
-  const btn    = document.getElementById("saveBtn");
+  const btn = document.getElementById("saveBtn");
+
   const skills = document.getElementById("skills").value.trim();
   const exp    = document.getElementById("exp").value.trim();
+  const fullName = document.getElementById("fullName").value.trim();
 
   if (!skills || !exp) {
-    document.getElementById("incompleteBanner").classList.remove("hidden");
-    document.getElementById("incompleteBanner").textContent = "⚠️ Skills and Experience are both required.";
+    const banner = document.getElementById("incompleteBanner");
+    banner.textContent = "⚠️ Skills and Experience are required fields.";
+    banner.classList.remove("hidden");
     return;
   }
 
   btn.disabled = true; btn.textContent = "Saving...";
 
   try {
-    await updateUserProfile({ skills, exp: Number(exp) });
-    document.getElementById("successMsg").style.display = "block";
-    setTimeout(() => { document.getElementById("successMsg").style.display = "none"; }, 3000);
+    const profileData = {
+      skills,
+      exp: Number(exp),
+      fullName: fullName || undefined,
+      phone: document.getElementById("phone").value.trim() || undefined,
+      location: document.getElementById("location").value.trim() || undefined,
+      linkedin: document.getElementById("linkedin").value.trim() || undefined,
+      education: document.getElementById("education").value || undefined,
+      jobTitle: document.getElementById("jobTitle").value.trim() || undefined,
+      bio: document.getElementById("bio").value.trim() || undefined,
+    };
+
+    Object.keys(profileData).forEach(k => profileData[k] === undefined && delete profileData[k]);
+
+    await updateUserProfile(profileData);
+
+    const msg = document.getElementById("successMsg");
+    msg.style.display = "block";
+    setTimeout(() => { msg.style.display = "none"; }, 3500);
     loadProfile();
   } catch(err) {
     console.error(err);
-    alert("Failed to update ❌");
+    const banner = document.getElementById("incompleteBanner");
+    banner.textContent = "❌ Failed to save — please try again.";
+    banner.classList.remove("hidden");
   }
 
   btn.disabled = false; btn.textContent = "Update Profile 🚀";

@@ -1,168 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Activity Logs | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .filter-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.1rem 1.4rem; margin-bottom:1rem;
+    display:flex; align-items:center; gap:.75rem; flex-wrap:wrap;
+  }
+  .filter-card label { font-size:13px; color:#a78bfa; font-weight:600; }
+  .filter-card input,
+  .filter-card select {
+    background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:8px; padding:.55rem .9rem; color:#f5f3ff; font-size:13px; font-family:inherit;
+  }
+  .filter-card input { min-width:180px; }
+  .filter-card input:focus, .filter-card select:focus { outline:none; border-color:#7c3aed; }
+  .filter-card select option { background:#1e124f; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .filter-btn {
+    padding:.55rem 1.1rem; border-radius:8px; font-size:13px; font-weight:700;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none; cursor:pointer;
+    transition:filter .2s;
+  }
+  .filter-btn:hover { filter:brightness(1.1); }
+
+  .clear-btn {
+    padding:.55rem 1.1rem; border-radius:8px; font-size:13px; font-weight:700;
+    background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; cursor:pointer;
+    transition:background .2s;
+  }
+  .clear-btn:hover { background:rgba(124,58,237,.22); }
+
+  .logs-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .logs-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; display:flex; justify-content:space-between; align-items:center; }
+  .log-count { font-size:13px; font-weight:600; color:#a78bfa; }
+
+  .log-table { width:100%; border-collapse:collapse; }
+  .log-table th {
+    text-align:left; font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase;
+    letter-spacing:.04em; padding:.6rem .75rem; border-bottom:1px solid rgba(124,58,237,.15);
+  }
+  .log-table td {
+    padding:.7rem .75rem; font-size:13.5px; color:#e2e8f0;
+    border-bottom:1px solid rgba(124,58,237,.08);
+    vertical-align:middle;
+  }
+  .log-table tr:last-child td { border-bottom:none; }
+  .log-table tr:hover td { background:rgba(124,58,237,.05); }
+
+  .status-pill {
+    display:inline-flex; align-items:center; gap:.3rem;
+    padding:.25rem .65rem; border-radius:999px; font-size:12px; font-weight:700;
+  }
+  .pill-success { background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.25); color:#4ade80; }
+  .pill-error   { background:rgba(248,113,113,.1); border:1px solid rgba(248,113,113,.25); color:#f87171; }
+  .pill-info    { background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3);  color:#c4b5fd; }
+
+  .action-tag {
+    display:inline-block; background:rgba(79,70,229,.12); border:1px solid rgba(79,70,229,.25);
+    color:#818cf8; padding:.2rem .6rem; border-radius:6px; font-size:12px; font-weight:600;
+  }
+
+  .empty-state {
+    text-align:center; padding:2.5rem 1rem; color:#6b7280; font-size:14px;
+  }
+  .empty-state .icon { font-size:36px; display:block; margin-bottom:.75rem; }
+
+  .time-cell { font-size:12px; color:#6b7280; white-space:nowrap; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
 <aside class="sidebar" id="sidebar">
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html" class="active">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn">Logout 👋</a>
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html" class="active">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
 <main class="main">
 
-<div class="topbar">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>📜 Activity Logs</h2>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>📜 Activity Logs</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Full audit trail of platform events</p>
+    </div>
+    <button class="clear-btn" onclick="loadLogs()">🔄 Refresh</button>
+  </div>
 
-<div class="card">
+  <!-- Filters -->
+  <div class="filter-card">
+    <label>User</label>
+    <input type="text" id="filterUser" placeholder="Email or name...">
+    <label>Action</label>
+    <select id="filterAction">
+      <option value="">All Actions</option>
+      <option>Login</option>
+      <option>Job Post</option>
+      <option>Delete</option>
+      <option>User Banned</option>
+      <option>Application</option>
+    </select>
+    <label>Status</label>
+    <select id="filterStatus">
+      <option value="">All</option>
+      <option>success</option>
+      <option>error</option>
+    </select>
+    <button class="filter-btn" onclick="applyFilters()">Apply</button>
+    <button class="clear-btn" onclick="clearFilters()">Clear</button>
+  </div>
 
-<h3>🧾 System Activity</h3>
-
-<table id="logsTable">
-<tr>
-<th>Time</th>
-<th>User</th>
-<th>Action</th>
-<th>Status</th>
-</tr>
-</table>
-
-</div>
-
-<div class="card">
-
-<h3>🔍 Filters</h3>
-
-<input type="text" id="filterUser" >
-<select id="filterAction">
-<option value="">All</option>
-<option>Login</option>
-<option>Job Post</option>
-<option>Delete</option>
-</select>
-
-<button class="btn" onclick="applyFilters()">Apply Filters</button>
-
-</div>
+  <!-- Table -->
+  <div class="logs-card">
+    <h3>
+      🧾 System Events
+      <span class="log-count" id="logCount">0 entries</span>
+    </h3>
+    <div id="logsContainer"><div class="empty-state"><span class="icon">⏳</span>Loading logs...</div></div>
+  </div>
 
 </main>
 </div>
 
 <script type="module">
-
 import { db } from "./firebase.js";
-import {
-  collection,
-  getDocs
-} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { collection, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 let allLogs = [];
 
-// 🔥 LOAD LOGS
-async function loadLogs(){
-  const table = document.getElementById("logsTable");
-
-  const snapshot = await getDocs(collection(db,"logs"));
-
-  allLogs = [];
-
-  snapshot.forEach(doc=>{
-    const data = doc.data();
-    allLogs.push(data);
-  });
-
-  renderLogs(allLogs);
+function formatTime(ts) {
+  if (!ts) return "—";
+  const d = new Date(Number(ts));
+  if (isNaN(d)) return ts;
+  return d.toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" }) +
+    " " + d.toLocaleTimeString("en-US", { hour:"2-digit", minute:"2-digit" });
 }
 
-// 🧠 RENDER
-function renderLogs(logs){
-  const table = document.getElementById("logsTable");
-
-  table.innerHTML = `
-  <tr>
-    <th>Time</th>
-    <th>User</th>
-    <th>Action</th>
-    <th>Status</th>
-  </tr>`;
-
-  logs.forEach(l=>{
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${l.time || "-"}</td>
-      <td>${l.user || "-"}</td>
-      <td>${l.action || "-"}</td>
-      <td>${l.status || "-"}</td>
-    `;
-
-    table.appendChild(row);
-  });
+function statusClass(s) {
+  if (!s) return "pill-info";
+  const sl = s.toLowerCase();
+  if (sl === "success") return "pill-success";
+  if (sl === "error" || sl === "failed") return "pill-error";
+  return "pill-info";
 }
 
-// 🔍 FILTER
-window.applyFilters = function(){
+function renderLogs(logs) {
+  const container = document.getElementById("logsContainer");
+  document.getElementById("logCount").textContent = `${logs.length} entr${logs.length === 1 ? "y" : "ies"}`;
 
-  const user = document.getElementById("filterUser").value.toLowerCase();
+  if (logs.length === 0) {
+    container.innerHTML = `<div class="empty-state"><span class="icon">📭</span>No logs match your filter.</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>User</th>
+          <th>Action</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${logs.map(l => `
+          <tr>
+            <td class="time-cell">${formatTime(l.createdAt || l.time)}</td>
+            <td>${l.user || l.email || "—"}</td>
+            <td><span class="action-tag">${l.action || "—"}</span></td>
+            <td>
+              ${l.status
+                ? `<span class="status-pill ${statusClass(l.status)}">${l.status}</span>`
+                : "—"}
+            </td>
+          </tr>`).join("")}
+      </tbody>
+    </table>`;
+}
+
+window.loadLogs = async function() {
+  const container = document.getElementById("logsContainer");
+  container.innerHTML = `<div class="empty-state"><span class="icon">⏳</span>Loading...</div>`;
+  try {
+    const snap = await getDocs(collection(db, "logs"));
+    allLogs = [];
+    snap.forEach(d => allLogs.push(d.data()));
+    allLogs.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    renderLogs(allLogs);
+  } catch(e) {
+    console.error(e);
+    container.innerHTML = `<div class="empty-state"><span class="icon">❌</span>Failed to load logs.</div>`;
+  }
+}
+
+window.applyFilters = function() {
+  const user   = document.getElementById("filterUser").value.toLowerCase();
   const action = document.getElementById("filterAction").value;
-
-  const filtered = allLogs.filter(log=>{
-    return (
-      (!user || (log.user && log.user.toLowerCase().includes(user))) &&
-      (!action || log.action?.includes(action))
-    );
+  const status = document.getElementById("filterStatus").value;
+  const filtered = allLogs.filter(l => {
+    const u = (l.user || l.email || "").toLowerCase();
+    return (!user   || u.includes(user)) &&
+           (!action || (l.action || "").includes(action)) &&
+           (!status || (l.status || "").toLowerCase() === status.toLowerCase());
   });
-
   renderLogs(filtered);
 }
 
-// LOAD ON START
-loadLogs();
+window.clearFilters = function() {
+  document.getElementById("filterUser").value   = "";
+  document.getElementById("filterAction").value = "";
+  document.getElementById("filterStatus").value = "";
+  renderLogs(allLogs);
+}
 
+loadLogs();
 </script>
 
 <script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("active");
-}
-
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

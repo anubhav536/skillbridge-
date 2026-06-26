@@ -1,173 +1,290 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>SkillBridge AI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moderation | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .mod-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(340px,1fr)); gap:1rem; margin-bottom:1rem; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .mod-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem;
+  }
+  .mod-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+  .report-row {
+    display:flex; align-items:flex-start; gap:.85rem; padding:.85rem;
+    background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.15);
+    border-radius:10px; margin-bottom:.6rem;
+  }
+  .report-row:last-child { margin-bottom:0; }
+  .report-icon { font-size:18px; flex-shrink:0; }
+  .report-info { flex:1; }
+  .report-target { font-size:14px; font-weight:700; color:#f5f3ff; }
+  .report-reason { font-size:13px; color:#a78bfa; margin-top:.2rem; }
+  .report-actions { display:flex; gap:.4rem; flex-wrap:wrap; margin-top:.6rem; }
+
+  .btn-ban {
+    padding:.38rem .85rem; border-radius:7px; font-size:12.5px; font-weight:700;
+    background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.4); color:#f87171;
+    cursor:pointer; transition:background .2s;
+  }
+  .btn-ban:hover { background:rgba(239,68,68,.28); }
+
+  .btn-ignore {
+    padding:.38rem .85rem; border-radius:7px; font-size:12.5px; font-weight:700;
+    background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+    cursor:pointer; transition:background .2s;
+  }
+  .btn-ignore:hover { background:rgba(124,58,237,.22); }
+
+  .btn-del {
+    padding:.38rem .85rem; border-radius:7px; font-size:12.5px; font-weight:700;
+    background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.4); color:#f87171;
+    cursor:pointer; transition:background .2s;
+  }
+  .btn-del:hover { background:rgba(239,68,68,.28); }
+
+  .empty-state { text-align:center; padding:1.5rem 1rem; color:#6b7280; font-size:14px; }
+  .empty-state .icon { font-size:28px; display:block; margin-bottom:.5rem; }
+
+  /* Manual ban card */
+  .manual-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.4rem; margin-bottom:1rem;
+  }
+  .manual-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+  .manual-row { display:flex; gap:.75rem; flex-wrap:wrap; align-items:flex-end; }
+  .manual-row label { font-size:13px; color:#a78bfa; font-weight:600; display:block; margin-bottom:.35rem; }
+  .manual-row input {
+    background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.7rem 1rem; color:#f5f3ff; font-size:14px; font-family:inherit;
+    min-width:220px; flex:1;
+  }
+  .manual-row input:focus { outline:none; border-color:#7c3aed; }
+  .btn-action {
+    padding:.7rem 1.25rem; border-radius:10px; font-size:13.5px; font-weight:700; cursor:pointer;
+    border:1px solid; transition:background .2s;
+  }
+  .btn-action.ban { background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.4); color:#f87171; }
+  .btn-action.ban:hover { background:rgba(239,68,68,.28); }
+  .btn-action.unban { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.3); color:#4ade80; }
+  .btn-action.unban:hover { background:rgba(74,222,128,.2); }
+
+  /* Toast */
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+    padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+  .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+  .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
 <aside class="sidebar" id="sidebar">
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html" class="active">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn safe">Logout 👋</a>
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html" class="active">🛠 Mod</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
 <main class="main">
 
-<div class="top">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h2>🛠 Moderation Panel</h2>
-</div>
+  <div class="page-top">
+    <div>
+      <h1>🛠 Moderation Panel</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Review reports and manage user access</p>
+    </div>
+    <button class="btn-ignore" onclick="loadModeration()" style="padding:.55rem 1.1rem">🔄 Refresh</button>
+  </div>
 
-<!-- USERS -->
-<div class="card">
-<h3>🚫 Reported Users</h3>
-<table id="userTable">
-<tr><th>User</th><th>Reason</th><th>Action</th></tr>
-</table>
-</div>
+  <!-- Manual ban/unban -->
+  <div class="manual-card">
+    <h3>🔒 Manual User Control</h3>
+    <div class="manual-row">
+      <div style="flex:1;min-width:200px">
+        <label>Email address</label>
+        <input type="email" id="emailInput" placeholder="user@example.com">
+      </div>
+      <button class="btn-action ban" onclick="manualBan()">🚫 Ban User</button>
+      <button class="btn-action unban" onclick="manualUnban()">✅ Unban User</button>
+    </div>
+  </div>
 
-<!-- JOBS -->
-<div class="card">
-<h3>📛 Reported Jobs</h3>
-<table id="jobTable">
-<tr><th>Company</th><th>Issue</th><th>Action</th></tr>
-</table>
-</div>
+  <div class="mod-grid">
 
-<!-- CONTROL -->
-<div class="card">
-<h3>🔒 User Control</h3>
-<input type="text" id="emailInput" >
-<br><br>
-<button class="btn ban" onclick="manualBan()">Ban User</button>
-<button class="btn safe" onclick="manualUnban()">Unban User</button>
-</div>
+    <div class="mod-card">
+      <h3>🚫 Reported Users</h3>
+      <div id="userReports"><div class="empty-state"><span class="icon">⏳</span>Loading...</div></div>
+    </div>
+
+    <div class="mod-card">
+      <h3>📛 Reported Jobs</h3>
+      <div id="jobReports"><div class="empty-state"><span class="icon">⏳</span>Loading...</div></div>
+    </div>
+
+  </div>
 
 </main>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
 import { db } from "./firebase.js";
 import {
-  collection,
-  getDocs,
-  updateDoc,
-  deleteDoc,
-  doc,
-  addDoc
+  collection, getDocs, updateDoc, deleteDoc, doc, addDoc
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-/* LOAD DATA */
-async function loadModeration(){
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
+}
 
-  const userTable = document.getElementById("userTable");
-  const jobTable = document.getElementById("jobTable");
+window.loadModeration = async function() {
+  const userEl = document.getElementById("userReports");
+  const jobEl  = document.getElementById("jobReports");
+  userEl.innerHTML = `<div class="empty-state"><span class="icon">⏳</span>Loading...</div>`;
+  jobEl.innerHTML  = `<div class="empty-state"><span class="icon">⏳</span>Loading...</div>`;
 
-  const snap = await getDocs(collection(db,"moderation"));
+  try {
+    const snap = await getDocs(collection(db, "moderation"));
+    const userReports = [], jobReports = [];
+    snap.forEach(d => {
+      const data = { id: d.id, ...d.data() };
+      if (data.type === "job") jobReports.push(data);
+      else userReports.push(data);
+    });
 
-  snap.forEach(d=>{
-    const data = d.data();
-
-    if(data.type === "user"){
-      userTable.innerHTML += `
-      <tr>
-        <td>${data.targetId}</td>
-        <td>${data.reason}</td>
-        <td>
-          <button class="btn ban" onclick="ban('${d.id}')">Ban</button>
-          <button class="btn ignore" onclick="ignore('${d.id}')">Ignore</button>
-        </td>
-      </tr>`;
+    if (userReports.length === 0) {
+      userEl.innerHTML = `<div class="empty-state"><span class="icon">✅</span>No reported users</div>`;
+    } else {
+      userEl.innerHTML = userReports.map(r => `
+        <div class="report-row">
+          <div class="report-icon">🧑</div>
+          <div class="report-info">
+            <div class="report-target">${r.targetId || "Unknown"}</div>
+            <div class="report-reason">${r.reason || "No reason provided"}</div>
+            <div class="report-actions">
+              <button class="btn-ban" onclick="banReport('${r.id}')">🚫 Ban</button>
+              <button class="btn-ignore" onclick="ignoreReport('${r.id}')">✓ Dismiss</button>
+            </div>
+          </div>
+        </div>`).join("");
     }
 
-    if(data.type === "job"){
-      jobTable.innerHTML += `
-      <tr>
-        <td>${data.targetId}</td>
-        <td>${data.reason}</td>
-        <td>
-          <button class="btn delete" onclick="removeJob('${d.id}')">Delete</button>
-          <button class="btn review" onclick="review('${d.id}')">Review</button>
-        </td>
-      </tr>`;
+    if (jobReports.length === 0) {
+      jobEl.innerHTML = `<div class="empty-state"><span class="icon">✅</span>No reported jobs</div>`;
+    } else {
+      jobEl.innerHTML = jobReports.map(r => `
+        <div class="report-row">
+          <div class="report-icon">💼</div>
+          <div class="report-info">
+            <div class="report-target">Job: ${r.targetId || "Unknown"}</div>
+            <div class="report-reason">${r.reason || "No reason provided"}</div>
+            <div class="report-actions">
+              <button class="btn-del" onclick="removeJob('${r.id}')">🗑 Remove</button>
+              <button class="btn-ignore" onclick="ignoreReport('${r.id}')">✓ Dismiss</button>
+            </div>
+          </div>
+        </div>`).join("");
     }
-  });
+
+  } catch(e) {
+    console.error(e);
+    showToast("Failed to load moderation data", "error");
+  }
 }
 
-/* ACTIONS */
-window.ban = async(id)=>{
-  await updateDoc(doc(db,"moderation",id),{action:"banned"});
-  await addDoc(collection(db,"logs"),{
-    action:"User Banned",
-    createdAt:Date.now()
-  });
-  location.reload();
+window.banReport = async function(id) {
+  try {
+    await updateDoc(doc(db, "moderation", id), { action: "banned" });
+    await addDoc(collection(db, "logs"), { action: "User Banned via Moderation", status: "success", createdAt: Date.now() });
+    showToast("🚫 User banned.", "success");
+    loadModeration();
+  } catch(e) { showToast("Failed to ban user", "error"); }
 }
 
-window.ignore = async(id)=>{
-  await deleteDoc(doc(db,"moderation",id));
-  location.reload();
+window.ignoreReport = async function(id) {
+  try {
+    await deleteDoc(doc(db, "moderation", id));
+    showToast("✓ Report dismissed.", "success");
+    loadModeration();
+  } catch(e) { showToast("Failed to dismiss", "error"); }
 }
 
-window.removeJob = async(id)=>{
-  await deleteDoc(doc(db,"moderation",id));
-  location.reload();
+window.removeJob = async function(id) {
+  try {
+    await deleteDoc(doc(db, "moderation", id));
+    showToast("🗑 Job report removed.", "success");
+    loadModeration();
+  } catch(e) { showToast("Failed to remove", "error"); }
 }
 
-window.review = async(id)=>{
-  alert("Marked for review");
+window.manualBan = async function() {
+  const email = document.getElementById("emailInput").value.trim();
+  if (!email) { showToast("⚠️ Enter an email address.", "warn"); return; }
+  try {
+    await addDoc(collection(db, "moderation"), {
+      type: "user", targetId: email, action: "banned", reason: "Manual admin ban", createdAt: Date.now()
+    });
+    await addDoc(collection(db, "logs"), { action: "Manual Ban", user: email, status: "success", createdAt: Date.now() });
+    showToast(`🚫 ${email} has been banned.`, "success");
+    document.getElementById("emailInput").value = "";
+    loadModeration();
+  } catch(e) { showToast("Failed to ban user", "error"); }
 }
 
-/* MANUAL */
-window.manualBan = async()=>{
-  const email = document.getElementById("emailInput").value;
-
-  await addDoc(collection(db,"moderation"),{
-    type:"user",
-    targetId:email,
-    action:"banned",
-    createdAt:Date.now()
-  });
-
-  alert("User banned");
-}
-
-window.manualUnban = async()=>{
-  alert("Unban logic add later");
-}
-
-/* UI */
-window.toggleMenu = function(){
-  document.getElementById("sidebar").classList.toggle("active");
+window.manualUnban = async function() {
+  const email = document.getElementById("emailInput").value.trim();
+  if (!email) { showToast("⚠️ Enter an email address.", "warn"); return; }
+  showToast(`✅ Unban for ${email} noted. Remove their ban record from moderation list manually if present.`, "success");
 }
 
 loadModeration();
 </script>
 
+<script>
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
+  });
+});
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

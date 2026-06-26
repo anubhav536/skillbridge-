@@ -1,23 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apply Job | SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css?v=50">
+  <title>Apply for Job | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="universal.css">
+  <style>
+    .apply-header { display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+    .apply-header h1 { margin:0; }
+
+    .job-meta-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+      padding:1.1rem 1.4rem; margin-bottom:1.1rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+    }
+    .job-meta-card .job-tag {
+      display:inline-flex; align-items:center; gap:.4rem; background:rgba(124,58,237,.14);
+      border:1px solid rgba(124,58,237,.3); border-radius:999px; padding:.35rem .9rem;
+      font-size:13px; font-weight:600; color:#c4b5fd;
+    }
+    .job-meta-card h2 { font-size:18px; font-weight:800; color:#f5f3ff; margin:0; flex:1; }
+    .job-meta-card p  { font-size:13px; color:#a78bfa; margin:0; }
+
+    .apply-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+      padding:1.5rem;
+    }
+    .apply-card h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+    .apply-form label { display:block; font-size:13px; color:#a78bfa; font-weight:600; margin-bottom:.3rem; margin-top:.9rem; }
+    .apply-form label:first-of-type { margin-top:0; }
+    .apply-form input, .apply-form textarea {
+      width:100%; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+      border-radius:10px; padding:.75rem 1rem; color:#f5f3ff; font-size:14px; box-sizing:border-box;
+      font-family:inherit; resize:vertical;
+    }
+    .apply-form input:focus, .apply-form textarea:focus {
+      outline:none; border-color:#7c3aed; box-shadow:0 0 0 3px rgba(124,58,237,.2);
+    }
+    .hint { font-size:12px; color:#6b7280; margin-top:.25rem; }
+
+    .ats-row {
+      display:flex; align-items:center; justify-content:space-between;
+      background:rgba(124,58,237,.08); border:1px solid rgba(124,58,237,.2);
+      border-radius:12px; padding:.9rem 1.1rem; margin-top:1rem;
+    }
+    .ats-row span { font-size:14px; color:#a78bfa; font-weight:600; }
+    .ats-row strong { font-size:22px; font-weight:800; color:#f5f3ff; }
+    .ats-bar-wrap { flex:1; height:8px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; margin:0 1rem; }
+    .ats-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#4ade80); transition:width .5s ease; }
+
+    .match-score-box {
+      background:rgba(74,222,128,.06); border:1px solid rgba(74,222,128,.2);
+      border-radius:12px; padding:.8rem 1.1rem; margin-top:.75rem;
+      font-size:14px; color:#4ade80; display:none;
+    }
+
+    .submit-btn {
+      margin-top:1.25rem; width:100%; padding:.9rem; border-radius:12px;
+      font-size:15px; font-weight:700; background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      color:#fff; border:none; box-shadow:0 4px 16px rgba(124,58,237,.4); cursor:pointer;
+      transition:filter .2s, transform .2s;
+    }
+    .submit-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+    .submit-btn:disabled { opacity:.6; cursor:not-allowed; }
+
+    /* Toast */
+    .toast {
+      position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+      padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+      box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+      transition:opacity .3s, transform .3s; pointer-events:none; max-width:340px;
+    }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+    .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+    .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+
+    .inline-error {
+      background:rgba(248,113,113,.08); border:1px solid rgba(248,113,113,.25);
+      border-radius:10px; padding:.75rem 1rem; font-size:14px; color:#f87171;
+      margin-top:.75rem; display:none;
+    }
+  </style>
 </head>
 
 <body class="apply-page">
-
 <div class="dashboard">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
-
     <h2>👨‍🎓 Job Seeker Panel</h2>
-
     <nav>
       <a href="js-dashboard.html">Dashboard</a>
       <a href="js-jobs.html">Jobs</a>
@@ -26,308 +98,255 @@
       <a href="js-analytics.html">Analytics</a>
       <a href="js-profile.html">Profile</a>
     </nav>
-
     <button id="logoutBtn">Logout 👋</button>
-
   </aside>
 
-
-  <!-- MAIN -->
   <main class="main">
 
-    <!-- HEADER -->
     <div class="apply-header">
-
       <div>
         <h1>📥 Apply for Job</h1>
-        <p class="subtext">
-          One clean shot. One strong application 🎯
-        </p>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">One strong application beats ten weak ones.</p>
       </div>
-
-      <div class="job-pill">
-        Job ID:
-        <span id="jobId">Loading...</span>
-      </div>
-
     </div>
 
+    <!-- Job details banner -->
+    <div class="job-meta-card" id="jobMetaCard">
+      <div>
+        <h2 id="jobTitleDisplay">Loading job...</h2>
+        <p id="jobCompanyDisplay" style="color:#a78bfa;margin-top:.2rem"></p>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+        <span class="job-tag" id="jobTypeTag"></span>
+        <span class="job-tag" id="matchScoreTag" style="display:none"></span>
+      </div>
+    </div>
 
-    <!-- FORM CARD -->
     <section class="apply-card">
+      <h3>📋 Your Application</h3>
+
+      <div id="inlineError" class="inline-error"></div>
 
       <form id="applyForm" class="apply-form">
 
-        <!-- Skills -->
         <label>Your Skills</label>
-        <input
-          type="text"
-          id="skills"
-          
-        >
+        <input type="text" id="skills" placeholder="React, Python, SQL...">
+        <div class="hint">Auto-filled from your profile. Edit to tailor for this role.</div>
 
-        <!-- Experience -->
         <label>Experience (Years)</label>
-        <input
-          type="number"
-          id="experience"
-          min="0"
-          
-        >
+        <input type="number" id="experience" min="0" max="50" placeholder="0">
 
-        <!-- Resume -->
-        <label>Resume Summary</label>
-        <textarea
-          id="resumeText"
-          rows="7"
-          
-        ></textarea>
+        <label>Resume / Cover Letter Summary</label>
+        <textarea id="resumeText" rows="7" placeholder="Describe your relevant experience, key achievements, and why you're the right fit for this role..."></textarea>
+        <div class="hint">Aim for 3–5 sentences. Specific beats generic.</div>
 
-        <!-- ATS -->
-        <div class="score-box">
-          <span>📊 ATS Readiness Score</span>
+        <div class="ats-row">
+          <span>📊 ATS Score</span>
+          <div class="ats-bar-wrap"><div class="ats-bar-fill" id="atsBarFill" style="width:0%"></div></div>
           <strong id="atsScore">0%</strong>
         </div>
 
-        <!-- BUTTON -->
-        <button type="submit" id="applyBtn">
-          Submit Application 🚀
-        </button>
+        <div class="match-score-box" id="matchScoreBox"></div>
+
+        <button type="submit" id="applyBtn" class="submit-btn">Submit Application 🚀</button>
 
       </form>
-
     </section>
 
   </main>
-
 </div>
 
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script type="module">
+import { logoutUser, applyJob, getSession } from "./firebase.js";
+import { db } from "./firebase.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { calcMatchScore } from "./ai-match.js";
 
-import {
-  logoutUser,
-  applyJob,
-  getSession
-} from "./firebase.js";
-
-
-/* =========================
-   PAGE PROTECTION
-========================= */
-
+/* ── Auth ── */
 const user = getSession();
+if (!user) { window.location.href = "jobseeker-login.html"; }
+if (user && user.role !== "jobseeker") { window.location.href = "index.html"; }
 
-if(!user){
-  window.location.href =
-    "jobseeker-login.html";
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+/* ── Toast ── */
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.classList.remove("show"); }, 3500);
 }
 
-if(user && user.role !== "jobseeker"){
-  window.location.href =
-    "index.html";
+function showError(msg) {
+  const el = document.getElementById("inlineError");
+  el.textContent = msg;
+  el.style.display = "block";
+  setTimeout(() => { el.style.display = "none"; }, 4000);
 }
 
+/* ── Job ID ── */
+const params = new URLSearchParams(window.location.search);
+const currentJobId = params.get("id");
 
-/* =========================
-   LOGOUT
-========================= */
+if (!currentJobId) {
+  showToast("Invalid job link ❌", "error");
+  setTimeout(() => { window.location.href = "js-jobs.html"; }, 1500);
+}
 
-document.getElementById("logoutBtn")
-.addEventListener("click", logoutUser);
+/* ── Load Job Details ── */
+let currentJobData = null;
 
+async function loadJobDetails() {
+  if (!currentJobId) return;
+  try {
+    const snap = await getDoc(doc(db, "jobs", currentJobId));
+    if (snap.exists()) {
+      currentJobData = snap.data();
+      const title   = currentJobData.title   || "Job Application";
+      const company = currentJobData.company  || currentJobData.recruiter || "";
+      const type    = currentJobData.type     || currentJobData.jobType || "";
 
-/* =========================
-   GET JOB ID
-========================= */
+      document.getElementById("jobTitleDisplay").textContent  = title;
+      document.getElementById("jobCompanyDisplay").textContent = company;
 
-let currentJobId = "";
+      const typeTag = document.getElementById("jobTypeTag");
+      if (type) { typeTag.textContent = "💼 " + type; typeTag.style.display = "inline-flex"; }
 
-function loadJobId(){
+      // Match score
+      if (user && user.skills) {
+        const score = calcMatchScore(user.skills, currentJobData.skills || "");
+        const matchTag = document.getElementById("matchScoreTag");
+        matchTag.textContent = `🎯 ${score}% match`;
+        matchTag.style.display = "inline-flex";
+        matchTag.style.background = score >= 70
+          ? "rgba(74,222,128,.12)" : score >= 45
+          ? "rgba(124,58,237,.14)" : "rgba(248,113,113,.08)";
+        matchTag.style.borderColor = score >= 70
+          ? "rgba(74,222,128,.3)" : score >= 45
+          ? "rgba(124,58,237,.3)" : "rgba(248,113,113,.25)";
+        matchTag.style.color = score >= 70 ? "#4ade80" : score >= 45 ? "#c4b5fd" : "#f87171";
 
-  const params =
-    new URLSearchParams(window.location.search);
-
-  currentJobId =
-    params.get("id");
-
-  if(!currentJobId){
-    alert("Invalid Job Link ❌");
-    window.location.href =
-      "js-jobs.html";
-    return;
+        const matchBox = document.getElementById("matchScoreBox");
+        if (score >= 70) {
+          matchBox.textContent = `🔥 Strong match! Your skills align well with this role. Highlight your most relevant experience in the summary.`;
+          matchBox.style.display = "block";
+        } else if (score >= 40) {
+          matchBox.textContent = `💡 Moderate match. Emphasise transferable skills and mention willingness to learn any gaps.`;
+          matchBox.style.display = "block";
+          matchBox.style.background = "rgba(124,58,237,.06)";
+          matchBox.style.borderColor = "rgba(124,58,237,.2)";
+          matchBox.style.color = "#c4b5fd";
+        }
+      }
+    } else {
+      document.getElementById("jobTitleDisplay").textContent = "Job #" + currentJobId;
+    }
+  } catch(e) {
+    console.error(e);
+    document.getElementById("jobTitleDisplay").textContent = "Job Application";
   }
-
-  document.getElementById("jobId")
-  .innerText = currentJobId;
-
 }
 
-loadJobId();
+/* ── Auto-fill from profile ── */
+function prefillFromProfile() {
+  if (!user) return;
+  if (user.skills) {
+    document.getElementById("skills").value = user.skills;
+  }
+  if (user.exp !== undefined && user.exp !== null) {
+    document.getElementById("experience").value = user.exp;
+  }
+  calculateATS();
+}
 
-
-/* =========================
-   ATS SCORE
-========================= */
-
-function calculateATS(){
-
-  const skills =
-    document.getElementById("skills")
-    .value.trim();
-
-  const exp =
-    Number(
-      document.getElementById("experience")
-      .value || 0
-    );
-
-  const resume =
-    document.getElementById("resumeText")
-    .value.trim();
+/* ── ATS Score ── */
+function calculateATS() {
+  const skills = document.getElementById("skills").value.trim();
+  const exp    = Number(document.getElementById("experience").value || 0);
+  const resume = document.getElementById("resumeText").value.trim();
 
   let score = 0;
+  if (skills.length >= 5) score += 35;
+  if (exp >= 1)           score += 25;
+  if (resume.length >= 80) score += 30;
+  if (resume.length >= 200) score += 10;
+  score = Math.min(score, 100);
 
-  if(skills.length >= 5) score += 35;
-  if(exp >= 1) score += 25;
-  if(resume.length >= 80) score += 40;
-
-  score = Math.min(score,100);
-
-  document.getElementById("atsScore")
-  .innerText = score + "%";
-
+  document.getElementById("atsScore").textContent        = score + "%";
+  document.getElementById("atsBarFill").style.width      = score + "%";
+  document.getElementById("atsBarFill").style.background = score >= 70
+    ? "linear-gradient(90deg,#16a34a,#4ade80)"
+    : score >= 40
+    ? "linear-gradient(90deg,#7c3aed,#a78bfa)"
+    : "linear-gradient(90deg,#b45309,#fcd34d)";
 }
 
-document.getElementById("skills")
-.addEventListener("input", calculateATS);
+document.getElementById("skills").addEventListener("input", calculateATS);
+document.getElementById("experience").addEventListener("input", calculateATS);
+document.getElementById("resumeText").addEventListener("input", calculateATS);
 
-document.getElementById("experience")
-.addEventListener("input", calculateATS);
-
-document.getElementById("resumeText")
-.addEventListener("input", calculateATS);
-
-
-/* =========================
-   APPLY JOB
-========================= */
-
-document.getElementById("applyForm")
-.addEventListener("submit", async (e)=>{
-
+/* ── Submit ── */
+document.getElementById("applyForm").addEventListener("submit", async e => {
   e.preventDefault();
-
   const btn = document.getElementById("applyBtn");
 
-  btn.disabled = true;
-  btn.innerText = "Submitting...";
+  const skillsInput = document.getElementById("skills").value.trim();
+  const experience  = document.getElementById("experience").value.trim();
+  const resume      = document.getElementById("resumeText").value.trim();
 
-  const user = getSession();
+  if (!skillsInput) { showError("⚠️ Please enter your skills."); return; }
+  if (!resume)      { showError("⚠️ Please write a resume summary — even 2–3 sentences help."); return; }
 
-  if(!user){
-    window.location.href = "jobseeker-login.html";
+  // Duplicate check
+  const scopedKey  = `appliedJobs:${(user.email || "").toLowerCase()}`;
+  const appliedJobs = JSON.parse(localStorage.getItem(scopedKey)) || [];
+  if (appliedJobs.includes(currentJobId)) {
+    showError("⚠️ You've already applied to this job.");
     return;
   }
 
-  const skillsInput =
-    document.getElementById("skills").value.trim();
+  btn.disabled = true; btn.textContent = "Submitting...";
 
-  const experience =
-    document.getElementById("experience").value.trim();
+  try {
+    const skills = skillsInput.split(",").map(s => s.trim()).filter(Boolean);
+    const jobTitle = currentJobData?.title || "Applied Job";
 
-  const resume =
-    document.getElementById("resumeText").value.trim();
-
-  if(!skillsInput || !resume){
-
-    alert("Fill required fields ⚠️");
-
-    btn.disabled = false;
-    btn.innerText = "Submit Application 🚀";
-    return;
-  }
-
-  const skills = skillsInput
-    .split(",")
-    .map(s => s.trim())
-    .filter(Boolean);
-
-
-  // 🔥 DUPLICATE CHECK
-  const scopedKey =
-    `appliedJobs:${(user.email || "").toLowerCase()}`;
-
-  let appliedJobs =
-    JSON.parse(localStorage.getItem(scopedKey)) || [];
-
-  if(appliedJobs.includes(currentJobId)){
-
-    alert("Already applied ⚠️");
-
-    btn.disabled = false;
-    btn.innerText = "Submit Application 🚀";
-    return;
-  }
-
-
-  try{
-
-    // 🚀 CLEAN + CONSISTENT DATA
     const applicationData = {
-
-      // 👤 USER
-      name: user.name || "N/A",
-      email: user.email,
-
-      // 💼 JOB
-      jobId: currentJobId,
-      jobTitle: "Applied Job",
-
-      // 🧠 PROFILE
-      skills: skills,
+      name:       user.name || user.fullName || "N/A",
+      email:      user.email,
+      jobId:      currentJobId,
+      jobTitle,
+      skills,
       experience: Number(experience) || 0,
-      resume: resume,
-
-      // 📊 EXTRA (PRO LEVEL)
-      atsScore: document.getElementById("atsScore").innerText,
-
-      // 🟡 STATUS (IMPORTANT)
-      status: "pending",
-
-      // ⏱️ META
-      createdAt: Date.now()
-
+      resume,
+      atsScore:   document.getElementById("atsScore").textContent,
+      status:     "pending",
+      createdAt:  Date.now(),
     };
 
     await applyJob(applicationData);
 
-
-    // 💾 LOCAL SAVE
     appliedJobs.push(currentJobId);
+    localStorage.setItem(scopedKey, JSON.stringify(appliedJobs));
 
-    localStorage.setItem(
-      scopedKey,
-      JSON.stringify(appliedJobs)
-    );
+    showToast("Application submitted successfully! ✅", "success");
+    setTimeout(() => { window.location.href = "js-applications.html"; }, 1800);
 
-    alert("Application Submitted ✅");
-
-    window.location.href = "js-applications.html";
-
-  }catch(err){
-
+  } catch(err) {
     console.error(err);
-
-    alert("Submission Failed ❌");
-
-    btn.disabled = false;
-    btn.innerText = "Submit Application 🚀";
+    showError("❌ Submission failed. Please try again.");
+    btn.disabled = false; btn.textContent = "Submit Application 🚀";
   }
-
 });
-</script>
 
+/* ── Init ── */
+loadJobDetails();
+prefillFromProfile();
+</script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>
