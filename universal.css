@@ -955,3 +955,392 @@ a:hover {
     transition-duration: .01ms !important;
   }
 }
+
+/* ============================================================
+   ⚡ PREMIUM INTERACTION SYSTEM v3 — World Class
+   Ripple · Tilt · Magnetic · Glow · Stagger · Cursor
+   ============================================================ */
+
+/* ── Custom cursor ── */
+*, *::before, *::after { cursor: none !important; }
+#sb-cursor {
+  position: fixed;
+  width: 10px; height: 10px;
+  background: #7c3aed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  transition: width .18s ease, height .18s ease, background .18s ease, opacity .18s ease;
+  box-shadow: 0 0 16px rgba(124,58,237,.9), 0 0 32px rgba(124,58,237,.4);
+  mix-blend-mode: screen;
+}
+#sb-cursor-ring {
+  position: fixed;
+  width: 36px; height: 36px;
+  border: 1.5px solid rgba(167,139,250,.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99998;
+  transform: translate(-50%, -50%);
+  transition: width .35s cubic-bezier(.22,.68,0,1.2),
+              height .35s cubic-bezier(.22,.68,0,1.2),
+              border-color .25s ease,
+              transform .08s linear;
+}
+#sb-cursor.cursor-hover {
+  width: 6px; height: 6px;
+  background: #c4b5fd;
+}
+#sb-cursor-ring.cursor-hover {
+  width: 52px; height: 52px;
+  border-color: rgba(167,139,250,.8);
+}
+#sb-cursor.cursor-click {
+  width: 14px; height: 14px;
+  background: #a78bfa;
+}
+#sb-cursor-ring.cursor-click {
+  width: 24px; height: 24px;
+  border-color: #c4b5fd;
+}
+@media (hover: none), (pointer: coarse) {
+  *, *::before, *::after { cursor: auto !important; }
+  #sb-cursor, #sb-cursor-ring { display: none !important; }
+}
+
+/* ── Ripple effect ── */
+.sb-ripple-wrap { position: relative; overflow: hidden; }
+.sb-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: sbRippleOut .65s cubic-bezier(.22,.68,0,1) forwards;
+  pointer-events: none;
+  background: rgba(255,255,255,.2);
+}
+@keyframes sbRippleOut {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ── 3D Tilt card ── */
+.tilt-active {
+  transform-style: preserve-3d;
+  transition: transform .1s ease, box-shadow .1s ease;
+  will-change: transform;
+}
+.tilt-active .tilt-inner {
+  transform: translateZ(12px);
+}
+
+/* ── Gradient border on hover ── */
+.card, .dash-card, .stat-box, .section-card,
+.applicant-card, .pick-card, .score-card,
+.cg-section, .cg-job-card, .phase-item, .file-card {
+  position: relative;
+}
+.card::before, .dash-card::before, .stat-box::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(124,58,237,0), rgba(167,139,250,0), rgba(79,70,229,0));
+  z-index: -1;
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+.card:hover::before, .dash-card:hover::before, .stat-box:hover::before {
+  background: linear-gradient(135deg, rgba(124,58,237,.45), rgba(167,139,250,.2), rgba(79,70,229,.35));
+  opacity: 1;
+}
+
+/* ── Glow border on card hover (simpler solid approach) ── */
+.card:hover, .dash-card:hover, .section-card:hover,
+.applicant-card:hover, .pick-card:hover, .score-card:hover {
+  box-shadow:
+    0 0 0 1px rgba(167,139,250,.35),
+    0 20px 60px rgba(2,0,20,.6),
+    0 0 40px rgba(124,58,237,.22),
+    0 0 80px rgba(124,58,237,.1) !important;
+  transform: translateY(-4px) !important;
+}
+
+/* ── Sidebar nav — premium active indicator ── */
+.sidebar nav {
+  position: relative;
+}
+.sidebar nav a {
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  transition: all .25s cubic-bezier(.22,.68,0,1.2) !important;
+}
+.sidebar nav a::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #c4b5fd, #7c3aed);
+  border-radius: 0 3px 3px 0;
+  transform: scaleY(0);
+  transition: transform .22s cubic-bezier(.22,.68,0,1.3);
+  transform-origin: center;
+}
+.sidebar nav a.active::after,
+.sidebar nav a:hover::after {
+  transform: scaleY(1);
+}
+.sidebar nav a:hover {
+  transform: translateX(6px) !important;
+  background: rgba(124,58,237,.18) !important;
+}
+.sidebar nav a.active {
+  transform: translateX(4px) !important;
+}
+
+/* ── Sidebar nav — hover shimmer sweep ── */
+.sidebar nav a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(167,139,250,.1), transparent);
+  transform: translateX(-100%);
+  transition: transform .5s ease;
+}
+.sidebar nav a:hover::before {
+  transform: translateX(100%);
+}
+
+/* ── Button — press down + ripple-ready ── */
+button:not(:disabled),
+.btn:not(:disabled),
+.primary-btn:not(:disabled),
+input[type="submit"] {
+  position: relative;
+  overflow: hidden;
+  transform-origin: center;
+}
+button:not(:disabled):active,
+.btn:not(:disabled):active {
+  transform: scale(.96) translateY(0px) !important;
+  box-shadow: 0 4px 14px rgba(124,58,237,.3) !important;
+  filter: brightness(.95) !important;
+}
+
+/* ── Button — glow shimmer on hover ── */
+button:not(:disabled):not(.sb-toast-close)::after,
+.btn:not(:disabled)::after,
+.analyze-btn::after,
+.ci-btn::after {
+  content: '';
+  position: absolute;
+  top: -50%; left: -60%;
+  width: 50%; height: 200%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+  transform: skewX(-20deg) translateX(0);
+  transition: transform .55s ease;
+  pointer-events: none;
+}
+button:not(:disabled):not(.sb-toast-close):hover::after,
+.btn:not(:disabled):hover::after,
+.analyze-btn:hover::after,
+.ci-btn:hover::after {
+  transform: skewX(-20deg) translateX(400%);
+}
+
+/* ── Magnetic hover class (applied via JS) ── */
+.magnetic { transition: transform .25s cubic-bezier(.22,.68,0,1.2) !important; }
+
+/* ── Stagger mount classes (applied via IntersectionObserver) ── */
+.sb-stagger {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .5s ease, transform .5s cubic-bezier(.22,.68,0,1.2);
+}
+.sb-stagger.sb-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Counter number — pop + glow ── */
+@keyframes numGlowPop {
+  0%   { opacity:0; transform:scale(.5); filter:blur(4px); }
+  60%  { transform:scale(1.12); filter:blur(0); }
+  100% { opacity:1; transform:scale(1); }
+}
+.num-pop { animation: numGlowPop .6s cubic-bezier(.22,.68,0,1.3) forwards; }
+
+/* ── Stat card — gradient top border (color-coded) on hover lift ── */
+.stat-card, .mini-card, .dash-card {
+  transition: transform .3s cubic-bezier(.22,.68,0,1.2), box-shadow .3s ease !important;
+}
+
+/* ── Progress bar enhanced shimmer ── */
+@keyframes barShimmerPremium {
+  0%   { left: -70%; opacity: .7; }
+  100% { left: 130%; opacity: 0; }
+}
+.progress-bar, .resume-prog-fill, .pick-bar-fill,
+.match-bar, .score-mini-fill, .health-bar-fill,
+.bar-fill, .match-bar-fill, .cg-match-bar {
+  position: relative;
+  overflow: hidden;
+}
+.progress-bar::after, .resume-prog-fill::after,
+.pick-bar-fill::after, .match-bar::after,
+.health-bar-fill::after, .bar-fill::after,
+.cg-match-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -70%; height: 100%; width: 55%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+  animation: barShimmerPremium 2.2s ease-in-out infinite;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* ── Input — left border reveal on focus ── */
+input, select, textarea {
+  border-left: 3px solid rgba(124,58,237,.35) !important;
+  transition: border-color .25s ease, box-shadow .25s ease, background .25s ease,
+              border-left-color .25s ease !important;
+}
+input:focus, select:focus, textarea:focus {
+  border-left-color: #c4b5fd !important;
+  box-shadow: 0 0 0 3px rgba(124,58,237,.18), -2px 0 20px rgba(124,58,237,.15) !important;
+}
+
+/* ── Stats numbers — animated gradient text ── */
+@keyframes gradientShift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.stat-card p, .dash-card p, .mini-card p,
+.ring-num, .stat-num {
+  background: linear-gradient(135deg, #f5f3ff, #c4b5fd, #a78bfa, #7c3aed, #c4b5fd, #f5f3ff);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 5s ease infinite;
+}
+
+/* ── Section entrance — slide up with blur ── */
+@keyframes sectionEnter {
+  from { opacity: 0; transform: translateY(24px); filter: blur(3px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+.section-card, .card, .dash-card {
+  animation: sectionEnter .45s cubic-bezier(.22,.68,0,1.1) both;
+}
+
+/* ── Floating action elements ── */
+@keyframes floatBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
+}
+.badge, .live-badge {
+  animation: floatBob 3.5s ease-in-out infinite !important;
+}
+
+/* ── Quick action buttons — scale pop on hover ── */
+.quick-btn:hover, .q-btn:hover {
+  transform: translateY(-4px) scale(1.04) !important;
+  box-shadow: 0 10px 30px rgba(124,58,237,.3) !important;
+}
+
+/* ── Applicant / job cards — slide right indicator on hover ── */
+.applicant-card, .pick-card, .cg-job-card, .rec-item, .activity-item {
+  border-left: 3px solid rgba(124,58,237,.15);
+  transition: border-left-color .25s ease, box-shadow .25s ease, transform .25s ease !important;
+}
+.applicant-card:hover, .pick-card:hover, .cg-job-card:hover {
+  border-left-color: #7c3aed !important;
+}
+
+/* ── Score rings — glow pulse ── */
+@keyframes ringGlow {
+  0%,100% { filter: drop-shadow(0 0 4px rgba(124,58,237,.3)); }
+  50%      { filter: drop-shadow(0 0 14px rgba(167,139,250,.7)); }
+}
+.ring-svg { animation: ringGlow 3s ease-in-out infinite; }
+
+/* ── Toast — countdown progress bar ── */
+.sb-toast-progress {
+  position: absolute;
+  bottom: 0; left: 0;
+  height: 3px;
+  border-radius: 0 0 14px 14px;
+  background: rgba(167,139,250,.7);
+  animation: toastProgress linear forwards;
+}
+@keyframes toastProgress {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+/* ── Table row hover — animated ── */
+tr { transition: background .15s ease, transform .15s ease; }
+tr:hover td { transform: translateX(2px); }
+
+/* ── Glow hover on all links inside .main ── */
+.main a:not(button):not(.btn):not(.q-btn):not(.quick-btn):hover {
+  text-shadow: 0 0 16px rgba(167,139,250,.6);
+}
+
+/* ── Sidebar logout button — hover pulse ── */
+.sidebar button#logoutBtn {
+  transition: all .3s cubic-bezier(.22,.68,0,1.2) !important;
+}
+.sidebar button#logoutBtn:hover {
+  transform: scale(1.03) !important;
+  box-shadow: 0 6px 22px rgba(220,38,38,.45) !important;
+}
+
+/* ── Page loading — shimmer overlay ── */
+#sb-page-loader {
+  position: fixed; inset: 0;
+  background: #06041a;
+  z-index: 100000;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .4s ease;
+}
+#sb-page-loader.loaded {
+  opacity: 0;
+  pointer-events: none;
+}
+.sb-loader-ring {
+  width: 48px; height: 48px;
+  border: 3px solid rgba(124,58,237,.2);
+  border-top-color: #7c3aed;
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Card inner glow on focus-within ── */
+.section-card:focus-within,
+.card:focus-within {
+  box-shadow: 0 0 0 1.5px rgba(167,139,250,.4),
+              0 20px 60px rgba(2,0,20,.6),
+              0 0 40px rgba(124,58,237,.2) !important;
+}
+
+/* ── Hero CTA — pulsing shadow ── */
+@keyframes ctaPulse {
+  0%,100% { box-shadow: 0 6px 22px rgba(124,58,237,.45); }
+  50%      { box-shadow: 0 10px 40px rgba(124,58,237,.7), 0 0 60px rgba(124,58,237,.3); }
+}
+.analyze-btn, .ci-btn, .hero-btns .primary-btn {
+  animation: ctaPulse 2.8s ease-in-out infinite !important;
+}
+.analyze-btn:hover, .ci-btn:hover {
+  animation: none !important;
+}
+
+/* ── Selection color ── */
+::selection {
+  background: rgba(124,58,237,.4);
+  color: #f5f3ff;
+}
+
