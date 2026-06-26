@@ -1,147 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SkillBridge AI</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .auth-page { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+  .auth-card {
+    width: min(400px, 100%);
+    background: var(--glass); border: 1px solid var(--bd); border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow), 0 0 60px rgba(124,58,237,.12);
+    backdrop-filter: blur(20px);
+    animation: fadeUp .4s cubic-bezier(.4,0,.2,1) both;
+  }
+  .auth-brand { text-align: center; margin-bottom: 1.75rem; }
+  .auth-brand-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: .75rem;
+    box-shadow: 0 6px 20px rgba(220,38,38,.35);
+  }
+  .auth-brand h2 { font-size: 20px; margin-bottom: .2rem; }
+  .auth-brand p  { font-size: 13px; color: var(--t4); margin: 0; }
+  .admin-warn {
+    display: flex; align-items: center; gap: .6rem;
+    background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.25);
+    border-radius: 10px; padding: .7rem .9rem; margin-bottom: 1.25rem;
+    font-size: 12.5px; color: #fca5a5;
+  }
+  .form-group { margin-bottom: .75rem; }
+  .form-group label { margin-top: 0; margin-bottom: .35rem; font-size: 12px; }
+  .form-group input { margin-bottom: 0; }
+  .auth-meta {
+    display: flex; justify-content: space-between; align-items: center;
+    margin: .75rem 0; font-size: 12px; color: var(--t4);
+  }
+  .auth-submit { width: 100%; padding: .88rem; font-size: 15px; font-weight: 700; border-radius: 10px; margin-top: .25rem; }
+  .auth-admin-submit {
+    background: linear-gradient(135deg, #dc2626, #b91c1c) !important;
+    box-shadow: 0 4px 16px rgba(220,38,38,.4) !important;
+  }
+  .auth-admin-submit:hover { filter: brightness(1.08); box-shadow: 0 8px 28px rgba(220,38,38,.5) !important; }
+  .auth-bottom { text-align: center; color: var(--t4); font-size: 13px; margin-top: 1rem; }
+  .auth-bottom a { color: var(--t3); }
+</style>
 </head>
+<body class="auth-page">
 
-<body class="login-page">
+<nav class="navbar">
+  <h2 id="adminBrandSecret">🚀 SkillBridge AI</h2>
+  <div class="nav-links">
+    <a href="index.html">← Back Home</a>
+    <a href="#" class="active">Admin</a>
+  </div>
+</nav>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <h2 id="adminBrandSecret">🚀 SkillBridge AI</h2>
+<div class="auth-center">
+  <div class="auth-card">
 
-    <div class="nav-links">
-      <a href="index.html">Home</a>
-      <a href="#" class="active">Admin</a>
-    </div>
-  </nav>
-
-  <!-- LOGIN SECTION -->
-  <section class="auth-container">
-
-    <div class="card login-card">
-
-      <!-- TOP ICON -->
-      <div>
-        <div>
-          🛡️
-        </div>
-      </div>
-
-      <h2>Admin Login</h2>
-      <p class="subtitle">
-        Control tower access only 🚀
-      </p>
-
-      <!-- FORM -->
-      <label>Email Address</label>
-      <input
-        type="email"
-        id="email"
-        
-      />
-
-      <label>Password</label>
-      <input
-        type="password"
-        id="password"
-        
-      />
-
-      <!-- EXTRA -->
-      <div>
-        <span class="muted">🔒 Secure Session</span>
-        <span class="muted">⚡ Fast Access</span>
-      </div>
-
-      <!-- BUTTON -->
-      <button
-        id="loginBtn"
-        class="btn btn-primary"
-       
-      >
-        Login 🔐
-      </button>
-
-      <!-- BACK -->
-      <p class="bottom-text">
-        <a href="index.html">← Back Home</a>
-      </p>
-
+    <div class="auth-brand">
+      <div class="auth-brand-icon">🛡️</div>
+      <h2>Admin Access</h2>
+      <p>Restricted — authorized personnel only</p>
     </div>
 
-  </section>
+    <div class="admin-warn">
+      🔒 This area is for platform administrators only. Unauthorized access is prohibited.
+    </div>
 
-  <!-- FOOTER -->
-  <footer class="footer">
-    © 2026 SkillBridge AI • Admin Portal
-  </footer>
+    <div class="form-group">
+      <label for="email">Admin Email</label>
+      <input type="email" id="email" placeholder="admin@skillbridge.ai" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+
+    <div class="auth-meta">
+      <span>🔒 Encrypted connection</span>
+      <span>⚡ Session secured</span>
+    </div>
+
+    <button id="loginBtn" class="primary-btn auth-submit auth-admin-submit">Login 🔐</button>
+
+    <div class="auth-bottom">
+      <a href="index.html">← Return to Home</a>
+    </div>
+
+  </div>
+</div>
+
+<footer class="footer">
+  <p>© 2026 SkillBridge AI · Admin Portal · Restricted Access</p>
+</footer>
+
 <script type="module">
 import { loginUser, startPresenceHeartbeat } from "./firebase.js";
-
-// 🔐 LOGIN BUTTON
-document
-  .getElementById("loginBtn")
-  .addEventListener("click", async () => {
-
-    const btn = document.getElementById("loginBtn");
-
-    const user = await loginUser(btn, "admin");
-
-    if (!user) {
-      alert("Invalid Admin Credentials 🚫");
-      return;
-    }
-
-    localStorage.setItem("role", "admin");
-    startPresenceHeartbeat("admin");
-
-  });
-
-
-// 🔥 LOGOUT FUNCTION (GLOBAL)
-window.logout = function(){
-  localStorage.clear();   // 🧹 full clean
-  window.location.href = "index.html";
-};
-
-
-
+document.getElementById("loginBtn").addEventListener("click", async () => {
+  const btn = document.getElementById("loginBtn");
+  const user = await loginUser(btn, "admin");
+  if (!user) { alert("Invalid Admin Credentials 🚫"); return; }
+  localStorage.setItem("role", "admin");
+  startPresenceHeartbeat("admin");
+});
+window.logout = function() { localStorage.clear(); window.location.href = "index.html"; };
 function unlockAdminSignup() {
   sessionStorage.setItem("admin_signup_unlocked", "1");
   window.location.href = "admin-signup.html";
 }
-
-// Desktop secret shortcut
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
-    unlockAdminSignup();
-  }
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) unlockAdminSignup();
 });
-
-// Mobile secret gesture: 5 taps in 3 seconds on brand title
-let tapCount = 0;
-let firstTapAt = 0;
+let tapCount = 0, firstTapAt = 0;
 const secretBrand = document.getElementById("adminBrandSecret");
-
 secretBrand.addEventListener("click", () => {
   const now = Date.now();
-
-  if (!firstTapAt || now - firstTapAt > 3000) {
-    firstTapAt = now;
-    tapCount = 1;
-    return;
-  }
-
-  tapCount += 1;
-
-  if (tapCount >= 5) {
-    unlockAdminSignup();
-  }
+  if (!firstTapAt || now - firstTapAt > 3000) { firstTapAt = now; tapCount = 1; return; }
+  if (++tapCount >= 5) unlockAdminSignup();
 });
 </script>
 <script type="module" src="./app-enhancements.js"></script>

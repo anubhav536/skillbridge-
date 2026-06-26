@@ -1,154 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SkillBridge AI</title>
-<link rel="stylesheet" href="style.css?v=97">
-  <link rel="stylesheet" href="universal.css">
-
-
+<title>Recruiter Signup — SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .auth-page { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-center { flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+  .auth-card {
+    width: min(440px, 100%);
+    background: var(--glass); border: 1px solid var(--bd); border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow), 0 0 60px rgba(124,58,237,.12);
+    backdrop-filter: blur(20px);
+    animation: fadeUp .4s cubic-bezier(.4,0,.2,1) both;
+  }
+  .auth-brand { text-align: center; margin-bottom: 1.5rem; }
+  .auth-brand-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: .75rem;
+    box-shadow: 0 6px 20px var(--pg);
+  }
+  .auth-brand h2 { font-size: 20px; margin-bottom: .2rem; }
+  .auth-brand p  { font-size: 13px; color: var(--t4); margin: 0; }
+  .trust-row {
+    display: grid; grid-template-columns: repeat(3,1fr); gap: .5rem;
+    margin-bottom: 1.1rem;
+  }
+  .trust-box {
+    background: var(--pb); border: 1px solid var(--bd2);
+    border-radius: 10px; padding: .75rem .5rem; text-align: center;
+  }
+  .trust-box h4 { font-size: 16px; font-weight: 800; color: var(--t2); margin-bottom: .2rem; font-family: Poppins,sans-serif; }
+  .trust-box p  { font-size: 11px; color: var(--t4); margin: 0; }
+  .form-group { margin-bottom: .75rem; }
+  .form-group label { margin-top: 0; margin-bottom: .35rem; font-size: 12px; }
+  .form-group input { margin-bottom: 0; }
+  .auth-submit { width: 100%; padding: .88rem; font-size: 15px; font-weight: 700; border-radius: 10px; margin-top: .35rem; }
+  .auth-bottom { text-align: center; color: var(--t4); font-size: 13px; margin-top: 1rem; }
+  .auth-bottom a { color: var(--t3); font-weight: 600; }
+  .auth-bottom a:hover { color: var(--t2); }
+</style>
 </head>
+<body class="auth-page">
 
-<body class="rec-signup-page">
-
-<!-- NAVBAR -->
 <nav class="navbar">
-
   <h2>🚀 SkillBridge AI</h2>
-
   <div class="nav-links">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+    <a href="index.html">← Home</a>
+    <a href="recruiter-login.html">Sign In</a>
   </div>
-
 </nav>
 
-<!-- SIGNUP -->
-<section class="auth-container">
+<div class="auth-center">
+  <div class="auth-card">
 
-  <div class="card signup-card">
-
-    <div class="signup-badge">
-      🏢 Recruiter Onboarding
+    <div class="auth-brand">
+      <div class="auth-brand-icon">🏢</div>
+      <h2>Create Recruiter Account</h2>
+      <p>Start hiring smarter with AI-powered candidate ranking</p>
     </div>
 
-    <h2>Recruiter Signup</h2>
-
-    <p class="subtitle">
-      Create your hiring HQ and start posting jobs instantly 🎯
-    </p>
-
-    <div class="signup-form">
-
-      <div class="input-group">
-        <label>Full Name</label>
-        <input type="text" id="name">
-      </div>
-
-      <div class="input-group">
-        <label>Email</label>
-        <input type="email" id="email">
-      </div>
-
-      <div class="input-group">
-        <label>Password</label>
-        <input type="password" id="password">
-      </div>
-
-      <button id="signupBtn" class="signup-btn">
-        Signup 🚀
-      </button>
-
-    </div>
-
-    <!-- STATS -->
     <div class="trust-row">
-
-      <div class="trust-box">
-        <h4>10K+</h4>
-        <p>Applicants</p>
-      </div>
-
-      <div class="trust-box">
-        <h4>500+</h4>
-        <p>Recruiters</p>
-      </div>
-
-      <div class="trust-box">
-        <h4>24/7</h4>
-        <p>AI Support</p>
-      </div>
-
+      <div class="trust-box"><h4>10K+</h4><p>Applicants</p></div>
+      <div class="trust-box"><h4>500+</h4><p>Recruiters</p></div>
+      <div class="trust-box"><h4>AI</h4><p>Powered</p></div>
     </div>
 
-    <p class="bottom-text">
-      Already have an account?
-      <a href="recruiter-login.html">Login</a>
-    </p>
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Your name" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label for="email">Work Email</label>
+      <input type="email" id="email" placeholder="recruiter@company.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+    </div>
+
+    <button id="signupBtn" class="primary-btn auth-submit">Create Account 🚀</button>
+
+    <div class="auth-bottom">
+      Already have an account? <a href="recruiter-login.html">Sign In</a>
+    </div>
 
   </div>
+</div>
 
-</section>
-
-<!-- FOOTER -->
 <footer class="footer">
-  <p>© 2026 SkillBridge AI</p>
+  <p>© 2026 SkillBridge AI · All rights reserved</p>
 </footer>
+
 <script type="module">
-
-import {
-  signupUser
-} from "./firebase.js";
-
-
-// 🚀 SIGNUP BUTTON
-document.getElementById("signupBtn")
-.addEventListener("click", async () => {
-
+import { signupUser } from "./firebase.js";
+document.getElementById("signupBtn").addEventListener("click", async () => {
   const btn = document.getElementById("signupBtn");
-
-  const user = await signupUser(
-    "recruiter",
-    btn
-  );
-
-  if(user){
-
-    // ✅ ROLE SET
+  const user = await signupUser("recruiter", btn);
+  if (user) {
     localStorage.setItem("role", "recruiter");
-
-    // 🚀 Direct dashboard entry
     window.location.href = "rec-dashboard.html";
-
   } else {
     alert("Signup Failed ❌");
   }
-
 });
-
 </script>
-
-
-
 <script>
-// Secret admin access (not visible in UI)
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-    window.location.href = "admin-login.html";
-  }
-});
-
-// Secret admin signup: Ctrl + Shift + S
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
-    window.location.href = "admin-signup.html";
-  }
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) window.location.href = "admin-login.html";
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) window.location.href = "admin-signup.html";
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

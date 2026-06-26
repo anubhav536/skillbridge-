@@ -3,80 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Seeker Login — SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .auth-page { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-center {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1.25rem;
+  }
+  .auth-card {
+    width: min(420px, 100%);
+    background: var(--glass);
+    border: 1px solid var(--bd);
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow), 0 0 60px rgba(124,58,237,.12);
+    backdrop-filter: blur(20px);
+    animation: fadeUp .4s cubic-bezier(.4,0,.2,1) both;
+  }
+  .auth-brand {
+    text-align: center; margin-bottom: 1.75rem;
+  }
+  .auth-brand-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: .75rem;
+    box-shadow: 0 6px 20px var(--pg);
+  }
+  .auth-brand h2 { font-size: 20px; margin-bottom: .2rem; color: var(--t1); }
+  .auth-brand p  { font-size: 13px; color: var(--t4); margin: 0; }
 
-<title>SkillBridge AI</title>
+  .auth-form { display: flex; flex-direction: column; gap: 0; }
+  .form-group { margin-bottom: .75rem; }
+  .form-group label { margin-top: 0; margin-bottom: .35rem; font-size: 12px; }
+  .form-group input { margin-bottom: 0; }
 
+  .auth-forgot {
+    text-align: right; margin-bottom: .9rem;
+    font-size: 12.5px;
+  }
+  .auth-forgot a { color: var(--t3); }
+  .auth-forgot a:hover { color: var(--t2); }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .auth-submit {
+    width: 100%; padding: .88rem; font-size: 15px; font-weight: 700;
+    border-radius: 10px; margin-top: .25rem;
+  }
+  .auth-divider {
+    display: flex; align-items: center; gap: .75rem;
+    margin: 1rem 0;
+  }
+  .auth-divider span { flex: 1; height: 1px; background: var(--bd2); }
+  .auth-divider small { font-size: 12px; color: var(--t4); white-space: nowrap; }
+
+  .auth-bottom {
+    text-align: center; color: var(--t4);
+    font-size: 13px; margin-top: 1rem;
+  }
+  .auth-bottom a { color: var(--t3); font-weight: 600; }
+  .auth-bottom a:hover { color: var(--t2); }
+
+  .auth-trust {
+    display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+    margin-top: 1.1rem;
+  }
+  .auth-trust-item { font-size: 11.5px; color: var(--t4); display: flex; align-items: center; gap: .3rem; }
+
+  .role-selector {
+    display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; margin-bottom: 1.25rem;
+  }
+  .role-opt {
+    padding: .65rem; border-radius: 10px; border: 1px solid var(--bd2);
+    background: transparent; color: var(--t3); font-size: 13px; font-weight: 500;
+    text-align: center; cursor: pointer; transition: all .18s ease;
+    text-decoration: none; display: flex; align-items: center; justify-content: center; gap: .35rem;
+  }
+  .role-opt:hover { background: var(--pb); border-color: var(--bd); color: var(--t2); }
+  .role-opt.active { background: linear-gradient(135deg, var(--p1), var(--p2)); border-color: transparent; color: #fff; box-shadow: 0 4px 14px var(--pg); }
+</style>
 </head>
+<body class="auth-page">
 
-<body>
+<nav class="navbar">
+  <h2>🚀 SkillBridge AI</h2>
+  <div class="nav-links">
+    <a href="index.html">← Back Home</a>
+    <a href="recruiter-login.html">Recruiter Login</a>
+  </div>
+</nav>
 
-<div class="container">
+<div class="auth-center">
+  <div class="auth-card">
 
-<h2>👨‍🎓 Job Seeker Login</h2>
+    <div class="auth-brand">
+      <div class="auth-brand-icon">👨‍🎓</div>
+      <h2>Welcome Back</h2>
+      <p>Sign in to your Job Seeker account</p>
+    </div>
 
-<input type="email" id="email">
-<input type="password" id="password">
+    <div class="role-selector">
+      <a href="jobseeker-login.html" class="role-opt active">👨‍🎓 Job Seeker</a>
+      <a href="recruiter-login.html" class="role-opt">🏢 Recruiter</a>
+    </div>
 
-<button id="loginBtn">Login 🚀</button>
+    <div class="auth-form">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div class="auth-forgot">
+        <a href="#" id="forgotPassword">Forgot password?</a>
+      </div>
+      <button id="loginBtn" class="primary-btn auth-submit">Sign in 🚀</button>
+    </div>
 
-<p><a href="#" id="forgotPassword">Forgot Password?</a></p>
+    <div class="auth-trust">
+      <span class="auth-trust-item">🔒 Secure</span>
+      <span class="auth-trust-item">⚡ Instant</span>
+      <span class="auth-trust-item">🆓 Free</span>
+    </div>
 
-<p>Don't have account? <a href="jobseeker-signup.html">Signup</a></p>
+    <div class="auth-bottom">
+      Don't have an account? <a href="jobseeker-signup.html">Create Account</a>
+    </div>
 
+  </div>
 </div>
+
+<footer class="footer">
+  <p>© 2026 SkillBridge AI · All rights reserved</p>
+</footer>
 
 <script type="module">
 import { loginUser, resetPassword } from "./firebase.js";
-
-// LOGIN
-document.getElementById("loginBtn")
-.addEventListener("click", async () => {
-
-  console.log("Login clicked");
-
+document.getElementById("loginBtn").addEventListener("click", async () => {
   const btn = document.getElementById("loginBtn");
   await loginUser(btn, "jobseeker");
 });
-
-
-// FORGOT PASSWORD
-document.getElementById("forgotPassword")
-.addEventListener("click", (e) => {
-
+document.getElementById("forgotPassword").addEventListener("click", e => {
   e.preventDefault();
-
   const email = document.getElementById("email").value.trim();
-
-  if(!email){
-    alert("Enter email first");
-    return;
-  }
-
+  if (!email) { alert("Enter your email first 📩"); return; }
   resetPassword(email);
 });
 </script>
-
-
-
 <script>
-// Secret admin access (not visible in UI)
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-    window.location.href = "admin-login.html";
-  }
-});
-
-// Secret admin signup: Ctrl + Shift + S
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
-    window.location.href = "admin-signup.html";
-  }
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) window.location.href = "admin-login.html";
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) window.location.href = "admin-signup.html";
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

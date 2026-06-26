@@ -3,106 +3,129 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>SkillBridge AI</title>
+<title>Job Seeker Signup — SkillBridge AI</title>
 <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="universal.css">
-
-
+<link rel="stylesheet" href="universal.css">
+<style>
+  .auth-page { min-height: 100vh; display: flex; flex-direction: column; }
+  .auth-center {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    padding: 2rem 1.25rem;
+  }
+  .auth-card {
+    width: min(420px, 100%);
+    background: var(--glass);
+    border: 1px solid var(--bd);
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: var(--shadow), 0 0 60px rgba(124,58,237,.12);
+    backdrop-filter: blur(20px);
+    animation: fadeUp .4s cubic-bezier(.4,0,.2,1) both;
+  }
+  .auth-brand { text-align: center; margin-bottom: 1.6rem; }
+  .auth-brand-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--p1), var(--p2));
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: .75rem;
+    box-shadow: 0 6px 20px var(--pg);
+  }
+  .auth-brand h2 { font-size: 20px; margin-bottom: .2rem; }
+  .auth-brand p  { font-size: 13px; color: var(--t4); margin: 0; }
+  .form-group { margin-bottom: .7rem; }
+  .form-group label { margin-top: 0; margin-bottom: .3rem; font-size: 12px; }
+  .form-group input { margin-bottom: 0; }
+  .auth-submit { width: 100%; padding: .88rem; font-size: 15px; font-weight: 700; border-radius: 10px; margin-top: .35rem; }
+  .auth-bottom { text-align: center; color: var(--t4); font-size: 13px; margin-top: 1rem; }
+  .auth-bottom a { color: var(--t3); font-weight: 600; }
+  .auth-bottom a:hover { color: var(--t2); }
+  .auth-features {
+    display: flex; flex-direction: column; gap: .4rem;
+    margin: .85rem 0; padding: .9rem; background: var(--pb); border: 1px solid var(--bd2); border-radius: 10px;
+  }
+  .auth-feature-item { font-size: 12.5px; color: var(--t3); display: flex; align-items: center; gap: .45rem; }
+  .pwd-strength { font-size: 12px; margin-top: .3rem; height: 16px; }
+</style>
 </head>
+<body class="auth-page">
 
-<body class="js-signup-body">
-
-<!-- NAVBAR -->
-<nav class="js-signup-navbar">
-  <h2 class="js-signup-logo">🚀 SkillBridge AI</h2>
-
-  <div class="js-signup-navlinks">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
+<nav class="navbar">
+  <h2>🚀 SkillBridge AI</h2>
+  <div class="nav-links">
+    <a href="index.html">← Back Home</a>
+    <a href="jobseeker-login.html">Sign In</a>
   </div>
 </nav>
 
-<!-- SIGNUP -->
-<section class="js-signup-section">
+<div class="auth-center">
+  <div class="auth-card">
 
-  <div class="js-signup-box">
+    <div class="auth-brand">
+      <div class="auth-brand-icon">🚀</div>
+      <h2>Create Your Account</h2>
+      <p>Join thousands of job seekers finding their dream roles</p>
+    </div>
 
-    <h2>👨‍🎓 Job Seeker Signup</h2>
+    <div class="auth-features">
+      <span class="auth-feature-item">✅ AI-powered job matching</span>
+      <span class="auth-feature-item">✅ Professional resume builder with ATS score</span>
+      <span class="auth-feature-item">✅ Career gap analysis &amp; roadmap</span>
+    </div>
 
-    <p class="js-signup-subtitle">
-      Create your account and unlock your career runway.
-    </p>
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" placeholder="Jane Smith" autocomplete="name">
+    </div>
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" placeholder="jane@example.com" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" placeholder="Create a strong password" autocomplete="new-password">
+      <div class="pwd-strength" id="pwdStrengthMsg"></div>
+    </div>
 
-    <label>Full Name</label>
-    <input
-      type="text"
-      id="name"
-      
-      class="js-signup-input"
-    >
+    <button id="signupBtn" class="primary-btn auth-submit">Create Account 🚀</button>
 
-    <label>Email</label>
-    <input
-      type="email"
-      id="email"
-      
-      class="js-signup-input"
-    >
-
-    <label>Password</label>
-    <input
-      type="password"
-      id="password"
-      
-      class="js-signup-input"
-    >
-
-    <button id="signupBtn" class="js-signup-btn">
-      Signup 🚀
-    </button>
-
-    <p class="js-signup-bottom">
-      Already have an account?
-      <a href="jobseeker-login.html">Login</a>
-    </p>
+    <div class="auth-bottom">
+      Already have an account? <a href="jobseeker-login.html">Sign In</a>
+    </div>
 
   </div>
+</div>
 
-</section>
-
-<!-- FOOTER -->
-<footer class="js-signup-footer">
-  <p>© 2026 SkillBridge AI</p>
+<footer class="footer">
+  <p>© 2026 SkillBridge AI · All rights reserved</p>
 </footer>
+
 <script type="module">
 import { signupUser } from "./firebase.js";
-
-// 🚀 SIGNUP BUTTON
 document.getElementById("signupBtn").addEventListener("click", async () => {
   const btn = document.getElementById("signupBtn");
   await signupUser("jobseeker", btn);
 });
 </script>
-
-
-
 <script>
-// Secret admin access (not visible in UI)
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-    window.location.href = "admin-login.html";
-  }
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) window.location.href = "admin-login.html";
+  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) window.location.href = "admin-signup.html";
 });
-
-// Secret admin signup: Ctrl + Shift + S
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "S" || e.key === "s")) {
-    window.location.href = "admin-signup.html";
-  }
-});
+// Password strength meter
+const pwd = document.getElementById("password");
+const msg = document.getElementById("pwdStrengthMsg");
+if (pwd && msg) {
+  pwd.addEventListener("input", () => {
+    const v = pwd.value;
+    let label = "", col = "";
+    if (!v) { msg.textContent = ""; return; }
+    if (v.length >= 10 && /\d/.test(v) && /[^a-zA-Z0-9]/.test(v)) { label = "Strong 💪"; col = "#4ade80"; }
+    else if (v.length >= 8 && /\d/.test(v)) { label = "Medium 🙂"; col = "#fcd34d"; }
+    else { label = "Weak — use 8+ chars & numbers 😬"; col = "#f87171"; }
+    msg.style.color = col; msg.textContent = label;
+  });
+}
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

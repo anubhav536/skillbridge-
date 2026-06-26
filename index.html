@@ -3,171 +3,315 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkillBridge AI</title>
+  <title>SkillBridge AI — Build Your Career With Smart AI Hiring</title>
+  <meta name="description" content="A modern platform connecting students, freshers, job seekers and recruiters through intelligent AI matching.">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="universal.css">
-</head>
+  <style>
+    /* ── Landing-specific polish ── */
+    .lp-wrap { width: min(1200px, calc(100% - 2rem)); margin: 0 auto; }
 
+    .hero { padding: 2rem 0 1rem; }
+    .hero-box {
+      padding: 5rem 2rem 4rem;
+      min-height: 420px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .35rem 1rem; border-radius: 999px;
+      background: rgba(124,58,237,.12); border: 1px solid rgba(124,58,237,.28);
+      color: var(--t2); font-size: 12.5px; font-weight: 600;
+      letter-spacing: .4px; text-transform: uppercase;
+      margin-bottom: 1.5rem; animation: fadeUp .3s ease both;
+    }
+    .hero-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: #4ade80; animation: blink 1.4s infinite; }
+
+    .hero-box h1 { font-size: clamp(32px, 6vw, 62px); max-width: 700px; margin: 0 auto 1rem; }
+    .hero-box > p { font-size: 16px; max-width: 520px; }
+
+    .hero-cta { display: flex; gap: .75rem; flex-wrap: wrap; justify-content: center; margin-top: 2rem; }
+    .hero-cta .primary-btn { padding: .88rem 2.2rem; font-size: 15px; border-radius: 10px; }
+    .hero-cta .secondary-btn { padding: .88rem 2.2rem; font-size: 15px; border-radius: 10px; }
+
+    .hero-trust {
+      margin-top: 2rem; color: var(--t4); font-size: 12.5px;
+      display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; justify-content: center;
+    }
+    .hero-trust-dot { width: 3px; height: 3px; border-radius: 50%; background: var(--t4); }
+
+    /* Feature grid */
+    .feat-section { margin: 1.5rem auto; }
+    .feat-section h2 { margin-bottom: 1.25rem; }
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .85rem; }
+    .feat-card {
+      background: var(--glass);
+      border: 1px solid var(--bd2);
+      border-radius: 14px;
+      padding: 1.35rem;
+      transition: all .22s cubic-bezier(.4,0,.2,1);
+      cursor: default;
+      position: relative;
+      overflow: hidden;
+    }
+    .feat-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--pb), transparent);
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+    .feat-card:hover { border-color: var(--bd); transform: translateY(-3px); box-shadow: 0 12px 36px var(--pb), 0 0 0 1px var(--bd); }
+    .feat-card:hover::before { opacity: 1; }
+    .feat-icon { font-size: 26px; margin-bottom: .75rem; }
+    .feat-card h3 { font-size: 14px; font-weight: 700; margin-bottom: .35rem; color: var(--t1); }
+    .feat-card p  { font-size: 13px; color: var(--t4); margin: 0; line-height: 1.6; }
+
+    /* Stats */
+    .stats-section { margin: 0 auto 1.5rem; }
+    .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: .85rem; }
+    .stat-bubble {
+      background: var(--glass);
+      border: 1px solid var(--bd2);
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+      transition: all .22s ease;
+    }
+    .stat-bubble:hover { border-color: var(--bd); box-shadow: 0 0 30px var(--pb); }
+    .stat-bubble h3 { font-size: 36px; font-weight: 800; background: linear-gradient(135deg, var(--t1), var(--p4)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:.3rem; }
+    .stat-bubble p  { font-size: 13px; color: var(--t4); margin: 0; }
+
+    /* Testimonials */
+    .test-section { margin: 0 auto; }
+    #liveTestimonials { display: flex; flex-direction: column; gap: .6rem; }
+    .test-card {
+      background: var(--glass);
+      border: 1px solid var(--bd2);
+      border-radius: 12px;
+      padding: .9rem 1.1rem;
+      font-size: 13.5px; color: var(--t2);
+      transition: var(--transition);
+    }
+    .test-card:hover { border-color: var(--bd); }
+
+    /* How it works */
+    .how-section { margin: 0 auto 1.5rem; }
+    .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .85rem; }
+    .how-step {
+      background: var(--glass);
+      border: 1px solid var(--bd2);
+      border-radius: 14px;
+      padding: 1.4rem 1.2rem;
+      text-align: center;
+      transition: all .22s ease;
+      position: relative;
+    }
+    .how-step:hover { border-color: var(--bd); transform: translateY(-2px); }
+    .step-num {
+      width: 38px; height: 38px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--p1), var(--p2));
+      color: #fff;
+      font-weight: 800; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      margin: 0 auto .9rem;
+      box-shadow: 0 4px 14px var(--pg);
+    }
+    .how-step h3 { font-size: 14px; margin-bottom: .35rem; }
+    .how-step p  { font-size: 12.5px; color: var(--t4); margin: 0; }
+
+    /* CTA Banner */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(124,58,237,.18), rgba(79,70,229,.12));
+      border: 1px solid var(--bd);
+      border-radius: 18px;
+      padding: 2.5rem 2rem;
+      text-align: center;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+      width: 500px; height: 300px;
+      background: radial-gradient(ellipse, var(--pg) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cta-banner h2 { font-size: clamp(20px, 4vw, 34px); margin-bottom: .65rem; }
+    .cta-banner p  { font-size: 15px; margin-bottom: 1.5rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-banner .primary-btn { padding: .88rem 2.4rem; font-size: 15.5px; }
+
+    @media (max-width: 640px) {
+      .stat-row { grid-template-columns: 1fr 1fr; }
+      .how-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 400px) {
+      .stat-row { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
 <body>
 
 <!-- NAVBAR -->
 <nav class="navbar">
-
   <h2 id="homeBrandSecret">🚀 SkillBridge AI</h2>
-
   <div class="nav-links">
     <a href="index.html" class="active">Home</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
-    
   </div>
-
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-
+<section class="hero lp-wrap">
   <div class="hero-box">
-
-    <span class="badge">🔥 AI Powered Career Platform</span>
-
-    <h1>Build Your Career With Smart AI Hiring</h1>
-
-    <p>
-      A modern platform connecting students, freshers,
-      job seekers and recruiters through intelligent matching.
-    </p>
-
-    <div class="hero-btns">
-
-      <a href="jobseeker-login.html" class="primary-btn">
-        👨‍🎓 I am a Job Seeker
-      </a>
-
-      <a href="recruiter-login.html" class="secondary-btn">
-        🏢 I am a Recruiter
-      </a>
-
-
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-dot"></span>
+      AI-Powered Career Platform
     </div>
-
+    <h1>Build Your Career With Smart AI Hiring</h1>
+    <p>A modern platform connecting students, freshers, job seekers and recruiters through intelligent matching and AI-driven insights.</p>
+    <div class="hero-cta">
+      <a href="jobseeker-login.html" class="primary-btn">👨‍🎓 I am a Job Seeker</a>
+      <a href="recruiter-login.html" class="secondary-btn">🏢 I am a Recruiter</a>
+    </div>
+    <div class="hero-trust">
+      <span>🔒 Secure &amp; Private</span>
+      <span class="hero-trust-dot"></span>
+      <span>⚡ AI-Powered Matching</span>
+      <span class="hero-trust-dot"></span>
+      <span>📊 Real-time Analytics</span>
+      <span class="hero-trust-dot"></span>
+      <span>🆓 Free to Join</span>
+    </div>
   </div>
-
 </section>
 
 <!-- FEATURES -->
-<section class="features">
-
-  <h2>🔥 Features</h2>
-
-  <div class="feature-grid">
-
-    <div class="card">
-      <h3>🎯 Smart Matching</h3>
-      <p>AI recommends best jobs according to your skills.</p>
+<section class="feat-section lp-wrap">
+  <h5>What You Get</h5>
+  <h2>Everything You Need to Get Hired</h2>
+  <div class="feat-grid">
+    <div class="feat-card">
+      <div class="feat-icon">🎯</div>
+      <h3>Smart AI Matching</h3>
+      <p>6-factor AI engine recommends the best jobs based on your skills, experience, and goals.</p>
     </div>
-
-    <div class="card">
-      <h3>📄 Resume Builder</h3>
-      <p>Create modern resumes with ATS score instantly.</p>
+    <div class="feat-card">
+      <div class="feat-icon">📄</div>
+      <h3>Resume Builder</h3>
+      <p>Create modern, ATS-optimized resumes with live score and PDF export in minutes.</p>
     </div>
-
-    <div class="card">
-      <h3>📈 Analytics</h3>
-      <p>Track profile growth and application success.</p>
+    <div class="feat-card">
+      <div class="feat-icon">🧠</div>
+      <h3>AI Career Gap Analysis</h3>
+      <p>Discover your skill gaps, get personalized roadmaps and career readiness scores.</p>
     </div>
-
-    <div class="card">
-      <h3>🏢 Recruiter Tools</h3>
-      <p>Easy hiring dashboard with applicant management.</p>
+    <div class="feat-card">
+      <div class="feat-icon">📈</div>
+      <h3>Analytics Dashboard</h3>
+      <p>Track profile growth, application success rates and career progress over time.</p>
     </div>
-
-    <div class="card">
-      <h3>🛡️ Admin Control</h3>
-      <p>Manage users, jobs, reports and full platform control.</p>
+    <div class="feat-card">
+      <div class="feat-icon">🏢</div>
+      <h3>Recruiter Tools</h3>
+      <p>Easy hiring dashboard with AI-ranked candidates, applicant management and insights.</p>
     </div>
-
+    <div class="feat-card">
+      <div class="feat-icon">🛡️</div>
+      <h3>Admin Control</h3>
+      <p>Full platform visibility — manage users, jobs, applications and platform health.</p>
+    </div>
   </div>
+</section>
 
+<!-- HOW IT WORKS -->
+<section class="how-section lp-wrap">
+  <h5>Process</h5>
+  <h2>Get Hired in 4 Steps</h2>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="step-num">1</div>
+      <h3>Create Profile</h3>
+      <p>Sign up and fill in your skills, experience and education.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">2</div>
+      <h3>AI Matches You</h3>
+      <p>Our AI instantly matches you with the most relevant jobs.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">3</div>
+      <h3>Apply with 1 Click</h3>
+      <p>Apply to jobs with one click — your profile is the resume.</p>
+    </div>
+    <div class="how-step">
+      <div class="step-num">4</div>
+      <h3>Get Hired</h3>
+      <p>Recruiters review your AI score and contact you directly.</p>
+    </div>
+  </div>
 </section>
 
 <!-- STATS -->
-<section class="stats">
-
-  <h2>📊 Platform Stats</h2>
-
-  <div class="stats-grid">
-
-    <div class="stat-box">
-      <h3 id="liveUsersCount">Loading...</h3>
-      <p>Users</p>
+<section class="stats-section lp-wrap">
+  <h5>Live Data</h5>
+  <h2>Platform Numbers</h2>
+  <div class="stat-row">
+    <div class="stat-bubble">
+      <h3 id="liveUsersCount">—</h3>
+      <p>Active Users</p>
     </div>
-
-    <div class="stat-box">
-      <h3 id="liveJobsCount">Loading...</h3>
+    <div class="stat-bubble">
+      <h3 id="liveJobsCount">—</h3>
       <p>Jobs Posted</p>
     </div>
-
-    <div class="stat-box">
-      <h3 id="liveApplicationsCount">Loading...</h3>
+    <div class="stat-bubble">
+      <h3 id="liveApplicationsCount">—</h3>
       <p>Applications</p>
     </div>
-
   </div>
-
 </section>
 
-<!-- TESTIMONIAL -->
-<section class="testimonial">
-
+<!-- TESTIMONIALS -->
+<section class="test-section lp-wrap">
+  <h5>Community</h5>
   <h2>💬 Live Testimonials</h2>
-
-  <div id="liveTestimonials" class="live-testimonials">
-    <p>Loading latest positive feedback...</p>
+  <div id="liveTestimonials">
+    <div class="test-card">Loading latest feedback...</div>
   </div>
+</section>
 
+<!-- CTA BANNER -->
+<section class="lp-wrap">
+  <div class="cta-banner">
+    <h2>Ready to Build Your Career?</h2>
+    <p>Join thousands of job seekers and recruiters already using SkillBridge AI.</p>
+    <a href="jobseeker-login.html" class="primary-btn">🚀 Get Started Free</a>
+  </div>
 </section>
 
 <!-- FOOTER -->
 <footer class="footer">
-  <p>© 2026 SkillBridge AI. All rights reserved.</p>
+  <p>© 2026 SkillBridge AI · All rights reserved · <a href="about.html">About</a> · <a href="contact.html">Contact</a></p>
 </footer>
 
-
 <script>
-function openAdminLogin() {
-  window.location.href = "admin-login.html";
-}
-
-// Desktop secret admin access: Ctrl + Shift + A
-document.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) {
-    openAdminLogin();
-  }
+function openAdminLogin() { window.location.href = "admin-login.html"; }
+document.addEventListener("keydown", e => {
+  if (e.ctrlKey && e.shiftKey && (e.key === "A" || e.key === "a")) openAdminLogin();
 });
-
-// Mobile secret gesture: 5 taps in 3 seconds on brand title
-let homeTapCount = 0;
-let homeFirstTapAt = 0;
+let homeTapCount = 0, homeFirstTapAt = 0;
 const homeBrand = document.getElementById("homeBrandSecret");
-
 homeBrand.addEventListener("click", () => {
   const now = Date.now();
-
-  if (!homeFirstTapAt || now - homeFirstTapAt > 3000) {
-    homeFirstTapAt = now;
-    homeTapCount = 1;
-    return;
-  }
-
-  homeTapCount += 1;
-
-  if (homeTapCount >= 5) {
-    openAdminLogin();
-  }
+  if (!homeFirstTapAt || now - homeFirstTapAt > 3000) { homeFirstTapAt = now; homeTapCount = 1; return; }
+  if (++homeTapCount >= 5) openAdminLogin();
 });
 </script>
-
 <script type="module" src="./realtime-public.js"></script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>
