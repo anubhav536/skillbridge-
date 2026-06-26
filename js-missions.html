@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Missions | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="universal.css">
+  <style>
+    .missions-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+    .missions-top h1 { margin:0; }
+
+    /* Hero bar */
+    .missions-hero {
+      background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(79,70,229,.18));
+      border:1px solid rgba(124,58,237,.38); border-radius:18px;
+      padding:1.4rem 1.8rem; margin-bottom:1rem;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+    }
+    .mh-left h2 { font-size:16px; font-weight:800; color:#f5f3ff; margin:0 0 .35rem; }
+    .mh-left p  { font-size:13.5px; color:#a78bfa; margin:0; }
+    .mh-stats { display:flex; gap:1.5rem; flex-wrap:wrap; }
+    .mh-stat { text-align:center; }
+    .mh-stat .n { font-size:28px; font-weight:900; color:#c4b5fd; line-height:1; }
+    .mh-stat .l { font-size:12px; color:#6b7280; margin-top:.15rem; }
+
+    /* Section tabs */
+    .section-tabs { display:flex; gap:.5rem; margin-bottom:1rem; flex-wrap:wrap; }
+    .stab {
+      padding:.55rem 1.2rem; border-radius:999px; font-size:14px; font-weight:700; cursor:pointer;
+      border:1px solid rgba(124,58,237,.3); color:#a78bfa; background:transparent;
+      transition:all .2s;
+    }
+    .stab.active { background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border-color:transparent; }
+    .stab:hover:not(.active) { background:rgba(124,58,237,.15); }
+
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* Mission card */
+    .mission-card {
+      display:flex; align-items:flex-start; gap:1rem; padding:1.1rem 1.25rem;
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:14px;
+      margin-bottom:.75rem; transition:box-shadow .2s, border-color .2s;
+      position:relative; overflow:hidden;
+    }
+    .mission-card::before {
+      content:''; position:absolute; top:0; left:0; width:4px; height:100%; border-radius:4px 0 0 4px;
+    }
+    .mc-easy::before   { background:linear-gradient(#4ade80,#16a34a); }
+    .mc-medium::before { background:linear-gradient(#a78bfa,#7c3aed); }
+    .mc-hard::before   { background:linear-gradient(#fcd34d,#d97706); }
+    .mission-card.completed { border-color:rgba(74,222,128,.25); background:rgba(74,222,128,.04); }
+    .mission-card.completed::before { background:linear-gradient(#4ade80,#16a34a) !important; }
+    .mission-card:hover:not(.completed) { box-shadow:0 0 22px rgba(124,58,237,.18); border-color:rgba(124,58,237,.38); }
+
+    .mc-icon { font-size:28px; flex-shrink:0; width:44px; text-align:center; }
+    .mc-body { flex:1; min-width:0; }
+    .mc-label { font-size:15px; font-weight:700; color:#f5f3ff; }
+    .mc-label.completed-text { color:#4ade80; text-decoration:line-through; opacity:.8; }
+    .mc-meta  { display:flex; gap:.65rem; align-items:center; flex-wrap:wrap; margin-top:.4rem; }
+    .mc-type  {
+      font-size:11.5px; font-weight:700; padding:.2rem .6rem; border-radius:6px;
+      text-transform:uppercase; letter-spacing:.04em;
+    }
+    .type-daily  { background:rgba(129,140,248,.12); border:1px solid rgba(129,140,248,.3); color:#818cf8; }
+    .type-career { background:rgba(124,58,237,.14); border:1px solid rgba(124,58,237,.3); color:#c4b5fd; }
+    .type-weekly { background:rgba(245,158,11,.1); border:1px solid rgba(245,158,11,.3); color:#fcd34d; }
+    .mc-reward { font-size:13px; color:#4ade80; font-weight:700; }
+    .mc-xp     { font-size:13px; color:#a78bfa; }
+
+    .mc-right { display:flex; flex-direction:column; align-items:flex-end; gap:.5rem; flex-shrink:0; }
+    .mc-claim-btn {
+      padding:.5rem 1.1rem; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+      box-shadow:0 2px 10px rgba(124,58,237,.3); transition:filter .2s, transform .2s;
+      white-space:nowrap;
+    }
+    .mc-claim-btn:hover:not(:disabled) { filter:brightness(1.1); transform:translateY(-1px); }
+    .mc-claim-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; filter:none; }
+    .mc-done-badge {
+      padding:.45rem .9rem; border-radius:8px; font-size:13px; font-weight:700;
+      background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.3); color:#4ade80;
+    }
+    .difficulty-badge {
+      font-size:11px; font-weight:700; padding:.18rem .55rem; border-radius:999px;
+      text-transform:uppercase; letter-spacing:.04em;
+    }
+    .diff-easy   { background:rgba(74,222,128,.1); color:#4ade80; }
+    .diff-medium { background:rgba(124,58,237,.14); color:#c4b5fd; }
+    .diff-hard   { background:rgba(245,158,11,.1); color:#fcd34d; }
+
+    /* Progress overview */
+    .progress-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:.75rem; margin-bottom:1.1rem; }
+    .prog-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:14px;
+      padding:1rem; text-align:center;
+    }
+    .prog-card .p-num   { font-size:30px; font-weight:900; color:#c4b5fd; line-height:1; }
+    .prog-card .p-label { font-size:12px; color:#6b7280; margin-top:.3rem; font-weight:600; }
+    .prog-card .p-icon  { font-size:22px; margin-bottom:.3rem; display:block; }
+
+    /* Empty */
+    .empty-state { text-align:center; padding:2.5rem 1rem; color:#6b7280; font-size:14px; }
+    .empty-icon  { font-size:36px; display:block; margin-bottom:.75rem; }
+
+    /* Toast */
+    .toast {
+      position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+      padding:.9rem 1.4rem; border-radius:12px; font-size:14px; font-weight:600;
+      box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+      transition:opacity .3s, transform .3s; pointer-events:none; max-width:340px;
+    }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+    .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+    .toast-info    { background:#1e3a5f; border:1px solid #60a5fa; color:#60a5fa; }
+    .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+
+    /* Coin celebration */
+    @keyframes popIn { 0%{transform:scale(0);opacity:0} 60%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+    .coin-pop { animation:popIn .4s ease forwards; }
+  </style>
+</head>
+
+<body>
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <h2>👨‍🎓 Job Seeker Panel</h2>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="career-gap.html">🧠 AI Career Gap</a>
+      <a href="js-profile.html">Profile</a>
+      <a href="js-wallet.html">🪙 Wallet</a>
+      <a href="js-missions.html" class="active">⚡ Missions</a>
+    </nav>
+    <button id="logoutBtn">Logout 👋</button>
+  </aside>
+
+  <main class="main">
+
+    <div class="missions-top">
+      <div>
+        <h1>⚡ Career Missions</h1>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Complete missions to earn Career Coins, XP, and level up your career.</p>
+      </div>
+      <a href="js-wallet.html" style="font-size:13px;color:#c4b5fd;font-weight:700;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.3);padding:.5rem 1rem;border-radius:999px;text-decoration:none">🪙 <span id="headerBalance">— CC</span></a>
+    </div>
+
+    <!-- Hero -->
+    <div class="missions-hero">
+      <div class="mh-left">
+        <h2>Your Mission Hub</h2>
+        <p>Daily resets at midnight · Career missions are one-time achievements · Weekly resets every Monday</p>
+      </div>
+      <div class="mh-stats">
+        <div class="mh-stat"><div class="n" id="totalDone">—</div><div class="l">Missions Done</div></div>
+        <div class="mh-stat"><div class="n" id="coinsEarned">—</div><div class="l">CC Earned</div></div>
+        <div class="mh-stat"><div class="n" id="xpEarned">—</div><div class="l">XP Earned</div></div>
+      </div>
+    </div>
+
+    <!-- Progress cards -->
+    <div class="progress-grid">
+      <div class="prog-card"><span class="p-icon">📅</span><div class="p-num" id="dailyDone">—</div><div class="p-label">Daily Done Today</div></div>
+      <div class="prog-card"><span class="p-icon">🏆</span><div class="p-num" id="careerDone">—</div><div class="p-label">Career Missions Completed</div></div>
+      <div class="prog-card"><span class="p-icon">⚡</span><div class="p-num" id="weeklyDone">—</div><div class="p-label">Weekly Completed</div></div>
+      <div class="prog-card"><span class="p-icon">🪙</span><div class="p-num" id="levelDisplay">Lv 1</div><div class="p-label">Current Level</div></div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="section-tabs">
+      <button class="stab active" onclick="switchTab('daily')">📅 Daily Missions</button>
+      <button class="stab" onclick="switchTab('career')">🏆 Career Missions</button>
+      <button class="stab" onclick="switchTab('weekly')">⚡ Weekly Challenge</button>
+    </div>
+
+    <div id="tab-daily"  class="tab-panel active">
+      <div id="dailyList"><div class="empty-state"><span class="empty-icon">⏳</span>Loading...</div></div>
+    </div>
+    <div id="tab-career" class="tab-panel">
+      <div id="careerList"><div class="empty-state"><span class="empty-icon">⏳</span>Loading...</div></div>
+    </div>
+    <div id="tab-weekly" class="tab-panel">
+      <div id="weeklyList"><div class="empty-state"><span class="empty-icon">⏳</span>Loading...</div></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { logoutUser, getSession, protectPage } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import {
+  getWallet, getUserMissions, completeMission,
+  calcLevel, formatCoins, MISSIONS
+} from "./economy.js";
+
+protectPage("jobseeker");
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+let currentUserId = null;
+let missionsData  = null;
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+window.switchTab = function(tab) {
+  document.querySelectorAll(".stab").forEach((b, i) => {
+    b.classList.toggle("active", ["daily","career","weekly"][i] === tab);
+  });
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+  document.getElementById(`tab-${tab}`).classList.add("active");
+};
+
+function renderMissionList(containerId, missions) {
+  const el = document.getElementById(containerId);
+  if (!missions || missions.length === 0) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span>No missions here yet.</div>`;
+    return;
+  }
+
+  el.innerHTML = missions.map(m => {
+    const typeClass  = `type-${m.type}`;
+    const diffClass  = `diff-${m.difficulty}`;
+    const cardClass  = `mc-${m.difficulty}`;
+    const isComplete = m.completed;
+
+    return `<div class="mission-card ${cardClass} ${isComplete ? 'completed' : ''}" id="mc-${m.id}">
+      <div class="mc-icon">${m.icon}</div>
+      <div class="mc-body">
+        <div class="mc-label ${isComplete ? 'completed-text' : ''}">${m.label}</div>
+        <div class="mc-meta">
+          <span class="mc-type ${typeClass}">${m.type}</span>
+          <span class="mc-reward">+${m.coins} CC</span>
+          <span class="mc-xp">+${m.xp} XP</span>
+          <span class="difficulty-badge ${diffClass}">${m.difficulty}</span>
+        </div>
+      </div>
+      <div class="mc-right">
+        ${isComplete
+          ? `<div class="mc-done-badge">✅ Done</div>`
+          : `<button class="mc-claim-btn" data-id="${m.id}" onclick="claimMission('${m.id}')">
+               Claim +${m.coins} CC
+             </button>`
+        }
+      </div>
+    </div>`;
+  }).join("");
+}
+
+window.claimMission = async function(missionId) {
+  const btn = document.querySelector(`#mc-${missionId} .mc-claim-btn`);
+  if (btn) { btn.disabled = true; btn.textContent = "Claiming..."; }
+
+  const result = await completeMission(currentUserId, missionId);
+
+  if (result.success) {
+    showToast(`🎉 +${result.coins} CC · +${result.xp} XP — ${result.label}`, "success");
+    await loadMissions(currentUserId);
+  } else {
+    showToast(result.message || "Cannot claim yet", "warn");
+    if (btn) { btn.disabled = false; btn.textContent = `Claim`; }
+  }
+};
+
+async function loadMissions(userId) {
+  currentUserId = userId;
+  const user  = getSession();
+  const wallet = await getWallet(userId);
+
+  // Header balance
+  document.getElementById("headerBalance").textContent = formatCoins(wallet.balance || 0) + " CC";
+
+  // Hero stats
+  document.getElementById("coinsEarned").textContent = formatCoins(wallet.totalEarned || 0);
+  document.getElementById("xpEarned").textContent    = (wallet.xp || 0) + " XP";
+
+  const levelInfo = calcLevel(wallet.xp || 0);
+  document.getElementById("levelDisplay").textContent = `Lv ${levelInfo.level}`;
+
+  // Count total apps for career mission auto-detection
+  let totalApps = 0;
+  let profilePct = 0;
+  try {
+    const { db } = await import("./firebase.js");
+    const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
+    const snap = await getDocs(collection(db, "applications"));
+    snap.forEach(d => {
+      const a = d.data();
+      if (a.email === user?.email || a.user === user?.email || a.seeker === user?.email) totalApps++;
+    });
+
+    if (user) {
+      const checks = [
+        (user.skills||"").trim().length>0, user.exp!==undefined&&String(user.exp)!=="",
+        (user.fullName||user.name||"").trim().length>0, (user.phone||"").trim().length>0,
+        (user.location||"").trim().length>0, (user.education||"").trim().length>0,
+        (user.bio||"").trim().length>0, (user.jobTitle||"").trim().length>0
+      ];
+      profilePct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+    }
+  } catch(e) { console.error(e); }
+
+  const data = await getUserMissions(userId, { totalApps, profilePct });
+  missionsData = data;
+
+  // Progress counts
+  const dailyDone  = data.daily.filter(m => m.completed).length;
+  const careerDone = data.career.filter(m => m.completed).length;
+  const weeklyDone = data.weekly.filter(m => m.completed).length;
+  const totalDone  = dailyDone + careerDone + weeklyDone;
+
+  document.getElementById("dailyDone").textContent  = `${dailyDone}/${data.daily.length}`;
+  document.getElementById("careerDone").textContent = careerDone;
+  document.getElementById("weeklyDone").textContent = weeklyDone;
+  document.getElementById("totalDone").textContent  = totalDone;
+
+  renderMissionList("dailyList",  data.daily);
+  renderMissionList("careerList", data.career);
+  renderMissionList("weeklyList", data.weekly);
+}
+
+onAuthStateChanged(auth, user => {
+  if (user) loadMissions(user.uid);
+  else window.location.href = "jobseeker-login.html";
+});
+</script>
+<script type="module" src="./app-enhancements.js"></script>
+</body>
+</html>

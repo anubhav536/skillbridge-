@@ -97,6 +97,8 @@
       <a href="js-resume.html">Resume Builder</a>
       <a href="js-analytics.html">Analytics</a>
       <a href="js-profile.html">Profile</a>
+      <a href="js-wallet.html">🪙 Wallet</a>
+      <a href="js-missions.html">⚡ Missions</a>
     </nav>
     <button id="logoutBtn">Logout 👋</button>
   </aside>
@@ -160,10 +162,15 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { logoutUser, applyJob, getSession } from "./firebase.js";
+import { logoutUser, applyJob, getSession, auth } from "./firebase.js";
 import { db } from "./firebase.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import { calcMatchScore } from "./ai-match.js";
+import { earnCoins } from "./economy.js";
+
+let _authUserId = null;
+onAuthStateChanged(auth, u => { if (u) _authUserId = u.uid; });
 
 /* ── Auth ── */
 const user = getSession();
@@ -333,7 +340,14 @@ document.getElementById("applyForm").addEventListener("submit", async e => {
     appliedJobs.push(currentJobId);
     localStorage.setItem(scopedKey, JSON.stringify(appliedJobs));
 
-    showToast("Application submitted successfully! ✅", "success");
+    // Career Coins — reward for applying
+    if (_authUserId) {
+      const isFirst = appliedJobs.length === 1;
+      if (isFirst) earnCoins(_authUserId, 'first_application').catch(() => {});
+      earnCoins(_authUserId, 'job_applied', { jobId: currentJobId, jobTitle }).catch(() => {});
+    }
+
+    showToast("Application submitted! ✅ +5 Career Coins earned", "success");
     setTimeout(() => { window.location.href = "js-applications.html"; }, 1800);
 
   } catch(err) {

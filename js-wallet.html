@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Career Wallet | SkillBridge AI</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="universal.css">
+  <style>
+    .wallet-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+    .wallet-top h1 { margin:0; }
+
+    /* Hero balance card */
+    .balance-hero {
+      background:linear-gradient(135deg,rgba(124,58,237,.35),rgba(79,70,229,.25));
+      border:1px solid rgba(124,58,237,.45); border-radius:20px; padding:2rem;
+      margin-bottom:1rem; position:relative; overflow:hidden;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1.5rem;
+    }
+    .balance-hero::before {
+      content:'🪙'; font-size:120px; position:absolute; right:-10px; top:-10px;
+      opacity:.07; line-height:1; pointer-events:none;
+    }
+    .balance-left h2 { font-size:14px; color:#a78bfa; font-weight:600; margin:0 0 .4rem; text-transform:uppercase; letter-spacing:.05em; }
+    .balance-amount { font-size:56px; font-weight:900; color:#f5f3ff; line-height:1; letter-spacing:-2px; }
+    .balance-amount span { font-size:22px; font-weight:700; color:#a78bfa; margin-left:.35rem; }
+    .balance-meta { display:flex; gap:1.5rem; margin-top:.9rem; flex-wrap:wrap; }
+    .balance-meta div { display:flex; flex-direction:column; gap:.15rem; }
+    .balance-meta .bm-label { font-size:12px; color:#6b7280; }
+    .balance-meta .bm-val   { font-size:18px; font-weight:800; color:#c4b5fd; }
+    .balance-right { text-align:center; }
+
+    /* Level card */
+    .level-ring {
+      width:90px; height:90px; border-radius:50%;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      box-shadow:0 0 40px rgba(124,58,237,.5); font-size:26px;
+    }
+    .level-ring .lv-num { font-size:13px; font-weight:800; color:#c4b5fd; margin-top:.15rem; }
+    .level-ring .lv-lbl { font-size:10px; color:#a78bfa; font-weight:600; }
+    .xp-bar-wrap { width:90px; height:6px; background:rgba(255,255,255,.1); border-radius:99px; overflow:hidden; margin-top:.6rem; }
+    .xp-bar-fill { height:100%; background:linear-gradient(90deg,#7c3aed,#a78bfa); border-radius:99px; transition:width .8s ease; }
+    .xp-label { font-size:11px; color:#6b7280; margin-top:.3rem; }
+
+    /* Stats row */
+    .wallet-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.75rem; margin-bottom:1rem; }
+    .ws-card {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:14px;
+      padding:1rem 1.1rem; display:flex; flex-direction:column; gap:.25rem;
+    }
+    .ws-card .ws-icon { font-size:20px; }
+    .ws-card .ws-label { font-size:12px; color:#6b7280; font-weight:600; margin-top:.1rem; }
+    .ws-card .ws-val   { font-size:22px; font-weight:800; color:#f5f3ff; line-height:1.2; }
+    .ws-card .ws-sub   { font-size:12px; color:#a78bfa; }
+
+    /* Two-col layout */
+    .wallet-grid { display:grid; grid-template-columns:1fr 1.2fr; gap:1rem; margin-bottom:1rem; }
+    @media(max-width:768px){ .wallet-grid { grid-template-columns:1fr; } }
+
+    .w-panel {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px; padding:1.4rem;
+    }
+    .w-panel h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+
+    /* Earn guide */
+    .earn-item {
+      display:flex; align-items:center; gap:.85rem; padding:.7rem;
+      border-radius:10px; margin-bottom:.5rem; background:rgba(124,58,237,.07);
+      border:1px solid rgba(124,58,237,.12); cursor:default;
+      transition:background .2s;
+    }
+    .earn-item:hover { background:rgba(124,58,237,.14); }
+    .earn-item:last-child { margin-bottom:0; }
+    .earn-icon { font-size:20px; width:32px; text-align:center; flex-shrink:0; }
+    .earn-info { flex:1; }
+    .earn-label { font-size:13.5px; font-weight:700; color:#e2e8f0; }
+    .earn-sub   { font-size:12px; color:#6b7280; margin-top:.1rem; }
+    .earn-coins {
+      font-size:14px; font-weight:800; color:#4ade80;
+      background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.2);
+      padding:.2rem .65rem; border-radius:999px; white-space:nowrap;
+    }
+
+    /* Spend catalog */
+    .spend-item {
+      display:flex; align-items:center; gap:.85rem; padding:.85rem 1rem;
+      border-radius:12px; margin-bottom:.6rem; background:rgba(30,18,80,.5);
+      border:1px solid rgba(124,58,237,.15); transition:all .2s;
+    }
+    .spend-item:last-child { margin-bottom:0; }
+    .spend-icon { font-size:22px; width:36px; text-align:center; flex-shrink:0; }
+    .spend-info { flex:1; }
+    .spend-label { font-size:14px; font-weight:700; color:#f5f3ff; }
+    .spend-desc  { font-size:12px; color:#6b7280; margin-top:.15rem; }
+    .spend-btn {
+      padding:.45rem 1rem; border-radius:8px; font-size:13px; font-weight:700; cursor:pointer;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+      box-shadow:0 2px 10px rgba(124,58,237,.3); transition:filter .2s, transform .2s;
+      white-space:nowrap;
+    }
+    .spend-btn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    .spend-btn:disabled { opacity:.5; cursor:not-allowed; transform:none; filter:none; }
+    .spend-cost { font-size:13px; font-weight:800; color:#c4b5fd; display:block; margin-top:.2rem; }
+
+    /* Transaction history */
+    .tx-item {
+      display:flex; align-items:center; gap:.85rem; padding:.75rem;
+      border-radius:10px; margin-bottom:.45rem; background:rgba(30,18,80,.4);
+      border:1px solid rgba(124,58,237,.1);
+    }
+    .tx-item:last-child { margin-bottom:0; }
+    .tx-icon { font-size:18px; width:32px; text-align:center; flex-shrink:0; }
+    .tx-info { flex:1; min-width:0; }
+    .tx-reason { font-size:13.5px; font-weight:600; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tx-time   { font-size:12px; color:#6b7280; margin-top:.1rem; }
+    .tx-amount { font-size:15px; font-weight:800; white-space:nowrap; }
+    .tx-earn   { color:#4ade80; }
+    .tx-spend  { color:#f87171; }
+
+    .empty-state { text-align:center; padding:2rem 1rem; color:#6b7280; font-size:14px; }
+    .empty-icon  { font-size:36px; display:block; margin-bottom:.75rem; }
+
+    /* Streak card */
+    .streak-row { display:flex; align-items:center; gap:1rem; }
+    .streak-fire { font-size:48px; line-height:1; }
+    .streak-info h4 { font-size:28px; font-weight:900; color:#fcd34d; margin:0; }
+    .streak-info p  { font-size:13px; color:#a78bfa; margin:.2rem 0 0; }
+    .streak-bar-wrap { background:rgba(255,255,255,.07); height:6px; border-radius:99px; margin-top:.75rem; overflow:hidden; }
+    .streak-bar-fill { height:100%; border-radius:99px; background:linear-gradient(90deg,#d97706,#fcd34d); transition:width .8s ease; }
+    .streak-hint { font-size:12.5px; color:#6b7280; margin-top:.5rem; }
+
+    /* Purchases */
+    .purchase-pill {
+      display:inline-flex; align-items:center; gap:.35rem;
+      padding:.35rem .85rem; border-radius:999px; font-size:13px; font-weight:600; margin:.25rem;
+      background:rgba(124,58,237,.12); border:1px solid rgba(124,58,237,.25); color:#c4b5fd;
+    }
+
+    /* Toast */
+    .toast {
+      position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+      padding:.9rem 1.4rem; border-radius:12px; font-size:14px; font-weight:600;
+      box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+      transition:opacity .3s, transform .3s; pointer-events:none; max-width:320px;
+    }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+    .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+    .toast-info    { background:#1e3a5f; border:1px solid #60a5fa; color:#60a5fa; }
+
+    /* Coin burst animation */
+    @keyframes coinBurst { 0%{transform:scale(1)} 50%{transform:scale(1.2)} 100%{transform:scale(1)} }
+    .coin-burst { animation:coinBurst .4s ease; }
+  </style>
+</head>
+
+<body>
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <h2>👨‍🎓 Job Seeker Panel</h2>
+    <nav>
+      <a href="js-dashboard.html">Dashboard</a>
+      <a href="js-jobs.html">Jobs</a>
+      <a href="js-applications.html">Applications</a>
+      <a href="js-resume.html">Resume Builder</a>
+      <a href="js-analytics.html">Analytics</a>
+      <a href="career-gap.html">🧠 AI Career Gap</a>
+      <a href="js-profile.html">Profile</a>
+      <a href="js-wallet.html" class="active">🪙 Wallet</a>
+      <a href="js-missions.html">⚡ Missions</a>
+    </nav>
+    <button id="logoutBtn">Logout 👋</button>
+  </aside>
+
+  <main class="main">
+
+    <div class="wallet-top">
+      <div>
+        <h1>🪙 Career Wallet</h1>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Every action you take creates real value here.</p>
+      </div>
+      <a href="js-missions.html" class="btn" style="padding:.6rem 1.2rem;font-size:14px;font-weight:700;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;cursor:pointer;text-decoration:none">⚡ View Missions</a>
+    </div>
+
+    <!-- Hero Balance -->
+    <div class="balance-hero">
+      <div class="balance-left">
+        <h2>Career Coins Balance</h2>
+        <div class="balance-amount" id="balanceDisplay">—<span>CC</span></div>
+        <div class="balance-meta">
+          <div><span class="bm-label">Total Earned</span><span class="bm-val" id="totalEarned">—</span></div>
+          <div><span class="bm-label">Total Spent</span><span class="bm-val" id="totalSpent">—</span></div>
+          <div><span class="bm-label">🔥 Streak</span><span class="bm-val" id="streakDisplay">—</span></div>
+        </div>
+      </div>
+      <div class="balance-right">
+        <div class="level-ring" id="levelRing">
+          <span id="levelIcon">🌱</span>
+          <div class="lv-num">Lv <span id="levelNum">1</span></div>
+          <div class="lv-lbl" id="levelLabel">Starter</div>
+        </div>
+        <div class="xp-bar-wrap">
+          <div class="xp-bar-fill" id="xpBar" style="width:0%"></div>
+        </div>
+        <div class="xp-label" id="xpLabel">0 XP</div>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="wallet-stats">
+      <div class="ws-card">
+        <div class="ws-icon">📊</div>
+        <div class="ws-label">Trust Score</div>
+        <div class="ws-val" id="trustScore">—</div>
+        <div class="ws-sub">Out of 100</div>
+      </div>
+      <div class="ws-card">
+        <div class="ws-icon">🏆</div>
+        <div class="ws-label">Longest Streak</div>
+        <div class="ws-val" id="longestStreak">— days</div>
+        <div class="ws-sub">Personal best</div>
+      </div>
+      <div class="ws-card">
+        <div class="ws-icon">✅</div>
+        <div class="ws-label">Missions Done</div>
+        <div class="ws-val" id="missionsDone">—</div>
+        <div class="ws-sub">Career missions</div>
+      </div>
+      <div class="ws-card">
+        <div class="ws-icon">🛒</div>
+        <div class="ws-label">Purchases</div>
+        <div class="ws-val" id="purchaseCount">—</div>
+        <div class="ws-sub">Items redeemed</div>
+      </div>
+    </div>
+
+    <div class="wallet-grid">
+
+      <!-- LEFT: Earn Guide + Streak -->
+      <div style="display:flex;flex-direction:column;gap:1rem">
+
+        <div class="w-panel">
+          <h3>🔥 Login Streak</h3>
+          <div class="streak-row">
+            <div class="streak-fire">🔥</div>
+            <div class="streak-info">
+              <h4 id="streakDays">0</h4>
+              <p>Day streak</p>
+            </div>
+          </div>
+          <div class="streak-bar-wrap">
+            <div class="streak-bar-fill" id="streakBar" style="width:0%"></div>
+          </div>
+          <div class="streak-hint" id="streakHint">Log in tomorrow to keep your streak alive</div>
+        </div>
+
+        <div class="w-panel">
+          <h3>💰 How to Earn Coins</h3>
+          <div id="earnGuide">Loading...</div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: Transaction History -->
+      <div class="w-panel">
+        <h3>📜 Transaction History</h3>
+        <div id="txHistory">
+          <div class="empty-state"><span class="empty-icon">⏳</span>Loading transactions...</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Spend Catalog -->
+    <div class="w-panel" style="margin-bottom:1rem">
+      <h3>🛒 Spend Your Coins</h3>
+      <p style="font-size:13.5px;color:#6b7280;margin-bottom:1rem">Redeem Career Coins for premium features, boosts, and career tools.</p>
+      <div id="spendCatalog">Loading catalog...</div>
+    </div>
+
+    <!-- My Purchases -->
+    <div class="w-panel" id="purchasesPanel" style="margin-bottom:1rem;display:none">
+      <h3>🏷️ My Purchases</h3>
+      <div id="purchasesList"></div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { logoutUser, getSession, protectPage } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import {
+  getWallet, spendCoins, getTransactionHistory,
+  EARN_EVENTS, SPEND_CATALOG, calcLevel, computeTrustScore,
+  formatCoins, formatTime
+} from "./economy.js";
+
+protectPage("jobseeker");
+document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+let currentWallet = null;
+let currentUserId = null;
+
+async function loadWallet(userId) {
+  currentUserId = userId;
+  const user = getSession();
+
+  try {
+    const wallet = await getWallet(userId);
+    currentWallet = wallet;
+
+    // Balance hero
+    const balEl = document.getElementById("balanceDisplay");
+    balEl.innerHTML = `${formatCoins(wallet.balance || 0)}<span>CC</span>`;
+    balEl.classList.add("coin-burst");
+    setTimeout(() => balEl.classList.remove("coin-burst"), 500);
+
+    document.getElementById("totalEarned").textContent   = formatCoins(wallet.totalEarned || 0) + ' CC';
+    document.getElementById("totalSpent").textContent    = formatCoins(wallet.totalSpent  || 0) + ' CC';
+    document.getElementById("streakDisplay").textContent = (wallet.streakDays || 0) + ' days';
+
+    // Level
+    const levelInfo = calcLevel(wallet.xp || 0);
+    document.getElementById("levelIcon").textContent  = levelInfo.icon;
+    document.getElementById("levelNum").textContent   = levelInfo.level;
+    document.getElementById("levelLabel").textContent = levelInfo.label;
+    document.getElementById("xpBar").style.width      = levelInfo.progress + "%";
+    document.getElementById("xpLabel").textContent    = `${wallet.xp || 0} XP → ${levelInfo.nextXp} XP`;
+
+    // Streak
+    const streak = wallet.streakDays || 0;
+    document.getElementById("streakDays").textContent = streak;
+    const streakPct = Math.min((streak / 30) * 100, 100);
+    document.getElementById("streakBar").style.width  = streakPct + "%";
+    const nextMilestone = streak < 7 ? 7 : streak < 30 ? 30 : "∞";
+    document.getElementById("streakHint").textContent =
+      streak === 0 ? "Log in daily to build your streak and earn bonus coins!" :
+      streak >= 30 ? `🏆 You're on a 30+ day streak! Legend status achieved.` :
+      `${nextMilestone - streak} more days to ${nextMilestone}-day milestone bonus`;
+
+    // Stats
+    const profilePct = user ? calcProfilePct(user) : 0;
+    const trust = computeTrustScore(wallet, profilePct, 0, 0);
+    document.getElementById("trustScore").textContent    = trust + "/100";
+    document.getElementById("longestStreak").textContent = (wallet.longestStreak || 0) + " days";
+
+    const missionsDone = Object.values(wallet.missions || {}).filter(m => m.completed).length;
+    document.getElementById("missionsDone").textContent  = missionsDone;
+
+    const purchases = wallet.purchases || [];
+    document.getElementById("purchaseCount").textContent = purchases.length;
+
+    if (purchases.length > 0) {
+      document.getElementById("purchasesPanel").style.display = "block";
+      document.getElementById("purchasesList").innerHTML = purchases.map(p => `
+        <span class="purchase-pill">${p.label || p.id} — ${formatTime(p.purchasedAt)}</span>
+      `).join("");
+    }
+
+    // Spend catalog
+    renderSpendCatalog(wallet.balance || 0);
+
+    // Transactions
+    const txs = await getTransactionHistory(userId, 30);
+    renderTransactions(txs);
+
+  } catch(e) {
+    console.error(e);
+    showToast("Failed to load wallet data", "error");
+  }
+}
+
+function calcProfilePct(user) {
+  const checks = [
+    (user.skills || "").trim().length > 0,
+    user.exp !== undefined && String(user.exp) !== "",
+    (user.fullName || user.name || "").trim().length > 0,
+    (user.phone || "").trim().length > 0,
+    (user.location || "").trim().length > 0,
+    (user.education || "").trim().length > 0,
+    (user.bio || "").trim().length > 0,
+    (user.jobTitle || "").trim().length > 0,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+function renderEarnGuide() {
+  const topEvents = [
+    'daily_login', 'profile_complete', 'resume_built', 'job_applied',
+    'career_gap_analysis', 'interview_practice', 'mission_daily', 'mission_weekly',
+    'first_application', 'streak_7', 'referral'
+  ];
+  const guide = document.getElementById("earnGuide");
+  guide.innerHTML = topEvents.map(key => {
+    const e = EARN_EVENTS[key];
+    if (!e) return "";
+    const cooldownLabel = e.cooldown === 'once' ? 'Once only'
+      : e.cooldown === 'daily'   ? `Up to ${e.max}×/day`
+      : e.cooldown === 'weekly'  ? 'Once/week'
+      : 'Milestone';
+    return `<div class="earn-item">
+      <div class="earn-icon">${e.icon}</div>
+      <div class="earn-info">
+        <div class="earn-label">${e.label}</div>
+        <div class="earn-sub">${cooldownLabel} · +${e.xp} XP</div>
+      </div>
+      <div class="earn-coins">+${e.coins} CC</div>
+    </div>`;
+  }).join("");
+}
+
+function renderSpendCatalog(balance) {
+  const cat = document.getElementById("spendCatalog");
+  cat.innerHTML = SPEND_CATALOG.map(item => `
+    <div class="spend-item">
+      <div class="spend-icon">${item.icon}</div>
+      <div class="spend-info">
+        <div class="spend-label">${item.label}</div>
+        <div class="spend-desc">${item.desc}</div>
+        <span class="spend-cost">${item.cost} CC</span>
+      </div>
+      <button class="spend-btn" data-id="${item.id}" data-cost="${item.cost}"
+        ${balance < item.cost ? 'disabled' : ''}>
+        ${balance < item.cost ? `Need ${item.cost - balance} more` : 'Redeem'}
+      </button>
+    </div>`).join("");
+
+  cat.querySelectorAll(".spend-btn:not(:disabled)").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id   = btn.dataset.id;
+      const cost = Number(btn.dataset.cost);
+      btn.disabled = true; btn.textContent = "Redeeming...";
+      const result = await spendCoins(currentUserId, id);
+      if (result.success) {
+        showToast(`✅ Redeemed! New balance: ${result.newBalance} CC`, "success");
+        await loadWallet(currentUserId);
+      } else {
+        showToast(result.message || "Failed to redeem", "error");
+        btn.disabled = false; btn.textContent = "Redeem";
+      }
+    });
+  });
+}
+
+function renderTransactions(txs) {
+  const el = document.getElementById("txHistory");
+  if (txs.length === 0) {
+    el.innerHTML = `<div class="empty-state"><span class="empty-icon">📭</span>No transactions yet.<br>Start earning by completing your profile!</div>`;
+    return;
+  }
+  el.innerHTML = txs.map(tx => {
+    const isEarn = tx.type === 'earn';
+    const icon   = isEarn ? '⬆️' : '⬇️';
+    return `<div class="tx-item">
+      <div class="tx-icon">${icon}</div>
+      <div class="tx-info">
+        <div class="tx-reason">${tx.reason || tx.eventType || '—'}</div>
+        <div class="tx-time">${formatTime(tx.timestamp)}</div>
+      </div>
+      <div class="tx-amount ${isEarn ? 'tx-earn' : 'tx-spend'}">
+        ${isEarn ? '+' : ''}${tx.amount} CC
+      </div>
+    </div>`;
+  }).join("");
+}
+
+// Init
+renderEarnGuide();
+
+onAuthStateChanged(auth, user => {
+  if (user) loadWallet(user.uid);
+  else window.location.href = "jobseeker-login.html";
+});
+</script>
+<script type="module" src="./app-enhancements.js"></script>
+</body>
+</html>

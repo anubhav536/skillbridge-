@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Economy Control | SkillBridge Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="universal.css">
+  <style>
+    .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+    .page-top h1 { margin:0; }
+
+    /* Economy stats hero */
+    .eco-hero { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:.85rem; margin-bottom:1.1rem; }
+    .eco-stat {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.25); border-radius:16px;
+      padding:1.3rem 1.2rem; position:relative; overflow:hidden; transition:box-shadow .2s;
+    }
+    .eco-stat:hover { box-shadow:0 0 28px rgba(124,58,237,.2); }
+    .eco-stat::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:3px 3px 0 0; }
+    .es-gold::before   { background:linear-gradient(90deg,#d97706,#fcd34d); }
+    .es-green::before  { background:linear-gradient(90deg,#16a34a,#4ade80); }
+    .es-blue::before   { background:linear-gradient(90deg,#1d4ed8,#60a5fa); }
+    .es-purple::before { background:linear-gradient(90deg,#7c3aed,#c4b5fd); }
+    .es-red::before    { background:linear-gradient(90deg,#dc2626,#f87171); }
+    .es-teal::before   { background:linear-gradient(90deg,#0d9488,#2dd4bf); }
+    .eco-stat h4 { font-size:12px; color:#a78bfa; font-weight:600; margin:0 0 .5rem; text-transform:uppercase; letter-spacing:.04em; }
+    .eco-stat p  { font-size:32px; font-weight:900; color:#f5f3ff; margin:0; line-height:1; }
+    .eco-stat .es-sub { font-size:12px; color:#6b7280; margin-top:.35rem; }
+
+    /* Two-col grid */
+    .admin-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1.1rem; }
+    @media(max-width:800px){ .admin-grid { grid-template-columns:1fr; } }
+
+    .a-panel {
+      background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px; padding:1.4rem;
+    }
+    .a-panel h3 { font-size:15px; font-weight:700; color:#f5f3ff; margin-bottom:1rem; }
+    .panel-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; flex-wrap:wrap; gap:.5rem; }
+    .panel-header h3 { margin:0; font-size:15px; font-weight:700; color:#f5f3ff; }
+
+    /* Leaderboard */
+    .lb-row {
+      display:flex; align-items:center; gap:.85rem; padding:.75rem;
+      border-radius:10px; margin-bottom:.45rem; background:rgba(30,18,80,.45);
+      border:1px solid rgba(124,58,237,.12); transition:background .2s;
+    }
+    .lb-row:hover { background:rgba(124,58,237,.12); }
+    .lb-rank { font-size:16px; font-weight:900; width:28px; text-align:center; flex-shrink:0; }
+    .lb-rank-1 { color:#fcd34d; }
+    .lb-rank-2 { color:#9ca3af; }
+    .lb-rank-3 { color:#d97706; }
+    .lb-rank-n { color:#6b7280; }
+    .lb-info   { flex:1; min-width:0; }
+    .lb-id     { font-size:13.5px; font-weight:700; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-family:monospace; }
+    .lb-sub    { font-size:12px; color:#6b7280; margin-top:.1rem; }
+    .lb-coins  { font-size:15px; font-weight:800; color:#fcd34d; white-space:nowrap; }
+    .lb-level  {
+      font-size:11px; font-weight:700; padding:.18rem .55rem; border-radius:6px;
+      background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3); color:#c4b5fd;
+    }
+
+    /* Recent transactions */
+    .tx-row {
+      display:flex; align-items:center; gap:.85rem; padding:.75rem;
+      border-radius:10px; margin-bottom:.45rem; background:rgba(30,18,80,.45);
+      border:1px solid rgba(124,58,237,.1);
+    }
+    .tx-icon { font-size:18px; width:28px; text-align:center; flex-shrink:0; }
+    .tx-info { flex:1; min-width:0; }
+    .tx-label{ font-size:13.5px; font-weight:600; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .tx-uid  { font-size:11px; color:#6b7280; font-family:monospace; }
+    .tx-amt-earn  { font-size:14px; font-weight:800; color:#4ade80; white-space:nowrap; }
+    .tx-amt-spend { font-size:14px; font-weight:800; color:#f87171; white-space:nowrap; }
+
+    /* Award form */
+    .award-form { display:flex; flex-direction:column; gap:.75rem; }
+    .award-form input, .award-form textarea {
+      background:rgba(255,255,255,.07); border:1px solid rgba(124,58,237,.3);
+      border-radius:10px; padding:.75rem 1rem; font-size:14px; color:#f5f3ff;
+      font-family:inherit; outline:none; transition:border-color .2s;
+    }
+    .award-form input:focus, .award-form textarea:focus { border-color:#7c3aed; }
+    .award-form input::placeholder, .award-form textarea::placeholder { color:#6b7280; }
+    .award-btn {
+      padding:.75rem; border-radius:10px; font-size:14px; font-weight:700;
+      background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; border:none;
+      cursor:pointer; box-shadow:0 3px 12px rgba(124,58,237,.35); transition:filter .2s;
+    }
+    .award-btn:hover:not(:disabled) { filter:brightness(1.1); }
+    .award-btn:disabled { opacity:.6; cursor:not-allowed; }
+
+    /* Economy controls */
+    .eco-control { display:flex; align-items:center; justify-content:space-between; padding:.9rem;
+      border-radius:10px; margin-bottom:.55rem; background:rgba(30,18,80,.45); border:1px solid rgba(124,58,237,.12); gap:1rem; flex-wrap:wrap; }
+    .ec-info h5 { font-size:14px; font-weight:700; color:#f5f3ff; margin:0 0 .2rem; }
+    .ec-info p  { font-size:12.5px; color:#6b7280; margin:0; }
+    .toggle-wrap { display:flex; align-items:center; gap:.5rem; }
+    .toggle-switch { position:relative; width:44px; height:24px; cursor:pointer; }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-track {
+      position:absolute; inset:0; border-radius:12px; background:rgba(124,58,237,.2);
+      border:1px solid rgba(124,58,237,.3); transition:background .2s;
+    }
+    .toggle-switch input:checked + .toggle-track { background:#7c3aed; border-color:#a78bfa; }
+    .toggle-knob {
+      position:absolute; top:3px; left:3px; width:18px; height:18px;
+      border-radius:50%; background:#fff; transition:transform .2s;
+    }
+    .toggle-switch input:checked ~ .toggle-knob { transform:translateX(20px); }
+
+    /* Distribution bar */
+    .dist-bar-wrap { margin-top:.75rem; }
+    .dist-row { display:flex; align-items:center; gap:.75rem; margin-bottom:.45rem; }
+    .dist-label { font-size:13px; color:#a78bfa; width:100px; flex-shrink:0; }
+    .dist-track { flex:1; height:8px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; }
+    .dist-fill  { height:100%; border-radius:99px; background:linear-gradient(90deg,#7c3aed,#a78bfa); }
+    .dist-val   { font-size:13px; font-weight:800; color:#f5f3ff; width:60px; text-align:right; flex-shrink:0; }
+
+    /* Empty */
+    .empty-state { text-align:center; padding:2rem; color:#6b7280; font-size:14px; }
+
+    /* Toast */
+    .toast {
+      position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+      padding:.9rem 1.4rem; border-radius:12px; font-size:14px; font-weight:600;
+      box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+      transition:opacity .3s, transform .3s; pointer-events:none; max-width:320px;
+    }
+    .toast.show { opacity:1; transform:translateY(0); }
+    .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+    .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+    .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+    .toast-info    { background:#1e3a5f; border:1px solid #60a5fa; color:#60a5fa; }
+  </style>
+</head>
+
+<body>
+<!-- Admin role guard -->
+<script>
+  if (localStorage.getItem("role") !== "admin") {
+    window.location.href = "admin-login.html";
+  }
+</script>
+
+<div class="dashboard">
+
+  <aside class="sidebar">
+    <h2>🛡️ Admin Panel</h2>
+    <nav>
+      <a href="admin-dashboard.html">Dashboard</a>
+      <a href="admin-users.html">Users</a>
+      <a href="admin-jobs.html">Jobs</a>
+      <a href="admin-applications.html">Applications</a>
+      <a href="admin-analytics.html">Analytics</a>
+      <a href="admin-leaderboard.html">Leaderboard</a>
+      <a href="admin-economy.html" class="active">🪙 Economy</a>
+      <a href="admin-flags.html">Flags</a>
+      <a href="admin-moderation.html">Moderation</a>
+      <a href="admin-logs.html">Logs</a>
+      <a href="admin-ai-control.html">AI Control</a>
+      <a href="admin-notifications.html">Notifications</a>
+      <a href="admin-settings.html">Settings</a>
+    </nav>
+    <button onclick="logout()">Logout 👋</button>
+  </aside>
+
+  <main class="main">
+
+    <div class="page-top">
+      <div>
+        <h1>🪙 Economy Control</h1>
+        <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">Monitor and control the Career Coins economy in real-time.</p>
+      </div>
+      <button onclick="loadAll()" class="btn" style="padding:.65rem 1.3rem;font-size:14px;font-weight:700;border-radius:10px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;border:none;cursor:pointer">🔄 Refresh</button>
+    </div>
+
+    <!-- Economy stats -->
+    <div class="eco-hero">
+      <div class="eco-stat es-gold">
+        <h4>🪙 Coins in Circulation</h4>
+        <p id="totalCoins">—</p>
+        <div class="es-sub">Total held across all wallets</div>
+      </div>
+      <div class="eco-stat es-green">
+        <h4>📈 Total Ever Earned</h4>
+        <p id="totalEarned">—</p>
+        <div class="es-sub">All-time coins issued</div>
+      </div>
+      <div class="eco-stat es-red">
+        <h4>🛒 Total Ever Spent</h4>
+        <p id="totalSpent">—</p>
+        <div class="es-sub">All-time coins redeemed</div>
+      </div>
+      <div class="eco-stat es-blue">
+        <h4>👛 Active Wallets</h4>
+        <p id="activeWallets">—</p>
+        <div class="es-sub" id="totalWallets">of 0 registered</div>
+      </div>
+      <div class="eco-stat es-purple">
+        <h4>⚖️ Velocity</h4>
+        <p id="velocity">—</p>
+        <div class="es-sub">Spent ÷ Earned ratio</div>
+      </div>
+      <div class="eco-stat es-teal">
+        <h4>📊 Avg Balance</h4>
+        <p id="avgBalance">—</p>
+        <div class="es-sub">Per active wallet</div>
+      </div>
+    </div>
+
+    <!-- Two-col: top earners + award coins -->
+    <div class="admin-grid">
+
+      <!-- Top Earners -->
+      <div class="a-panel">
+        <div class="panel-header">
+          <h3>🏆 Top Earners</h3>
+          <span style="font-size:12px;color:#6b7280" id="earnerCount">—</span>
+        </div>
+        <div id="leaderboardList">
+          <div class="empty-state">Loading...</div>
+        </div>
+      </div>
+
+      <!-- Award Coins -->
+      <div class="a-panel">
+        <h3>🎁 Award Coins to User</h3>
+        <p style="font-size:13px;color:#6b7280;margin-bottom:1rem">Manually grant Career Coins to any user wallet. Use for support, promotions, and corrections.</p>
+        <div class="award-form">
+          <input type="text" id="awardUserId" placeholder="User ID (from Firebase Auth / Users list)" />
+          <input type="number" id="awardAmount" placeholder="Amount (e.g. 100)" min="1" max="10000" />
+          <textarea id="awardReason" rows="2" placeholder="Reason (e.g. Referral promotion, Support resolution)"></textarea>
+          <button class="award-btn" id="awardBtn" onclick="doAward()">🎁 Award Coins</button>
+        </div>
+        <div id="awardResult" style="margin-top:.75rem;font-size:13px;display:none"></div>
+      </div>
+
+    </div>
+
+    <!-- Two-col: coin distribution + economy controls -->
+    <div class="admin-grid">
+
+      <!-- Coin Supply Distribution -->
+      <div class="a-panel">
+        <h3>📊 Coin Supply Distribution</h3>
+        <div class="dist-bar-wrap" id="distBars">
+          <div class="empty-state">Loading distribution...</div>
+        </div>
+      </div>
+
+      <!-- Economy Controls -->
+      <div class="a-panel">
+        <h3>⚙️ Economy Controls</h3>
+        <div class="eco-control">
+          <div class="ec-info">
+            <h5>Daily Login Rewards</h5>
+            <p>Users earn 10 CC on first login each day</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleLogin" checked onchange="saveControl('daily_login_enabled', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="eco-control">
+          <div class="ec-info">
+            <h5>Streak Bonuses</h5>
+            <p>7-day (+50 CC) and 30-day (+200 CC) milestones</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleStreak" checked onchange="saveControl('streak_bonus_enabled', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="eco-control">
+          <div class="ec-info">
+            <h5>Mission Rewards</h5>
+            <p>Career Coins awarded on mission completion</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleMissions" checked onchange="saveControl('mission_rewards_enabled', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="eco-control">
+          <div class="ec-info">
+            <h5>Spend Catalog</h5>
+            <p>Users can redeem coins from the spend catalog</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleSpend" checked onchange="saveControl('spend_enabled', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+        <div class="eco-control">
+          <div class="ec-info">
+            <h5>Anti-Fraud Mode</h5>
+            <p>Enforce daily/weekly limits and cooldowns</p>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="toggleFraud" checked onchange="saveControl('anti_fraud_enabled', this.checked)">
+            <div class="toggle-track"></div>
+            <div class="toggle-knob"></div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Recent Transactions Monitor -->
+    <div class="a-panel" style="margin-bottom:1rem">
+      <div class="panel-header">
+        <h3>📋 Recent Economy Activity</h3>
+        <span style="font-size:12px;color:#6b7280">Live from Firestore</span>
+      </div>
+      <div id="recentActivity">
+        <div class="empty-state">Loading activity...</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import {
+  collection, getDocs, doc, updateDoc, setDoc, getDoc, addDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import {
+  getPlatformEconomyStats, adminAwardCoins, formatCoins, formatTime, calcLevel
+} from "./economy.js";
+
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 4000);
+}
+
+function logout() {
+  localStorage.removeItem("session");
+  localStorage.removeItem("role");
+  window.location.href = "admin-login.html";
+}
+window.logout = logout;
+
+window.saveControl = async function(key, val) {
+  try {
+    const ref = doc(db, "economy_config", "controls");
+    const snap = await getDoc(ref);
+    if (!snap.exists()) await setDoc(ref, {});
+    await updateDoc(ref, { [key]: val, updatedAt: Date.now() });
+    showToast(`${val ? 'Enabled' : 'Disabled'}: ${key}`, "info");
+  } catch(e) {
+    console.error(e); showToast("Failed to save control", "error");
+  }
+};
+
+window.doAward = async function() {
+  const uid    = document.getElementById("awardUserId").value.trim();
+  const amount = parseInt(document.getElementById("awardAmount").value);
+  const reason = document.getElementById("awardReason").value.trim();
+  const btn    = document.getElementById("awardBtn");
+  const res    = document.getElementById("awardResult");
+
+  if (!uid || !amount || !reason) {
+    showToast("Fill in all 3 fields", "error"); return;
+  }
+  if (amount < 1 || amount > 10000) {
+    showToast("Amount must be 1–10,000", "error"); return;
+  }
+
+  btn.disabled = true; btn.textContent = "Awarding...";
+  const result = await adminAwardCoins(uid, amount, reason);
+
+  if (result.success) {
+    res.style.display = "block";
+    res.style.color   = "#4ade80";
+    res.textContent   = `✅ Awarded ${amount} CC to wallet. New balance: ${result.newBalance} CC`;
+    document.getElementById("awardUserId").value  = "";
+    document.getElementById("awardAmount").value  = "";
+    document.getElementById("awardReason").value  = "";
+    showToast(`✅ ${amount} CC awarded successfully`, "success");
+    await loadAll();
+  } else {
+    res.style.display = "block";
+    res.style.color   = "#f87171";
+    res.textContent   = "❌ Award failed — check User ID";
+    showToast("Award failed — verify User ID", "error");
+  }
+  btn.disabled = false; btn.textContent = "🎁 Award Coins";
+};
+
+async function loadEconomyControls() {
+  try {
+    const snap = await getDoc(doc(db, "economy_config", "controls"));
+    if (snap.exists()) {
+      const data = snap.data();
+      const map = {
+        daily_login_enabled: "toggleLogin",
+        streak_bonus_enabled: "toggleStreak",
+        mission_rewards_enabled: "toggleMissions",
+        spend_enabled: "toggleSpend",
+        anti_fraud_enabled: "toggleFraud"
+      };
+      for (const [k, id] of Object.entries(map)) {
+        const el = document.getElementById(id);
+        if (el && data[k] !== undefined) el.checked = data[k];
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function loadRecentActivity() {
+  try {
+    const walletsSnap = await getDocs(collection(db, "wallets"));
+    const allTxs = [];
+    const userIds = [];
+    walletsSnap.forEach(d => userIds.push(d.id));
+
+    // Sample latest 5 wallets' transactions
+    const sample = userIds.slice(0, 8);
+    for (const uid of sample) {
+      try {
+        const txSnap = await getDocs(collection(db, "wallets", uid, "transactions"));
+        txSnap.forEach(d => allTxs.push({ ...d.data(), userId: uid }));
+      } catch(e) {}
+    }
+
+    allTxs.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    const recent = allTxs.slice(0, 15);
+
+    const el = document.getElementById("recentActivity");
+    if (recent.length === 0) {
+      el.innerHTML = `<div class="empty-state">No transactions recorded yet.</div>`;
+      return;
+    }
+
+    el.innerHTML = recent.map(tx => {
+      const isEarn = tx.type === 'earn';
+      return `<div class="tx-row">
+        <div class="tx-icon">${isEarn ? '⬆️' : '⬇️'}</div>
+        <div class="tx-info">
+          <div class="tx-label">${tx.reason || tx.eventType || '—'}</div>
+          <div class="tx-uid">UID: ${tx.userId}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="${isEarn ? 'tx-amt-earn' : 'tx-amt-spend'}">${isEarn ? '+' : ''}${tx.amount} CC</div>
+          <div style="font-size:11px;color:#6b7280">${formatTime(tx.timestamp)}</div>
+        </div>
+      </div>`;
+    }).join("");
+  } catch(e) {
+    console.error(e);
+    document.getElementById("recentActivity").innerHTML = `<div class="empty-state">Failed to load activity.</div>`;
+  }
+}
+
+window.loadAll = async function() {
+  try {
+    const stats = await getPlatformEconomyStats();
+
+    // Heroes
+    document.getElementById("totalCoins").textContent    = formatCoins(stats.totalCoins);
+    document.getElementById("totalEarned").textContent   = formatCoins(stats.totalEarned);
+    document.getElementById("totalSpent").textContent    = formatCoins(stats.totalSpent);
+    document.getElementById("activeWallets").textContent = stats.activeWallets;
+    document.getElementById("totalWallets").textContent  = `of ${stats.totalWallets} registered`;
+
+    const velocity = stats.totalEarned > 0 ? Math.round((stats.totalSpent / stats.totalEarned) * 100) : 0;
+    document.getElementById("velocity").textContent  = velocity + "%";
+    const avg = stats.activeWallets > 0 ? Math.round(stats.totalCoins / stats.activeWallets) : 0;
+    document.getElementById("avgBalance").textContent = avg + " CC";
+
+    // Leaderboard
+    const lb = document.getElementById("leaderboardList");
+    document.getElementById("earnerCount").textContent = `Top ${Math.min(stats.topEarners.length, 10)} earners`;
+
+    if (stats.topEarners.length === 0) {
+      lb.innerHTML = `<div class="empty-state">No earner data yet.</div>`;
+    } else {
+      lb.innerHTML = stats.topEarners.slice(0, 10).map((e, i) => {
+        const rank    = i + 1;
+        const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+        const rankCls  = rank <= 3 ? `lb-rank-${rank}` : 'lb-rank-n';
+        const lv = calcLevel(e.xp || 0);
+        return `<div class="lb-row">
+          <div class="lb-rank ${rankCls}">${rankIcon}</div>
+          <div class="lb-info">
+            <div class="lb-id">${e.userId.slice(0,20)}…</div>
+            <div class="lb-sub">${e.totalEarned} CC earned · ${e.xp || 0} XP</div>
+          </div>
+          <span class="lb-level">${lv.icon} Lv${lv.level}</span>
+          <div class="lb-coins">${e.balance} CC</div>
+        </div>`;
+      }).join("");
+    }
+
+    // Distribution: bucket users by balance
+    const buckets = { '0':0, '1-50':0, '51-200':0, '201-500':0, '500+':0 };
+    stats.topEarners.forEach(e => {
+      const b = e.balance;
+      if (b === 0)       buckets['0']++;
+      else if (b <= 50)  buckets['1-50']++;
+      else if (b <= 200) buckets['51-200']++;
+      else if (b <= 500) buckets['201-500']++;
+      else               buckets['500+']++;
+    });
+    const maxB = Math.max(...Object.values(buckets), 1);
+    const distEl = document.getElementById("distBars");
+    distEl.innerHTML = Object.entries(buckets).map(([label, count]) => `
+      <div class="dist-row">
+        <div class="dist-label">${label} CC</div>
+        <div class="dist-track"><div class="dist-fill" style="width:${Math.round((count/maxB)*100)}%"></div></div>
+        <div class="dist-val">${count} users</div>
+      </div>`).join("");
+
+  } catch(e) {
+    console.error(e);
+    showToast("Failed to load economy stats", "error");
+  }
+
+  await loadRecentActivity();
+  await loadEconomyControls();
+};
+
+loadAll();
+</script>
+</body>
+</html>

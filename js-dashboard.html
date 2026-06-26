@@ -199,6 +199,49 @@
   /* ── Lower two-col ── */
   .lower-two { display:grid; grid-template-columns:1fr 1fr; gap:.9rem; margin-bottom:1.1rem; }
   @media(max-width:700px){ .lower-two { grid-template-columns:1fr; } }
+
+  /* ── Economy Banner ── */
+  .economy-banner {
+    background:linear-gradient(135deg,rgba(124,58,237,.28),rgba(250,204,21,.08));
+    border:1px solid rgba(124,58,237,.4); border-radius:18px; padding:1.25rem 1.5rem;
+    margin-bottom:1.1rem; display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:1rem; position:relative; overflow:hidden;
+  }
+  .economy-banner::after {
+    content:'🪙'; position:absolute; right:-5px; top:-10px; font-size:100px; opacity:.07; pointer-events:none;
+  }
+  .eb-coins { display:flex; align-items:center; gap:1.5rem; flex-wrap:wrap; }
+  .eb-stat  { display:flex; flex-direction:column; }
+  .eb-label { font-size:12px; color:#6b7280; font-weight:600; }
+  .eb-val   { font-size:24px; font-weight:900; color:#fcd34d; line-height:1.1; }
+  .eb-val-sm{ font-size:16px; font-weight:800; color:#c4b5fd; line-height:1.2; }
+  .eb-actions { display:flex; gap:.65rem; flex-wrap:wrap; }
+  .eb-btn {
+    padding:.55rem 1.1rem; border-radius:8px; font-size:13px; font-weight:700;
+    border:none; cursor:pointer; text-decoration:none; display:inline-block; white-space:nowrap;
+  }
+  .eb-btn-primary { background:linear-gradient(135deg,#7c3aed,#4f46e5); color:#fff; box-shadow:0 3px 12px rgba(124,58,237,.35); }
+  .eb-btn-secondary { background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.3) !important; color:#c4b5fd; }
+
+  /* ── Mission preview strip ── */
+  .mission-strip { display:flex; flex-direction:column; gap:.45rem; }
+  .ms-item {
+    display:flex; align-items:center; gap:.75rem; padding:.65rem .9rem;
+    background:rgba(30,18,80,.5); border:1px solid rgba(124,58,237,.15); border-radius:10px;
+  }
+  .ms-icon  { font-size:17px; flex-shrink:0; }
+  .ms-label { font-size:13.5px; color:#c4b5fd; flex:1; }
+  .ms-reward{ font-size:13px; font-weight:800; color:#4ade80; white-space:nowrap; }
+  .ms-done  { font-size:12px; color:#4ade80; background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.2); padding:.15rem .55rem; border-radius:999px; }
+
+  /* ── Streak bar ── */
+  .streak-mini { display:flex; align-items:center; gap:.7rem; }
+  .streak-fire { font-size:22px; }
+  .streak-info-mini { flex:1; }
+  .streak-txt { font-size:15px; font-weight:800; color:#fcd34d; }
+  .streak-sub { font-size:12px; color:#6b7280; }
+  .streak-prog-wrap { height:5px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; margin-top:.4rem; }
+  .streak-prog-fill { height:100%; background:linear-gradient(90deg,#d97706,#fcd34d); border-radius:99px; transition:width .8s; }
 </style>
 </head>
 
@@ -216,6 +259,8 @@
     <a href="js-analytics.html">Analytics</a>
     <a href="career-gap.html">🧠 AI Career Gap</a>
     <a href="js-profile.html">Profile</a>
+    <a href="js-wallet.html">🪙 Wallet</a>
+    <a href="js-missions.html">⚡ Missions</a>
   </nav>
   <button id="logoutBtn">Logout 👋</button>
 </aside>
@@ -236,6 +281,32 @@
   <div id="profileNudge" class="profile-nudge" style="display:none">
     ⚡ Complete your profile to unlock AI job matching
     <a href="js-profile.html">Complete Profile →</a>
+  </div>
+
+  <!-- ECONOMY BANNER -->
+  <div class="economy-banner">
+    <div class="eb-coins">
+      <div class="eb-stat">
+        <span class="eb-label">🪙 Career Coins</span>
+        <span class="eb-val" id="econBalance">—</span>
+      </div>
+      <div class="eb-stat">
+        <span class="eb-label">⚡ Level</span>
+        <span class="eb-val-sm" id="econLevel">Lv 1 · Starter</span>
+      </div>
+      <div class="eb-stat">
+        <span class="eb-label">🔥 Streak</span>
+        <span class="eb-val-sm" id="econStreak">— days</span>
+      </div>
+      <div class="eb-stat">
+        <span class="eb-label">📊 Trust Score</span>
+        <span class="eb-val-sm" id="econTrust">—/100</span>
+      </div>
+    </div>
+    <div class="eb-actions">
+      <a href="js-missions.html" class="eb-btn eb-btn-primary">⚡ Missions</a>
+      <a href="js-wallet.html"   class="eb-btn eb-btn-secondary">🪙 Wallet</a>
+    </div>
   </div>
 
   <!-- STATS -->
@@ -345,6 +416,38 @@
 
   </div>
 
+  <!-- ECONOMY: MISSIONS + STREAK -->
+  <div class="lower-two">
+
+    <section class="section-card">
+      <div class="sec-header">
+        <h3>⚡ Active Missions</h3>
+        <a href="js-missions.html" style="font-size:12px;color:#a78bfa;font-weight:600">View All →</a>
+      </div>
+      <div id="missionPreview" class="mission-strip">
+        <p style="color:#a78bfa;font-size:14px">Loading missions...</p>
+      </div>
+    </section>
+
+    <section class="section-card">
+      <div class="sec-header">
+        <h3>🔥 Login Streak</h3>
+        <a href="js-wallet.html" style="font-size:12px;color:#a78bfa;font-weight:600">My Wallet →</a>
+      </div>
+      <div class="streak-mini">
+        <div class="streak-fire">🔥</div>
+        <div class="streak-info-mini">
+          <div class="streak-txt"><span id="streakDays">0</span> Day Streak</div>
+          <div class="streak-sub" id="streakSubtext">Log in daily to keep your streak alive</div>
+          <div class="streak-prog-wrap">
+            <div class="streak-prog-fill" id="streakProgFill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
   <!-- DAILY QUOTE -->
   <section class="section-card quote-card">
     <h3>🔥 Daily Push</h3>
@@ -358,6 +461,12 @@
 import { db, logoutUser, getSession, protectPage } from "./firebase.js";
 import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { rankJobs, calcEmployabilityScore, parseSkills, matchLabel } from "./ai-match.js";
+import {
+  getWallet, checkAndUpdateStreak, getUserMissions, earnCoins,
+  calcLevel, computeTrustScore, formatCoins
+} from "./economy.js";
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
@@ -552,6 +661,102 @@ async function loadDashboard() {
 }
 
 loadDashboard();
+
+// ── ECONOMY INTEGRATION ──
+async function loadEconomyWidgets(userId, user, totalApps, successApps) {
+  try {
+    // Fire-and-forget: update streak + award daily login coins
+    checkAndUpdateStreak(userId).catch(() => {});
+
+    const wallet = await getWallet(userId);
+    if (!wallet) return;
+
+    // Economy banner
+    document.getElementById("econBalance").textContent = formatCoins(wallet.balance || 0) + " CC";
+
+    const levelInfo = calcLevel(wallet.xp || 0);
+    document.getElementById("econLevel").textContent   = `${levelInfo.icon} Lv ${levelInfo.level} · ${levelInfo.label}`;
+    document.getElementById("econStreak").textContent  = (wallet.streakDays || 0) + " days";
+
+    const profilePct = calcProfilePctFromSession(user);
+    const trust = computeTrustScore(wallet, profilePct, totalApps, successApps);
+    document.getElementById("econTrust").textContent = trust + "/100";
+
+    // Streak section
+    const streak = wallet.streakDays || 0;
+    document.getElementById("streakDays").textContent = streak;
+    const nextMil = streak < 7 ? 7 : 30;
+    const streakPct = Math.min((streak / nextMil) * 100, 100);
+    document.getElementById("streakProgFill").style.width = streakPct + "%";
+    document.getElementById("streakSubtext").textContent =
+      streak === 0 ? "Log in daily to earn bonus coins!" :
+      streak >= 30 ? "🏆 30-day legend! Max streak bonus unlocked." :
+      streak >= 7  ? `🔥 ${30 - streak} days to 30-day bonus (+200 CC)` :
+      `⚡ ${7 - streak} days to 7-day bonus (+50 CC)`;
+
+    // Missions preview — show first 4 incomplete daily + career missions
+    const missions = await getUserMissions(userId, { totalApps, profilePct });
+    const pending  = [
+      ...missions.daily.filter(m => !m.completed).slice(0, 2),
+      ...missions.career.filter(m => !m.completed).slice(0, 2),
+    ];
+
+    const mEl = document.getElementById("missionPreview");
+    if (pending.length === 0) {
+      mEl.innerHTML = `<div class="ms-item"><div class="ms-icon">🎉</div><div class="ms-label">All missions done for today!</div></div>`;
+    } else {
+      mEl.innerHTML = pending.map(m =>
+        `<div class="ms-item">
+          <div class="ms-icon">${m.icon}</div>
+          <div class="ms-label">${m.label}</div>
+          <div class="ms-reward">+${m.coins} CC</div>
+        </div>`).join("");
+    }
+
+    // Also fire profile_complete coin if profile is fully done (once only)
+    if (profilePct >= 80) earnCoins(userId, 'profile_complete').catch(() => {});
+
+  } catch(e) {
+    console.warn("Economy widgets failed silently:", e);
+  }
+}
+
+function calcProfilePctFromSession(user) {
+  if (!user) return 0;
+  const checks = [
+    (user.skills||"").trim().length > 0,
+    user.exp !== undefined && String(user.exp) !== "",
+    (user.fullName||user.name||"").trim().length > 0,
+    (user.phone||"").trim().length > 0,
+    (user.location||"").trim().length > 0,
+    (user.education||"").trim().length > 0,
+    (user.bio||"").trim().length > 0,
+    (user.jobTitle||"").trim().length > 0,
+  ];
+  return Math.round((checks.filter(Boolean).length / checks.length) * 100);
+}
+
+// Trigger economy after main dashboard loads
+onAuthStateChanged(auth, user => {
+  if (user) {
+    // Wait a moment so the main dashboard resolves apps first
+    setTimeout(async () => {
+      const session  = getSession();
+      let total = 0, success = 0;
+      try {
+        const snap = await getDocs(collection(db, "applications"));
+        snap.forEach(d => {
+          const a = d.data();
+          if (a.seeker === session?.email || a.user === session?.email || a.email === session?.email) {
+            total++;
+            if (a.status === "Hired" || a.status === "Shortlisted") success++;
+          }
+        });
+      } catch(e) {}
+      loadEconomyWidgets(user.uid, session, total, success);
+    }, 1000);
+  }
+});
 </script>
 <script type="module" src="./app-enhancements.js"></script>
 </body>

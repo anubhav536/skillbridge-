@@ -3,9 +3,14 @@
 // Phase 4: AI Career Intelligence (No external API)
 // =============================================
 
-import { db, getSession, logoutUser, protectPage } from "./firebase.js";
+import { db, getSession, logoutUser, protectPage, auth } from "./firebase.js";
 import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import { analyzeCareerGap, matchLabel } from "./ai-match.js";
+import { earnCoins } from "./economy.js";
+
+let _authUid = null;
+onAuthStateChanged(auth, u => { if (u) _authUid = u.uid; });
 
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
@@ -99,6 +104,9 @@ async function runAnalysis() {
     results.style.display  = "block";
 
     renderResults(analysis, jobs.length);
+
+    // Career Coins — reward for running analysis
+    if (_authUid) earnCoins(_authUid, 'career_gap_analysis').catch(() => {});
 
   } catch (e) {
     console.error(e);
