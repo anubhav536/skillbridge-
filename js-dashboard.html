@@ -713,8 +713,8 @@ async function loadEconomyWidgets(userId, user, totalApps, successApps) {
         </div>`).join("");
     }
 
-    // Also fire profile_complete coin if profile is fully done (once only)
-    if (profilePct >= 80) earnCoins(userId, 'profile_complete').catch(() => {});
+    // NOTE: profile_complete coins are only awarded in js-profile.html when user explicitly saves
+    // Do NOT auto-award here — that would give free coins without user action
 
   } catch(e) {
     console.warn("Economy widgets failed silently:", e);

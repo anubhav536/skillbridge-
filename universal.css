@@ -917,29 +917,156 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* ================================================================
-   RESPONSIVE
+   RESPONSIVE — All Device Support
    ================================================================ */
+
+/* ── Tablet (≤1000px) — sidebar collapses to top ── */
 @media (max-width: 1000px) {
-  .dashboard { grid-template-columns: 1fr; }
-  .sidebar { position: static; top: auto; }
+  .dashboard {
+    grid-template-columns: 1fr;
+    width: min(100%, calc(100% - 1rem));
+    margin: .5rem auto;
+    gap: .6rem;
+  }
+  .sidebar {
+    position: static;
+    top: auto;
+    padding: .75rem;
+    /* Horizontal scrollable nav on tablet */
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: .5rem;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar::-webkit-scrollbar { display: none; }
+  .sidebar h2 {
+    display: none; /* Hide panel heading when horizontal */
+  }
+  .sidebar nav {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: .3rem;
+    flex: 1;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .sidebar nav::-webkit-scrollbar { display: none; }
+  .sidebar nav a {
+    white-space: nowrap;
+    padding: .45rem .85rem;
+    font-size: 13px;
+    flex-shrink: 0;
+    transform: none !important;
+  }
+  .sidebar nav a::before { display: none; }
+  .sidebar button#logoutBtn, .sidebar > button:last-child {
+    margin-top: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: .45rem .85rem;
+    font-size: 13px;
+    width: auto;
+  }
   .pro-grid { grid-template-columns: 1fr; }
   .pro-form { position: static; }
   .pro-top  { grid-template-columns: 1fr; }
+  .main { border-radius: 12px; padding: 1rem; }
 }
+
+/* ── Mobile (≤768px) ── */
 @media (max-width: 768px) {
   .navbar, nav:not(.sidebar nav) {
-    padding: .8rem 1.1rem; flex-direction: column;
-    gap: .6rem; border-radius: var(--r);
-    top: .35rem;
+    padding: .75rem 1rem;
+    top: .25rem;
+    border-radius: 14px;
   }
-  .hero-box { padding: 2.5rem 1.25rem 2rem; }
+  .navbar .nav-links { display: none; }
+  .hero-box { padding: 2rem 1rem 1.75rem; }
   section { padding: .75rem 0; }
   #resumePreview { width: 100%; min-width: 794px; }
+
+  /* Stack stat grids to 2 cols on mobile */
+  .stats-grid, .eco-hero, .wallet-stats, .progress-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: .6rem !important;
+  }
+  .lower-two, .admin-grid, .wallet-grid {
+    grid-template-columns: 1fr !important;
+    gap: .65rem !important;
+  }
+  .picks-grid { grid-template-columns: 1fr !important; }
+
+  /* Economy banner stack */
+  .economy-banner { flex-direction: column; align-items: flex-start; padding: 1rem; }
+  .eb-coins { gap: 1rem; }
+  .eb-actions { width: 100%; justify-content: flex-start; }
+
+  /* Balance hero stack */
+  .balance-hero { flex-direction: column; padding: 1.25rem; }
+
+  /* Mission hero stack */
+  .missions-hero { flex-direction: column; }
+
+  /* Dashboard top */
+  .dash-top { flex-direction: column; align-items: flex-start; }
+
+  /* Theme button position on mobile */
+  #sb-theme-btn  { bottom: 1rem; right: 1rem; width: 40px; height: 40px; font-size: 16px; }
+  #sb-theme-panel{ bottom: 5rem; right: 1rem; width: 190px; }
 }
+
+/* ── Small mobile (≤520px) ── */
 @media (max-width: 520px) {
+  .dashboard { width: 100%; margin: 0; border-radius: 0; }
+  .main { border-radius: 0; padding: .85rem; }
+  .sidebar { border-radius: 0; }
+
   .hero-btns { flex-direction: column; align-items: stretch; }
   .hero-btns .primary-btn, .hero-btns .secondary-btn { width: 100%; text-align: center; }
-  .card, .section-card { padding: 1rem; border-radius: 12px; }
+  .card, .section-card { padding: .85rem; border-radius: 12px; }
+
+  /* Single column stats on very small screens */
+  .stats-grid, .eco-hero {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .wallet-stats, .progress-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Compact mission cards */
+  .mission-card { padding: .9rem; }
+  .mc-icon { font-size: 22px; width: 36px; }
+  .mc-label { font-size: 14px; }
+
+  /* Compact spend items */
+  .spend-item { flex-wrap: wrap; }
+  .spend-btn  { width: 100%; margin-top: .3rem; }
+
+  /* Compact leaderboard */
+  .lb-row { flex-wrap: wrap; gap: .5rem; }
+
+  /* Balance hero compact */
+  .balance-amount { font-size: 40px; }
+  .balance-meta   { gap: 1rem; }
+  .balance-meta .bm-val { font-size: 15px; }
+
+  /* Eco banner compact */
+  .eb-coins { flex-wrap: wrap; gap: .75rem; }
+  .eb-val   { font-size: 20px; }
+
+  /* Quick actions more compact */
+  .quick-grid { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+  .quick-btn  { padding: .75rem .6rem; font-size: 13px; }
+
+  /* Section tabs scroll */
+  .section-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .section-tabs::-webkit-scrollbar { display: none; }
+  .stab { flex-shrink: 0; font-size: 13px; padding: .45rem .9rem; }
 }
 
 /* ── Reduce motion ── */

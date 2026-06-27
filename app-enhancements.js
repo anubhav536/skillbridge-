@@ -159,11 +159,14 @@ function initCommandPalette() {
     { label: '📈 Admin Analytics',      url: 'admin-analytics.html', tags: 'analytics admin' },
     { label: '🚨 Flags',               url: 'admin-flags.html',     tags: 'flags reports admin' },
     { label: '🏆 Leaderboard',         url: 'admin-leaderboard.html', tags: 'leaderboard admin' },
-    { label: '📝 Project Report',       url: 'project-report.html',  tags: 'report project docs' },
   ];
 
   const style = document.createElement('style');
   style.textContent = `
+    /* Hide Cmd+K hint on touch/mobile devices */
+    @media (max-width: 768px), (pointer: coarse) {
+      #sb-cmdk-hint { display: none !important; }
+    }
     #sb-palette-overlay {
       position: fixed; inset: 0; z-index: 99990;
       background: rgba(2,0,16,.65);

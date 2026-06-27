@@ -242,7 +242,12 @@
 </div>
 
 <script type="module">
-import { logoutUser, updateUserProfile, protectPage, getSession } from "./firebase.js";
+import { logoutUser, updateUserProfile, protectPage, getSession, auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
+import { earnCoins } from "./economy.js";
+
+let _authUid = null;
+onAuthStateChanged(auth, u => { if (u) _authUid = u.uid; });
 
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
@@ -360,6 +365,21 @@ document.getElementById("profileForm").addEventListener("submit", async e => {
     Object.keys(profileData).forEach(k => profileData[k] === undefined && delete profileData[k]);
 
     await updateUserProfile(profileData);
+
+    // Award coins only when user explicitly saves — check completeness AFTER save
+    if (_authUid) {
+      const filledCount = [
+        skills, exp, fullName,
+        profileData.phone, profileData.location, profileData.education,
+        profileData.bio, profileData.jobTitle
+      ].filter(v => v && String(v).trim()).length;
+
+      const pct = Math.round((filledCount / 8) * 100);
+      if (pct >= 80) earnCoins(_authUid, 'profile_complete').catch(() => {});
+      if (profileData.bio)      earnCoins(_authUid, 'profile_bio_added').catch(() => {});
+      if (profileData.education) earnCoins(_authUid, 'education_added').catch(() => {});
+      if ((profileData.skills || skills || "").length > 0) earnCoins(_authUid, 'skills_added').catch(() => {});
+    }
 
     const msg = document.getElementById("successMsg");
     msg.style.display = "block";
