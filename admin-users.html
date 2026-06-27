@@ -3,126 +3,336 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkillBridge AI</title>
+<title>Users | SkillBridge AI</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="universal.css">
+<style>
+  .page-top { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.75rem; margin-bottom:1.25rem; }
+  .page-top h1 { margin:0; }
 
+  .filters-row { display:flex; gap:.75rem; flex-wrap:wrap; margin-bottom:1rem; align-items:center; }
+  .search-input {
+    flex:1; min-width:200px; background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; font-family:inherit;
+  }
+  .search-input:focus { outline:none; border-color:#7c3aed; }
+  .filter-select {
+    background:rgba(255,255,255,.05); border:1px solid rgba(124,58,237,.3);
+    border-radius:10px; padding:.72rem 1rem; color:#f5f3ff; font-size:14px; font-family:inherit;
+  }
+  .filter-select option { background:#1e124f; }
 
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="universal.css">
+  .users-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:1rem; }
+
+  .user-card {
+    background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22); border-radius:16px;
+    padding:1.25rem; transition:border-color .2s;
+  }
+  .user-card:hover { border-color:rgba(124,58,237,.5); }
+  .user-card.suspended { border-color:rgba(239,68,68,.35); background:rgba(39,12,12,.5); }
+
+  .uc-top { display:flex; align-items:flex-start; gap:.85rem; margin-bottom:.9rem; }
+  .uc-avatar {
+    width:42px; height:42px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+  }
+  .uc-info { flex:1; min-width:0; }
+  .uc-name { font-size:14.5px; font-weight:700; color:#f5f3ff; margin-bottom:.2rem;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .uc-email { font-size:12.5px; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .uc-date  { font-size:11.5px; color:#6b7280; margin-top:.15rem; }
+
+  .uc-badges { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.9rem; }
+  .badge {
+    font-size:11px; font-weight:700; padding:.22rem .65rem; border-radius:6px;
+    border:1px solid; text-transform:uppercase; letter-spacing:.4px;
+  }
+  .badge-jobseeker  { background:rgba(59,130,246,.12); border-color:rgba(59,130,246,.35); color:#93c5fd; }
+  .badge-recruiter  { background:rgba(16,185,129,.12); border-color:rgba(16,185,129,.35); color:#6ee7b7; }
+  .badge-admin      { background:rgba(124,58,237,.18); border-color:rgba(124,58,237,.5); color:#c4b5fd; }
+  .badge-pending    { background:rgba(245,158,11,.12); border-color:rgba(245,158,11,.35); color:#fcd34d; }
+  .badge-suspended  { background:rgba(239,68,68,.15); border-color:rgba(239,68,68,.4); color:#f87171; }
+  .badge-active     { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.3); color:#4ade80; }
+
+  .uc-actions { display:flex; gap:.4rem; flex-wrap:wrap; }
+  .ua-btn {
+    padding:.35rem .8rem; border-radius:7px; font-size:12px; font-weight:700;
+    cursor:pointer; border:1px solid; transition:background .2s; flex:1; min-width:80px;
+    text-align:center;
+  }
+  .ua-btn:disabled { opacity:.45; cursor:not-allowed; }
+  .ua-approve  { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.35); color:#4ade80; }
+  .ua-approve:hover:not(:disabled) { background:rgba(74,222,128,.2); }
+  .ua-suspend  { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.35); color:#f87171; }
+  .ua-suspend:hover:not(:disabled) { background:rgba(239,68,68,.2); }
+  .ua-unsuspend { background:rgba(74,222,128,.1); border-color:rgba(74,222,128,.35); color:#4ade80; }
+  .ua-unsuspend:hover:not(:disabled) { background:rgba(74,222,128,.2); }
+  .ua-role     { background:rgba(124,58,237,.12); border-color:rgba(124,58,237,.35); color:#c4b5fd; }
+  .ua-role:hover:not(:disabled) { background:rgba(124,58,237,.22); }
+  .ua-delete   { background:rgba(239,68,68,.1); border-color:rgba(239,68,68,.35); color:#f87171; }
+  .ua-delete:hover:not(:disabled) { background:rgba(239,68,68,.2); }
+
+  .stats-mini { display:flex; gap:.75rem; margin-bottom:1rem; flex-wrap:wrap; }
+  .stat-mini {
+    flex:1; min-width:110px; background:rgba(18,12,48,.72); border:1px solid rgba(124,58,237,.22);
+    border-radius:12px; padding:.9rem 1.1rem; text-align:center;
+  }
+  .stat-mini h4 { font-size:12px; color:#a78bfa; font-weight:600; margin-bottom:.3rem; }
+  .stat-mini p  { font-size:26px; font-weight:800; color:#f5f3ff; margin:0; line-height:1; }
+
+  .empty-state { text-align:center; padding:3rem 1rem; color:#6b7280; font-size:14px; grid-column:1/-1; }
+  .empty-state .icon { font-size:36px; display:block; margin-bottom:.75rem; }
+
+  .toast {
+    position:fixed; bottom:1.5rem; right:1.5rem; z-index:9999;
+    padding:.9rem 1.3rem; border-radius:12px; font-size:14px; font-weight:600;
+    box-shadow:0 8px 32px rgba(0,0,0,.4); opacity:0; transform:translateY(12px);
+    transition:opacity .3s, transform .3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast-success { background:#065f46; border:1px solid #4ade80; color:#4ade80; }
+  .toast-error   { background:#450a0a; border:1px solid #f87171; color:#f87171; }
+  .toast-warn    { background:#451a03; border:1px solid #fcd34d; color:#fcd34d; }
+</style>
 </head>
 
 <body>
+<script>
+  if (localStorage.getItem("role") !== "admin") { window.location.href = "index.html"; }
+</script>
 
 <div class="dashboard">
 
-<!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
-
-<h2>👑 Admin</h2>
-
-<nav>
-<a href="admin-dashboard.html">📊 Dashboard</a>
-<a href="admin-users.html" class="active">👥 Users</a>
-<a href="admin-jobs.html">💼 Jobs</a>
-<a href="admin-applications.html">📄 Apps</a>
-<a href="admin-flags.html">🚨 Flags</a>
-<a href="admin-analytics.html">📈 Analytics</a>
-<a href="admin-ai-control.html">🤖 AI</a>
-<a href="admin-leaderboard.html">🏆 Rank</a>
-<a href="admin-settings.html">⚙ Settings</a>
-<a href="admin-logs.html">📜 Logs</a>
-<a href="admin-notifications.html">📩 Notify</a>
-<a href="admin-moderation.html">🛠 Mod</a>
-</nav>
-
-<a href="index.html" class="btn">Logout 👋</a>
-
+  <h2>👑 Admin Panel</h2>
+  <nav>
+    <a href="admin-dashboard.html">📊 Dashboard</a>
+    <a href="admin-users.html" class="active">👥 Users</a>
+    <a href="admin-jobs.html">💼 Jobs</a>
+    <a href="admin-applications.html">📄 Apps</a>
+    <a href="admin-flags.html">🚨 Flags</a>
+    <a href="admin-analytics.html">📈 Analytics</a>
+    <a href="admin-ai-control.html">🤖 AI</a>
+    <a href="admin-leaderboard.html">🏆 Rank</a>
+    <a href="admin-settings.html">⚙ Settings</a>
+    <a href="admin-logs.html">📜 Logs</a>
+    <a href="admin-notifications.html">📩 Notify</a>
+    <a href="admin-moderation.html">🛠 Mod</a>
+    <a href="admin-economy.html">🪙 Economy</a>
+  </nav>
+  <button onclick="logout()">Logout 👋</button>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
 
-<!-- TOP -->
-<div class="page-top">
-  <span class="menu-btn" onclick="toggleMenu()">☰</span>
-  <h1>👥 All Users</h1>
-  <input type="text" id="searchUser" >
-</div>
+  <div class="page-top">
+    <div>
+      <h1>👥 User Management</h1>
+      <p style="color:#a78bfa;font-size:14px;margin:.2rem 0 0">View, suspend, change roles, and delete users</p>
+    </div>
+  </div>
 
-<!-- USERS LIST -->
-<div id="usersList" class="grid"></div>
+  <div class="stats-mini">
+    <div class="stat-mini"><h4>👥 Total</h4><p id="statTotal">—</p></div>
+    <div class="stat-mini"><h4>👔 Job Seekers</h4><p id="statJS">—</p></div>
+    <div class="stat-mini"><h4>🏢 Recruiters</h4><p id="statRec">—</p></div>
+    <div class="stat-mini"><h4>👑 Admins</h4><p id="statAdm">—</p></div>
+    <div class="stat-mini"><h4>🚫 Suspended</h4><p id="statSus">—</p></div>
+  </div>
+
+  <div class="filters-row">
+    <input type="text" id="searchUser" class="search-input" placeholder="🔍 Search by name or email...">
+    <select id="filterRole" class="filter-select">
+      <option value="">All Roles</option>
+      <option value="jobseeker">Job Seekers</option>
+      <option value="recruiter">Recruiters</option>
+      <option value="admin">Admins</option>
+      <option value="admin_pending">Pending Admin</option>
+    </select>
+    <select id="filterStatus" class="filter-select">
+      <option value="">All Status</option>
+      <option value="active">Active</option>
+      <option value="suspended">Suspended</option>
+    </select>
+  </div>
+
+  <div class="users-grid" id="usersList">
+    <div class="empty-state"><span class="icon">⏳</span>Loading users...</div>
+  </div>
 
 </main>
-
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script type="module">
-import { logoutUser, getSession, observeUsersRealtime, approveAdminUser } from "./firebase.js";
+import { db } from "./firebase.js";
+import {
+  collection, onSnapshot, query, orderBy, limit,
+  updateDoc, deleteDoc, doc, addDoc
+} from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
-document.querySelector(".btn").addEventListener("click", logoutUser);
-
-const container = document.getElementById("usersList");
-const searchInput = document.getElementById("searchUser");
 let allUsers = [];
 
+function showToast(msg, type = "success") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = `toast toast-${type} show`;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove("show"), 3200);
+}
+
+function fmt(ts) {
+  if (!ts) return "";
+  return new Date(ts).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric" });
+}
+
+function roleBadge(role) {
+  const map = {
+    jobseeker: "badge-jobseeker",
+    recruiter: "badge-recruiter",
+    admin: "badge-admin",
+    admin_pending: "badge-pending"
+  };
+  const labels = {
+    jobseeker: "Job Seeker",
+    recruiter: "Recruiter",
+    admin: "Admin",
+    admin_pending: "Pending Admin"
+  };
+  const cls = map[role] || "badge-admin";
+  return `<span class="badge ${cls}">${labels[role] || role}</span>`;
+}
+
 function cardMarkup(u) {
-  const pending = u.role === "admin_pending";
+  const isSuspended = u.suspended === true;
+  const isPending   = u.role === "admin_pending";
+  const avatar = (u.name || "U")[0].toUpperCase();
+
   return `
-    <div class="user-card" data-search="${`${u.name || ""} ${u.email || ""} ${u.role || ""}`.toLowerCase()}">
-      <h3>👤 ${u.name || "No Name"}</h3>
-      <p>📧 ${u.email || "No Email"}</p>
-      <span class="role-badge">${u.role || "N/A"}</span>
-      ${pending ? `<button class="btn approve-admin-btn" data-id="${u.id}" style="margin-top:10px;">Approve Admin ✅</button>` : ""}
+    <div class="user-card${isSuspended ? " suspended" : ""}" data-uid="${u.id}">
+      <div class="uc-top">
+        <div class="uc-avatar">${avatar}</div>
+        <div class="uc-info">
+          <div class="uc-name">${u.name || "No Name"}</div>
+          <div class="uc-email">${u.email || "No Email"}</div>
+          <div class="uc-date">Joined ${fmt(u.createdAt)}</div>
+        </div>
+      </div>
+      <div class="uc-badges">
+        ${roleBadge(u.role)}
+        <span class="badge ${isSuspended ? "badge-suspended" : "badge-active"}">${isSuspended ? "Suspended" : "Active"}</span>
+      </div>
+      <div class="uc-actions">
+        ${isPending ? `<button class="ua-btn ua-approve" onclick="approveAdmin('${u.id}')">✅ Approve</button>` : ""}
+        ${isSuspended
+          ? `<button class="ua-btn ua-unsuspend" onclick="unsuspendUser('${u.id}','${u.email || ""}')">✅ Unsuspend</button>`
+          : `<button class="ua-btn ua-suspend" onclick="suspendUser('${u.id}','${u.email || ""}')">🚫 Suspend</button>`
+        }
+        <button class="ua-btn ua-role" onclick="changeRole('${u.id}','${u.role}')">🔄 Role</button>
+        <button class="ua-btn ua-delete" onclick="deleteUser('${u.id}','${u.name || u.email || ""}')">🗑 Delete</button>
+      </div>
     </div>`;
 }
 
+function updateStats(users) {
+  document.getElementById("statTotal").textContent = users.length;
+  document.getElementById("statJS").textContent    = users.filter(u => u.role === "jobseeker").length;
+  document.getElementById("statRec").textContent   = users.filter(u => u.role === "recruiter").length;
+  document.getElementById("statAdm").textContent   = users.filter(u => u.role === "admin").length;
+  document.getElementById("statSus").textContent   = users.filter(u => u.suspended).length;
+}
+
 function render(users) {
+  const container = document.getElementById("usersList");
   if (!users.length) {
-    container.innerHTML = `<p class="loading">No users found 🚫</p>`;
+    container.innerHTML = `<div class="empty-state"><span class="icon">🚫</span>No users found</div>`;
     return;
   }
   container.innerHTML = users.map(cardMarkup).join("");
 }
 
-observeUsersRealtime((users) => {
-  allUsers = users;
-  render(allUsers);
-});
+function filterAndRender() {
+  const q   = document.getElementById("searchUser").value.toLowerCase().trim();
+  const role = document.getElementById("filterRole").value;
+  const status = document.getElementById("filterStatus").value;
 
-searchInput.addEventListener("keyup", function () {
-  const q = this.value.toLowerCase().trim();
-  const filtered = !q ? allUsers : allUsers.filter((u) => `${u.name || ""} ${u.email || ""} ${u.role || ""}`.toLowerCase().includes(q));
+  let filtered = allUsers;
+  if (q)      filtered = filtered.filter(u => `${u.name||""} ${u.email||""}`.toLowerCase().includes(q));
+  if (role)   filtered = filtered.filter(u => u.role === role);
+  if (status === "active")    filtered = filtered.filter(u => !u.suspended);
+  if (status === "suspended") filtered = filtered.filter(u => u.suspended);
   render(filtered);
-});
-
-container.addEventListener("click", async (e) => {
-  const btn = e.target.closest('.approve-admin-btn');
-  if (!btn) return;
-  const session = getSession() || {};
-  btn.disabled = true;
-  btn.textContent = "Approving...";
-  try {
-    await approveAdminUser(btn.dataset.id, session.email || session.name || "admin");
-  } catch (err) {
-    console.error(err);
-    alert("Approval failed ❌");
-    btn.disabled = false;
-    btn.textContent = "Approve Admin ✅";
-  }
-});
-
-window.toggleMenu = function(){
-  document.getElementById("sidebar").classList.toggle("active");
 }
 
-document.querySelectorAll(".sidebar a").forEach(link=>{
-  link.addEventListener("click",()=>{
-    if(window.innerWidth < 768){
-      document.getElementById("sidebar").classList.remove("active");
-    }
+onSnapshot(query(collection(db, "users"), orderBy("createdAt", "desc"), limit(500)), snap => {
+  allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  updateStats(allUsers);
+  filterAndRender();
+});
+
+document.getElementById("searchUser").addEventListener("input", filterAndRender);
+document.getElementById("filterRole").addEventListener("change", filterAndRender);
+document.getElementById("filterStatus").addEventListener("change", filterAndRender);
+
+window.approveAdmin = async function(uid) {
+  const btn = document.querySelector(`[data-uid="${uid}"] .ua-approve`);
+  if (btn) { btn.disabled = true; btn.textContent = "Approving..."; }
+  try {
+    await updateDoc(doc(db, "users", uid), { role: "admin", approved: true, approvedAt: Date.now() });
+    await addDoc(collection(db, "logs"), { action: "Admin Approved", targetUid: uid, status: "success", createdAt: Date.now() });
+    showToast("✅ Admin approved!", "success");
+  } catch(e) { showToast("Failed to approve admin", "error"); if(btn){btn.disabled=false;btn.textContent="✅ Approve";} }
+}
+
+window.suspendUser = async function(uid, email) {
+  if (!confirm(`Suspend user: ${email}?\n\nThey will be blocked from logging in.`)) return;
+  try {
+    await updateDoc(doc(db, "users", uid), { suspended: true, suspendedAt: Date.now() });
+    await addDoc(collection(db, "logs"), { action: "User Suspended", user: email, targetUid: uid, status: "success", createdAt: Date.now() });
+    showToast(`🚫 ${email} suspended.`, "success");
+  } catch(e) { showToast("Failed to suspend user", "error"); }
+}
+
+window.unsuspendUser = async function(uid, email) {
+  try {
+    await updateDoc(doc(db, "users", uid), { suspended: false, suspendedAt: null });
+    await addDoc(collection(db, "logs"), { action: "User Unsuspended", user: email, targetUid: uid, status: "success", createdAt: Date.now() });
+    showToast(`✅ ${email} unsuspended.`, "success");
+  } catch(e) { showToast("Failed to unsuspend user", "error"); }
+}
+
+window.changeRole = async function(uid, currentRole) {
+  const roles = ["jobseeker", "recruiter", "admin"];
+  const next = roles[(roles.indexOf(currentRole) + 1) % roles.length];
+  if (!confirm(`Change role from "${currentRole}" → "${next}"?`)) return;
+  try {
+    await updateDoc(doc(db, "users", uid), { role: next });
+    await addDoc(collection(db, "logs"), { action: "Role Changed", targetUid: uid, from: currentRole, to: next, status: "success", createdAt: Date.now() });
+    showToast(`🔄 Role changed to ${next}.`, "success");
+  } catch(e) { showToast("Failed to change role", "error"); }
+}
+
+window.deleteUser = async function(uid, name) {
+  if (!confirm(`⚠️ Permanently delete user: "${name}"?\n\nThis removes their profile from the database. This cannot be undone.`)) return;
+  try {
+    await deleteDoc(doc(db, "users", uid));
+    await addDoc(collection(db, "logs"), { action: "User Deleted", targetUid: uid, label: name, status: "success", createdAt: Date.now() });
+    showToast(`🗑 User "${name}" deleted.`, "success");
+  } catch(e) { showToast("Failed to delete user. Check Firestore rules.", "error"); }
+}
+</script>
+
+<script>
+function logout() { localStorage.clear(); window.location.href = "index.html"; }
+function toggleMenu() { document.getElementById("sidebar").classList.toggle("active"); }
+document.querySelectorAll(".sidebar a").forEach(link => {
+  link.addEventListener("click", () => {
+    if (window.innerWidth < 768) document.getElementById("sidebar").classList.remove("active");
   });
 });
 </script>
-
 <script type="module" src="./app-enhancements.js"></script>
 </body>
 </html>

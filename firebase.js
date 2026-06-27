@@ -130,6 +130,27 @@ export async function loginUser(btn = null, expectedRole = null) {
 
     const user = snap.data();
 
+    // Check if account is suspended
+    if (user.suspended) {
+      await signOut(auth);
+      clearSession();
+      alert("Your account has been suspended. Please contact support.");
+      return null;
+    }
+
+    // Check maintenance mode (non-admins blocked during maintenance)
+    if (user.role !== "admin") {
+      try {
+        const settingsSnap = await getDoc(doc(db, "settings", "main"));
+        if (settingsSnap.exists() && settingsSnap.data().maintenanceMode) {
+          await signOut(auth);
+          clearSession();
+          alert("Platform is under maintenance. Please try again later. 🔧");
+          return null;
+        }
+      } catch (_) {}
+    }
+
     if (expectedRole === "admin" && user.role === "admin_pending") {
       await signOut(auth);
       clearSession();
@@ -183,6 +204,24 @@ export async function signupUser(role, btn = null) {
     if (password.length < 6) {
       alert("Password must be 6+ characters ❌");
       return null;
+    }
+
+    // Check platform settings before creating account
+    if (role !== "admin") {
+      try {
+        const settingsSnap = await getDoc(doc(db, "settings", "main"));
+        if (settingsSnap.exists()) {
+          const s = settingsSnap.data();
+          if (s.maintenanceMode) {
+            alert("Platform is under maintenance. Please try again later. 🔧");
+            return null;
+          }
+          if (s.allowSignup === false) {
+            alert("New signups are currently disabled by the administrator. ❌");
+            return null;
+          }
+        }
+      } catch (_) {}
     }
 
     const cred = await createUserWithEmailAndPassword(auth, email, password);

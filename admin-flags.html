@@ -126,7 +126,7 @@
 <script type="module">
 import { db } from "./firebase.js";
 import {
-  collection, getDocs, deleteDoc, doc, updateDoc, addDoc
+  collection, getDocs, deleteDoc, doc, updateDoc, addDoc, query, where
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 function showToast(msg, type = "success") {
@@ -188,14 +188,24 @@ window.loadFlags = async function() {
 
 window.banUser = async function(id, email) {
   try {
+    // Mark flag as banned
     await updateDoc(doc(db, "flags", id), { status: "banned" });
+
+    // Actually suspend the user in the users collection
+    if (email) {
+      const userSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+      userSnap.forEach(async userDoc => {
+        await updateDoc(doc(db, "users", userDoc.id), { suspended: true, suspendedAt: Date.now() });
+      });
+    }
+
     await addDoc(collection(db, "logs"), {
       action: "User Banned via Flags",
       user: email,
       status: "success",
       createdAt: Date.now()
     });
-    showToast(`🚫 ${email || "User"} has been banned.`, "success");
+    showToast(`🚫 ${email || "User"} has been banned and account suspended.`, "success");
     loadFlags();
   } catch(e) {
     console.error(e);

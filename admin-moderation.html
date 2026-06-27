@@ -162,7 +162,7 @@
 <script type="module">
 import { db } from "./firebase.js";
 import {
-  collection, getDocs, updateDoc, deleteDoc, doc, addDoc
+  collection, getDocs, updateDoc, deleteDoc, doc, addDoc, query, where
 } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 
 function showToast(msg, type = "success") {
@@ -230,9 +230,21 @@ window.loadModeration = async function() {
 
 window.banReport = async function(id) {
   try {
+    const modDoc = (await getDocs(collection(db, "moderation"))).docs.find(d => d.id === id);
+    const targetEmail = modDoc?.data()?.targetId || "";
+
     await updateDoc(doc(db, "moderation", id), { action: "banned" });
-    await addDoc(collection(db, "logs"), { action: "User Banned via Moderation", status: "success", createdAt: Date.now() });
-    showToast("🚫 User banned.", "success");
+
+    // Also suspend the user in the users collection by email
+    if (targetEmail) {
+      const userSnap = await getDocs(query(collection(db, "users"), where("email", "==", targetEmail)));
+      userSnap.forEach(async userDoc => {
+        await updateDoc(doc(db, "users", userDoc.id), { suspended: true, suspendedAt: Date.now() });
+      });
+    }
+
+    await addDoc(collection(db, "logs"), { action: "User Banned via Moderation", user: targetEmail, status: "success", createdAt: Date.now() });
+    showToast("🚫 User banned and account suspended.", "success");
     loadModeration();
   } catch(e) { showToast("Failed to ban user", "error"); }
 }
@@ -257,11 +269,19 @@ window.manualBan = async function() {
   const email = document.getElementById("emailInput").value.trim();
   if (!email) { showToast("⚠️ Enter an email address.", "warn"); return; }
   try {
+    // Find and suspend user in users collection by email
+    const userSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+    if (userSnap.empty) { showToast("⚠️ No user found with that email.", "warn"); return; }
+
+    userSnap.forEach(async userDoc => {
+      await updateDoc(doc(db, "users", userDoc.id), { suspended: true, suspendedAt: Date.now() });
+    });
+
     await addDoc(collection(db, "moderation"), {
       type: "user", targetId: email, action: "banned", reason: "Manual admin ban", createdAt: Date.now()
     });
     await addDoc(collection(db, "logs"), { action: "Manual Ban", user: email, status: "success", createdAt: Date.now() });
-    showToast(`🚫 ${email} has been banned.`, "success");
+    showToast(`🚫 ${email} has been banned and account suspended.`, "success");
     document.getElementById("emailInput").value = "";
     loadModeration();
   } catch(e) { showToast("Failed to ban user", "error"); }
@@ -270,7 +290,28 @@ window.manualBan = async function() {
 window.manualUnban = async function() {
   const email = document.getElementById("emailInput").value.trim();
   if (!email) { showToast("⚠️ Enter an email address.", "warn"); return; }
-  showToast(`✅ Unban for ${email} noted. Remove their ban record from moderation list manually if present.`, "success");
+  try {
+    // Find and unsuspend user in users collection by email
+    const userSnap = await getDocs(query(collection(db, "users"), where("email", "==", email)));
+    if (userSnap.empty) { showToast("⚠️ No user found with that email.", "warn"); return; }
+
+    userSnap.forEach(async userDoc => {
+      await updateDoc(doc(db, "users", userDoc.id), { suspended: false, suspendedAt: null });
+    });
+
+    // Remove active ban records from moderation
+    const modSnap = await getDocs(collection(db, "moderation"));
+    modSnap.forEach(async d => {
+      if (d.data().targetId === email && d.data().action === "banned") {
+        await deleteDoc(doc(db, "moderation", d.id));
+      }
+    });
+
+    await addDoc(collection(db, "logs"), { action: "Manual Unban", user: email, status: "success", createdAt: Date.now() });
+    showToast(`✅ ${email} has been unbanned and account restored.`, "success");
+    document.getElementById("emailInput").value = "";
+    loadModeration();
+  } catch(e) { showToast("Failed to unban user", "error"); }
 }
 
 loadModeration();
