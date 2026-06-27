@@ -325,8 +325,11 @@
 
 <script type="module">
 import { db, getSession, applyJob, logoutUser } from "./firebase.js";
+import { auth } from "./firebase.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
 import { getDocs, collection } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
 import { rankJobs, getSkillGap, matchLabel, parseSkills } from "./ai-match.js";
+import { trackJobsBrowse } from "./economy.js";
 
 /* ── Auth ── */
 const user = getSession();
@@ -334,6 +337,17 @@ if (!user) { window.location.href = "jobseeker-login.html"; }
 if (user && user.role !== "jobseeker") { window.location.href = "index.html"; }
 
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
+
+/* ── 60-second browse tracker for daily_jobs_browse mission ── */
+onAuthStateChanged(auth, firebaseUser => {
+  if (!firebaseUser) return;
+  // After user has been on jobs page for 60 continuous seconds, mark as browsed
+  const _browseTimer = setTimeout(() => {
+    trackJobsBrowse(firebaseUser.uid).catch(() => {});
+  }, 60000);
+  // Cancel if user leaves before 60s (page unload)
+  window.addEventListener('beforeunload', () => clearTimeout(_browseTimer), { once: true });
+});
 
 /* ── State ── */
 let allJobs      = [];

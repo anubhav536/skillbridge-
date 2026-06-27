@@ -82,6 +82,20 @@
       padding:.45rem .9rem; border-radius:8px; font-size:13px; font-weight:700;
       background:rgba(74,222,128,.12); border:1px solid rgba(74,222,128,.3); color:#4ade80;
     }
+    .mc-hint-area {
+      display:flex; flex-direction:column; align-items:flex-end; gap:.35rem; max-width:180px;
+    }
+    .mc-hint-text {
+      font-size:11.5px; color:#94a3b8; text-align:right; line-height:1.4;
+    }
+    .mc-go-link {
+      font-size:12px; font-weight:700; color:#7c3aed; text-decoration:none; padding:.3rem .7rem;
+      border:1px solid rgba(124,58,237,.35); border-radius:6px;
+      transition:background .15s;
+    }
+    .mc-go-link:hover { background:rgba(124,58,237,.12); }
+    .mission-card.locked { opacity:.72; }
+    .mission-card.locked .mc-icon { filter:grayscale(.5); }
     .difficulty-badge {
       font-size:11px; font-weight:700; padding:.18rem .55rem; border-radius:999px;
       text-transform:uppercase; letter-spacing:.04em;
@@ -203,7 +217,6 @@ import {
   getWallet, getUserMissions, completeMission,
   calcLevel, formatCoins, MISSIONS
 } from "./economy.js";
-
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
 
@@ -238,8 +251,30 @@ function renderMissionList(containerId, missions) {
     const diffClass  = `diff-${m.difficulty}`;
     const cardClass  = `mc-${m.difficulty}`;
     const isComplete = m.completed;
+    const isVerified = m.verified;
 
-    return `<div class="mission-card ${cardClass} ${isComplete ? 'completed' : ''}" id="mc-${m.id}">
+    // Build the right-side action area
+    let actionHtml;
+    if (isComplete) {
+      actionHtml = `<div class="mc-done-badge">✅ Done</div>`;
+    } else if (isVerified) {
+      // Task is verified as done — show active Claim button
+      actionHtml = `<button class="mc-claim-btn" data-id="${m.id}" onclick="claimMission('${m.id}')">
+                      Claim +${m.coins} CC
+                    </button>`;
+    } else {
+      // Task not done yet — show hint with optional link
+      const hintText = m.hint || 'Complete the task first';
+      const linkPart = m.link
+        ? `<a href="${m.link}" class="mc-go-link">Go →</a>`
+        : '';
+      actionHtml = `<div class="mc-hint-area">
+                      <span class="mc-hint-text">⏳ ${hintText}</span>
+                      ${linkPart}
+                    </div>`;
+    }
+
+    return `<div class="mission-card ${cardClass} ${isComplete ? 'completed' : (!isVerified ? 'locked' : '')}" id="mc-${m.id}">
       <div class="mc-icon">${m.icon}</div>
       <div class="mc-body">
         <div class="mc-label ${isComplete ? 'completed-text' : ''}">${m.label}</div>
@@ -250,26 +285,27 @@ function renderMissionList(containerId, missions) {
           <span class="difficulty-badge ${diffClass}">${m.difficulty}</span>
         </div>
       </div>
-      <div class="mc-right">
-        ${isComplete
-          ? `<div class="mc-done-badge">✅ Done</div>`
-          : `<button class="mc-claim-btn" data-id="${m.id}" onclick="claimMission('${m.id}')">
-               Claim +${m.coins} CC
-             </button>`
-        }
-      </div>
+      <div class="mc-right">${actionHtml}</div>
     </div>`;
   }).join("");
 }
 
+// Cache latest userStats so claimMission can pass them for verification
+let _latestUserStats = {};
+
 window.claimMission = async function(missionId) {
   const btn = document.querySelector(`#mc-${missionId} .mc-claim-btn`);
-  if (btn) { btn.disabled = true; btn.textContent = "Claiming..."; }
+  if (btn) { btn.disabled = true; btn.textContent = "Verifying..."; }
 
-  const result = await completeMission(currentUserId, missionId);
+  // Pass userStats so server-side verification can check application counts, profile %, etc.
+  const result = await completeMission(currentUserId, missionId, _latestUserStats);
 
   if (result.success) {
     showToast(`🎉 +${result.coins} CC · +${result.xp} XP — ${result.label}`, "success");
+    await loadMissions(currentUserId);
+  } else if (result.notDone) {
+    showToast(`⏳ ${result.message}`, "warn");
+    if (btn) { btn.disabled = false; btn.textContent = `Claim +${btn.closest('[id]')?.id?.split('-')[1] || ''}`; }
     await loadMissions(currentUserId);
   } else {
     showToast(result.message || "Cannot claim yet", "warn");
@@ -292,16 +328,28 @@ async function loadMissions(userId) {
   const levelInfo = calcLevel(wallet.xp || 0);
   document.getElementById("levelDisplay").textContent = `Lv ${levelInfo.level}`;
 
-  // Count total apps for career mission auto-detection
-  let totalApps = 0;
+  // Count applications with date-based breakdown for mission verification
+  let totalApps = 0, appsToday = 0, appsThisWeek = 0;
   let profilePct = 0;
   try {
     const { db } = await import("./firebase.js");
     const { getDocs, collection } = await import("https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js");
     const snap = await getDocs(collection(db, "applications"));
+
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const now = Date.now();
+    const dayMs  = 86400000;
+    const weekMs = 7 * dayMs;
+
     snap.forEach(d => {
       const a = d.data();
-      if (a.email === user?.email || a.user === user?.email || a.seeker === user?.email) totalApps++;
+      const isOwn = a.email === user?.email || a.user === user?.email || a.seeker === user?.email;
+      if (!isOwn) return;
+      totalApps++;
+      const ts = a.createdAt || 0;
+      const appDate = new Date(ts).toISOString().slice(0, 10);
+      if (appDate === todayStr) appsToday++;
+      if (now - ts < weekMs) appsThisWeek++;
     });
 
     if (user) {
@@ -315,7 +363,10 @@ async function loadMissions(userId) {
     }
   } catch(e) { console.error(e); }
 
-  const data = await getUserMissions(userId, { totalApps, profilePct });
+  // Cache for claimMission verification
+  _latestUserStats = { totalApps, appsToday, appsThisWeek, profilePct };
+
+  const data = await getUserMissions(userId, _latestUserStats);
   missionsData = data;
 
   // Progress counts

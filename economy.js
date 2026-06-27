@@ -347,6 +347,81 @@ export async function checkAndUpdateStreak(userId) {
 }
 
 // ─────────────────────────────────────────
+// 🔍 MISSION TASK VERIFICATION
+// Checks Firestore / wallet proof that the task was actually done
+// Returns { ok: bool, reason: string, link: string|null }
+// ─────────────────────────────────────────
+function verifyMission(missionId, wallet, userStats = {}) {
+  const today = todayStr();
+  const week  = weekStr();
+
+  switch (missionId) {
+    // ── Daily Missions ──────────────────────
+    case 'daily_login_check':
+      // Being authenticated and on this page IS the proof
+      return { ok: true };
+
+    case 'daily_apply':
+      if ((userStats.appsToday || 0) >= 1)
+        return { ok: true };
+      return { ok: false, reason: 'Apply to at least one job today first', link: 'js-jobs.html' };
+
+    case 'daily_profile_check':
+      // Requires visiting profile page — tracked via wallet.profileVisitedDate
+      if (wallet.profileVisitedDate === today)
+        return { ok: true };
+      return { ok: false, reason: 'Open your Profile page first to complete this', link: 'js-profile.html' };
+
+    case 'daily_jobs_browse':
+      // Requires 60s on jobs page — tracked via wallet.jobsBrowsedDate
+      if (wallet.jobsBrowsedDate === today)
+        return { ok: true };
+      return { ok: false, reason: 'Browse Jobs for at least 60 seconds first', link: 'js-jobs.html' };
+
+    // ── Career Missions ──────────────────────
+    case 'career_first_app':
+      if ((userStats.totalApps || 0) >= 1) return { ok: true };
+      return { ok: false, reason: 'Submit your first job application', link: 'js-jobs.html' };
+
+    case 'career_5_apps':
+      if ((userStats.totalApps || 0) >= 5) return { ok: true };
+      return { ok: false, reason: `${Math.max(0, 5 - (userStats.totalApps||0))} more applications needed`, link: 'js-jobs.html' };
+
+    case 'career_10_apps':
+      if ((userStats.totalApps || 0) >= 10) return { ok: true };
+      return { ok: false, reason: `${Math.max(0, 10 - (userStats.totalApps||0))} more applications needed`, link: 'js-jobs.html' };
+
+    case 'career_resume':
+      if (wallet.earned?.resume_built) return { ok: true };
+      return { ok: false, reason: 'Build your resume in Resume Builder first', link: 'js-resume.html' };
+
+    case 'career_gap_analysis':
+      if (wallet.earned?.career_gap_analysis) return { ok: true };
+      return { ok: false, reason: 'Complete your AI Career Gap Analysis first', link: 'career-gap.html' };
+
+    case 'career_profile_100':
+      if ((userStats.profilePct || 0) >= 100) return { ok: true };
+      return { ok: false, reason: `Profile is ${userStats.profilePct||0}% — fill every field to 100%`, link: 'js-profile.html' };
+
+    case 'career_streak_7':
+      if ((wallet.longestStreak || 0) >= 7 || (wallet.streakDays || 0) >= 7) return { ok: true };
+      return { ok: false, reason: `Streak is ${wallet.streakDays||0} days — log in daily for 7 days`, link: null };
+
+    case 'career_interview':
+      if (wallet.earned?.interview_practice) return { ok: true };
+      return { ok: false, reason: 'Complete an interview practice session first', link: null };
+
+    // ── Weekly Mission ──────────────────────
+    case 'weekly_apply_3':
+      if ((userStats.appsThisWeek || 0) >= 3) return { ok: true };
+      return { ok: false, reason: `Applied ${userStats.appsThisWeek||0}/3 times this week`, link: 'js-jobs.html' };
+
+    default:
+      return { ok: true };
+  }
+}
+
+// ─────────────────────────────────────────
 // 📋 MISSIONS — GET USER STATE
 // ─────────────────────────────────────────
 export async function getUserMissions(userId, userStats = {}) {
@@ -357,7 +432,6 @@ export async function getUserMissions(userId, userStats = {}) {
   const today    = todayStr();
   const week     = weekStr();
 
-  // Build mission status array
   const daily  = [];
   const career = [];
   const weekly = [];
@@ -365,27 +439,19 @@ export async function getUserMissions(userId, userStats = {}) {
   for (const [id, def] of Object.entries(MISSIONS)) {
     const saved   = missions[id] || {};
     let completed = false;
-    let locked    = false;
 
     if (def.type === 'daily') {
       completed = saved.date === today && saved.completed;
     } else if (def.type === 'career') {
       completed = !!saved.completed;
-      // Auto-check career missions from userStats
-      if (!completed) {
-        if (id === 'career_first_app'   && (userStats.totalApps  || 0) >= 1)  completed = true;
-        if (id === 'career_5_apps'      && (userStats.totalApps  || 0) >= 5)  completed = true;
-        if (id === 'career_10_apps'     && (userStats.totalApps  || 0) >= 10) completed = true;
-        if (id === 'career_resume'      && wallet.earned?.resume_built)        completed = true;
-        if (id === 'career_gap_analysis'&& wallet.earned?.career_gap_analysis) completed = true;
-        if (id === 'career_profile_100' && (userStats.profilePct || 0) >= 100) completed = true;
-        if (id === 'career_streak_7'    && (wallet.longestStreak || 0) >= 7)   completed = true;
-      }
     } else if (def.type === 'weekly') {
       completed = saved.week === week && saved.completed;
     }
 
-    const missionObj = { id, ...def, completed, locked };
+    // Get verification status for uncompleted missions
+    const verification = completed ? { ok: true } : verifyMission(id, wallet, userStats);
+
+    const missionObj = { id, ...def, completed, verified: verification.ok, hint: verification.reason || null, link: verification.link || null };
 
     if (def.type === 'daily')  daily.push(missionObj);
     if (def.type === 'career') career.push(missionObj);
@@ -396,16 +462,17 @@ export async function getUserMissions(userId, userStats = {}) {
 }
 
 // ─────────────────────────────────────────
-// ✅ COMPLETE A MISSION
+// ✅ COMPLETE A MISSION — with task verification
+// userStats must include: totalApps, appsToday, appsThisWeek, profilePct
 // ─────────────────────────────────────────
-export async function completeMission(userId, missionId) {
+export async function completeMission(userId, missionId, userStats = {}) {
   if (!userId || !missionId) return { success: false };
 
   const def = MISSIONS[missionId];
   if (!def) return { success: false, message: 'Mission not found' };
 
   try {
-    const wallet  = await getWallet(userId);
+    const wallet   = await getWallet(userId);
     const missions = wallet.missions || {};
     const today    = todayStr();
     const week     = weekStr();
@@ -419,6 +486,12 @@ export async function completeMission(userId, missionId) {
     if (def.type === 'weekly' && saved.week === week && saved.completed)
       return { success: false, message: 'Already completed this week' };
 
+    // ── TASK VERIFICATION — must prove task was actually done ──
+    const verification = verifyMission(missionId, wallet, userStats);
+    if (!verification.ok) {
+      return { success: false, message: verification.reason || 'Complete the task first', notDone: true };
+    }
+
     // Save completion
     const missionUpdate = { completed: true, completedAt: Date.now() };
     if (def.type === 'daily')  missionUpdate.date = today;
@@ -429,7 +502,7 @@ export async function completeMission(userId, missionId) {
       updatedAt: Date.now()
     });
 
-    // Award coins
+    // Award coins only after verified completion
     const eventType = def.type === 'daily'  ? 'mission_daily'
                     : def.type === 'weekly' ? 'mission_weekly'
                     : 'mission_career';
@@ -441,6 +514,33 @@ export async function completeMission(userId, missionId) {
     console.error('completeMission error:', e);
     return { success: false, message: 'Server error' };
   }
+}
+
+// ─────────────────────────────────────────
+// 📍 ACTIVITY TRACKERS
+// Call these from the respective pages to prove task completion
+// ─────────────────────────────────────────
+
+// Track that the user visited their Profile page today
+export async function trackProfileVisit(userId) {
+  if (!userId) return;
+  try {
+    const ref  = doc(db, 'wallets', userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return; // don't create wallet just for tracking
+    await updateDoc(ref, { profileVisitedDate: todayStr(), updatedAt: Date.now() });
+  } catch(e) { console.error('trackProfileVisit:', e); }
+}
+
+// Track that the user browsed Jobs for 60+ seconds today
+export async function trackJobsBrowse(userId) {
+  if (!userId) return;
+  try {
+    const ref  = doc(db, 'wallets', userId);
+    const snap = await getDoc(ref);
+    if (!snap.exists()) return;
+    await updateDoc(ref, { jobsBrowsedDate: todayStr(), updatedAt: Date.now() });
+  } catch(e) { console.error('trackJobsBrowse:', e); }
 }
 
 // ─────────────────────────────────────────

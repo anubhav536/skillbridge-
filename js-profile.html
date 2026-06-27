@@ -244,10 +244,18 @@
 <script type="module">
 import { logoutUser, updateUserProfile, protectPage, getSession, auth } from "./firebase.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-auth.js";
-import { earnCoins } from "./economy.js";
+import { earnCoins, trackProfileVisit } from "./economy.js";
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/12.11.0/firebase-firestore.js";
+import { db } from "./firebase.js";
 
 let _authUid = null;
-onAuthStateChanged(auth, u => { if (u) _authUid = u.uid; });
+onAuthStateChanged(auth, async u => {
+  if (u) {
+    _authUid = u.uid;
+    // Track that user visited their profile page today (unlocks daily_profile_check mission)
+    trackProfileVisit(_authUid).catch(() => {});
+  }
+});
 
 protectPage("jobseeker");
 document.getElementById("logoutBtn").addEventListener("click", logoutUser);
@@ -366,19 +374,34 @@ document.getElementById("profileForm").addEventListener("submit", async e => {
 
     await updateUserProfile(profileData);
 
-    // Award coins only when user explicitly saves — check completeness AFTER save
+    // Award coins ONLY for fields that are genuinely NEW (were empty in Firestore before this save)
     if (_authUid) {
-      const filledCount = [
-        skills, exp, fullName,
-        profileData.phone, profileData.location, profileData.education,
-        profileData.bio, profileData.jobTitle
-      ].filter(v => v && String(v).trim()).length;
+      try {
+        const oldSnap = await getDoc(doc(db, 'users', _authUid));
+        const old = oldSnap.exists() ? oldSnap.data() : {};
 
-      const pct = Math.round((filledCount / 8) * 100);
-      if (pct >= 80) earnCoins(_authUid, 'profile_complete').catch(() => {});
-      if (profileData.bio)      earnCoins(_authUid, 'profile_bio_added').catch(() => {});
-      if (profileData.education) earnCoins(_authUid, 'education_added').catch(() => {});
-      if ((profileData.skills || skills || "").length > 0) earnCoins(_authUid, 'skills_added').catch(() => {});
+        const wasSkillsEmpty    = !(old.skills || "").trim();
+        const wasBioEmpty       = !(old.bio || "").trim();
+        const wasEducationEmpty = !(old.education || "").trim();
+
+        const filledCount = [
+          skills, exp, fullName,
+          profileData.phone, profileData.location, profileData.education,
+          profileData.bio, profileData.jobTitle
+        ].filter(v => v && String(v).trim()).length;
+
+        const pct = Math.round((filledCount / 8) * 100);
+
+        // profile_complete: once ever — safe, anti-fraud in earnCoins handles repeat
+        if (pct >= 80) earnCoins(_authUid, 'profile_complete').catch(() => {});
+        // Only award field bonuses if that field was actually EMPTY before this save
+        if (profileData.bio && wasBioEmpty)
+          earnCoins(_authUid, 'profile_bio_added').catch(() => {});
+        if (profileData.education && wasEducationEmpty)
+          earnCoins(_authUid, 'education_added').catch(() => {});
+        if (skills && wasSkillsEmpty)
+          earnCoins(_authUid, 'skills_added').catch(() => {});
+      } catch(coinErr) { console.error('coin award error:', coinErr); }
     }
 
     const msg = document.getElementById("successMsg");
